@@ -1,0 +1,44 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.header, .footer {
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.container {
+    display: flex;
+    margin: 20px;
+}
+
+.side-banner {
+    width: 20%;
+    background-color: #e2e2e2;
+    padding: 10px;
+    text-align: center;
+}
+
+.main-container {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nguphap p, h1, h2 {
+    margin: 0; /* Loại bỏ khoảng cách bên ngoài */
+    padding: 0; /* Loại bỏ khoảng cách bên trong */
+    text-align: left; /* Căn lề trái */
+}
+
+
+.footer {
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 10px 0;
+}

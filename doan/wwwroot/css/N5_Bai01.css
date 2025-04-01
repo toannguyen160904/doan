@@ -1,0 +1,141 @@
+﻿/* Reset mặc định của trình duyệt */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Toàn bộ trang */
+body {
+    background-color: #f8f8f8;
+    color: #333;
+}
+
+/* Header */
+.header {
+    background-color: #0073e6;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 24px;
+}
+
+.header a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.header a:hover {
+    text-decoration: underline;
+}
+
+/* Container chính */
+.container {
+    display: flex;
+    margin: 20px;
+}
+
+/* Sidebar (có thể dùng để đặt quảng cáo, thông tin phụ, v.v.) */
+.side-banner {
+    width: 20%;
+    background-color: #e2e2e2;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+/* Nội dung chính */
+.main-container {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Tiêu đề */
+h1, h2 {
+    color: #0073e6;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+/* Định dạng bảng */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #0073e6;
+    color: white;
+    font-weight: bold;
+}
+
+/* Hiệu ứng hover cho bảng */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Định dạng form */
+form {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Nút bấm */
+button {
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #005bb5;
+}
+
+/* Footer */
+.footer {
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 20px;
+}

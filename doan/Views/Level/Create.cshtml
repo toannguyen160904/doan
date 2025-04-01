@@ -1,0 +1,26 @@
+﻿@model doan.Models.LessonViewModel
+
+<h2>Thêm Bài Học</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LevelName"></label>
+        <select asp-for="LevelName" asp-items="ViewBag.Levels" class="form-control" required>
+            <option value="">-- Chọn Cấp Độ --</option>
+            <option value="N5">N5</option>
+            <option value="N4">N4</option>
+            <option value="N3">N3</option>
+        </select>
+        <span asp-validation-for="LevelName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+</form>
+
+<a asp-action="Index" class="btn btn-secondary">Quay Lại</a>

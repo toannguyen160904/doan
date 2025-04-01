@@ -1,0 +1,65 @@
+﻿@model doan.Models.Baihoc
+
+<h1>📘 Bài học: @Model.Name</h1>
+
+<h2>📚 Từ vựng</h2>
+@if (Model.tuvung.Any())
+{
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Từ vựng</th>
+                <th>Phát âm</th>
+                <th>Âm Hán</th>
+                <th>Hán tự</th>
+                <th>Nghĩa</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var word in Model.tuvung)
+            {
+                <tr>
+                    <td>@word.Tuvung</td>
+                    <td>@(string.IsNullOrEmpty(word.PhatAm) ? "" : word.PhatAm)</td>
+                    <td>@(string.IsNullOrEmpty(word.AmHan) ? "" : word.AmHan)</td>
+                    <td>@(string.IsNullOrEmpty(word.HanTu) ? "" : word.HanTu)</td>
+                    <td>@word.Nghia</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Chưa có từ vựng cho bài học này.</p>
+}
+
+<h2>📖 Ngữ pháp</h2>
+@if (Model.nguphap.Any())
+{
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Công thức</th>
+                <th>Giải thích</th>
+                <th>Câu ví dụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var grammar in Model.nguphap)
+            {
+                <tr>
+                    <td>@grammar.CongThuc</td>
+                    <td>@grammar.GiaiThich</td>
+                    <td>@grammar.CauViDu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Chưa có ngữ pháp cho bài học này.</p>
+}
+
+<a asp-controller="Home" asp-action="ChonLevel" class="btn btn-primary">🔙 Quay lại Chọn Level</a>
