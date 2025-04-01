@@ -37,15 +37,6 @@ namespace doan.Controllers
             var levels = await _context.Levels.ToListAsync();
             return View(levels);
         }
-
-        public async Task<IActionResult> Index1()
-        {
-
-            var levels = await _context.Levels.ToListAsync();
-            return View(levels);
-        }
-
-
         public async Task<IActionResult> ChonLevel()
         {
             // Lấy danh sách cấp độ (Levels) và bao gồm danh sách bài học (Lessons) liên quan đến mỗi cấp độ

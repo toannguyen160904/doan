@@ -17,7 +17,7 @@ namespace doan.Controllers
         }
 
         // 🟢 Hiển thị danh sách sản phẩm (Chỉ xem, không sửa, xóa)
-        public async Task<IActionResult> Index1()
+        public async Task<IActionResult> Index()
         {
             var products = await _context.Products.ToListAsync();
             return View(products);
