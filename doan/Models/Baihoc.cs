@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace doan.Models
 {
@@ -10,18 +10,20 @@ namespace doan.Models
 
         [Required]
         [StringLength(255)]
-        public string Name { get; set; }  // Tên bài học (VD: Chào hỏi, Giới thiệu bản thân)
+        public string Name { get; set; }  // Tên bài học
 
         [Required]
-        public int LevelId { get; set; } // Khóa ngoại liên kết bảng Level
+        [StringLength(255)]
+        public string Title { get; set; }  // Tiêu đề chi tiết
 
-        [ForeignKey("LevelId")]
-        public Level Level { get; set; } // Navigation property
+        [Required]
+        public int LevelId { get; set; }   // FK tự động
+
+        public Level Level { get; set; }   // Navigation Property
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        //public List<Baihoc> Lessons { get; set; } = new List<Baihoc>();
 
-        public ICollection<Vocabulary> tuvung { get; set; } = new List<Vocabulary>(); // Danh sách từ vựng
+        public ICollection<Vocabulary> tuvung { get; set; } = new List<Vocabulary>();
         public List<GrammarStructure> nguphap { get; set; } = new List<GrammarStructure>();
     }
 }

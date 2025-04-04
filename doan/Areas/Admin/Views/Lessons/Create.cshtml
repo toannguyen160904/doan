@@ -1,0 +1,40 @@
+﻿@model doan.Models.Baihoc
+@{
+    ViewData["Title"] = "Tạo bài học";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="mb-3">Tạo bài học</h2>
+<hr />
+
+@* Hiển thị lỗi tổng thể *@
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="form-label">Tên bài học</label>
+        <input asp-for="Name" class="form-control" placeholder="VD: Chào hỏi" autocomplete="off" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Title" class="form-label">Tiêu đề</label>
+        <input asp-for="Title" class="form-control" placeholder="VD: Giới thiệu bản thân" autocomplete="off" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="LevelId" class="form-label">Cấp độ</label>
+        <select asp-for="LevelId" class="form-control" asp-items="ViewBag.Levels">
+            <option value="">-- Chọn cấp độ --</option>
+        </select>
+        <span asp-validation-for="LevelId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Lưu bài học</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3 ms-2">Quay lại</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
