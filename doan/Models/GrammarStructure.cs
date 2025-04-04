@@ -10,19 +10,34 @@ namespace doan.Models
 
         [Required]
         [StringLength(255)]
-        public string CongThuc { get; set; } // Công thức ngữ pháp (〜ている, 〜たことがある)Structure
+        public string CongThuc { get; set; } // Công thức ngữ pháp (〜ている, 〜たことがある)
 
         [Required]
-        public string GiaiThich { get; set; } // Giải thích cách dùngExplanation
+        public string GiaiThich { get; set; } // Giải thích cách dùng
 
-        public string CauViDu { get; set; } // Câu ví dụ minh họaExample
+        public string CauViDu { get; set; } // Câu ví dụ minh họa
 
         [Required]
-        public int LessonId { get; set; } // Khóa ngoại liên kết với bảng Lesson
+        public int LessonId { get; set; }
 
         [ForeignKey("LessonId")]
-        public Baihoc Lesson { get; set; } // Navigation property
+        public Baihoc Lesson { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // ✅ Aliases for compatibility in Razor Views
+        [NotMapped]
+        public string Structure
+        {
+            get => CongThuc;
+            set => CongThuc = value;
+        }
+
+        [NotMapped]
+        public string Explanation
+        {
+            get => GiaiThich;
+            set => GiaiThich = value;
+        }
     }
 }

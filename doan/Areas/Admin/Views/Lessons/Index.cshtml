@@ -1,0 +1,46 @@
+﻿@model IEnumerable<doan.Models.Baihoc>
+@{
+    ViewData["Title"] = "Quản lý bài học";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>
+    <a class="btn btn-success" asp-action="Create">+ Tạo bài học mới</a>
+</p>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Tên bài học</th>
+            <th>Tiêu đề</th>
+            <th>Cấp độ</th>
+            <th>Ngày tạo</th>
+            <th class="text-center">Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Title</td>
+                    <td>@item.Level?.Name</td>
+                    <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Sửa</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Chi tiết</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center text-muted">Chưa có bài học nào.</td>
+            </tr>
+        }
+    </tbody>
+</table>

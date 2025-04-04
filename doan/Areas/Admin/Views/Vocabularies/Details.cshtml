@@ -1,0 +1,18 @@
+﻿@model doan.Models.Vocabulary
+@{
+    ViewData["Title"] = "Chi tiết từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<h2>Chi tiết</h2>
+<dl class="row">
+    <dt class="col-sm-3">Từ vựng</dt>
+    <dd class="col-sm-9">@Model.Tuvung</dd>
+    <dt class="col-sm-3">Phát âm</dt>
+    <dd class="col-sm-9">@Model.PhatAm</dd>
+    <dt class="col-sm-3">Nghĩa</dt>
+    <dd class="col-sm-9">@Model.Nghia</dd>
+    <dt class="col-sm-3">Hán tự</dt>
+    <dd class="col-sm-9">@Model.HanTu</dd>
+</dl>
+<a asp-action="Edit" asp-route-id="@Model.Id">Sửa</a> |
+<a asp-action="Index">Quay lại</a>

@@ -1,0 +1,20 @@
+﻿@model doan.Models.Baihoc
+@{
+    ViewData["Title"] = "Chi tiết Bài học";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Chi tiết Bài học</h2>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">Tên bài học</dt>
+    <dd class="col-sm-10">@Model.Name</dd>
+
+    <dt class="col-sm-2">Cấp độ</dt>
+    <dd class="col-sm-10">@Model.Level?.Name</dd>
+
+    <dt class="col-sm-2">Ngày tạo</dt>
+    <dd class="col-sm-10">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+</dl>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>

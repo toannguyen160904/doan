@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="bg-dark text-white p-3" style="width: 250px; min-height: 100vh;">
+            <h4 class="text-center mb-4">🎓 Admin Panel</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-area="Admin" asp-controller="Categories" asp-action="Index">📁 Danh mục</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-area="Admin" asp-controller="Products" asp-action="Index">🛒 Sản phẩm</a>
+                </li>
+
+                <!-- Quản lý học submenu -->
+                <li class="nav-item">
+                    <a class="nav-link text-white" data-bs-toggle="collapse" href="#learningSubmenu" role="button" aria-expanded="false" aria-controls="learningSubmenu">
+                        📚 Quản lý học ▾
+                    </a>
+                    <div class="collapse" id="learningSubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="Admin" asp-controller="Lessons" asp-action="Index">📖 Bài học</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="Admin" asp-controller="Vocabularies" asp-action="Index">📘 Từ vựng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="Admin" asp-controller="Grammars" asp-action="Index">📙 Ngữ pháp</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">🏠 Về trang chính</a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="btn btn-danger w-100" asp-area="Identity" asp-page="/Account/Logout">Đăng xuất</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-grow-1 p-4">
+            <h2 class="mb-3">@ViewData["Title"]</h2>
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

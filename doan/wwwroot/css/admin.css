@@ -1,0 +1,7 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.sidebar a.nav-link:hover {
+    background-color: #495057;
+}

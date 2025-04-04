@@ -1,29 +1,29 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User)) // Nếu đã đăng nhập
+<ul class="navbar-nav flex-row gap-2">
+    @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index1">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">
                 Xin chào, <strong>@user?.UserName</strong>!
             </a>
         </li>
         <li class="nav-item">
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" method="post">
-                <button type="submit" class="btn btn-danger"> Đăng xuất</button>
+                <button type="submit" class="btn btn-outline-danger">Đăng xuất</button>
             </form>
         </li>
     }
-    else // Nếu chưa đăng nhập
+    else
     {
         <li class="nav-item">
-            <a class="btn btn-primary" id="Login" asp-area="Identity" asp-page="/Account/Login">🔑 Đăng nhập</a>
+            <a class="btn btn-outline-primary" id="Login" asp-area="Identity" asp-page="/Account/Login">🔑 Đăng nhập</a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-success" id="Register" asp-area="Identity" asp-page="/Account/Register">📝 Đăng ký</a>
+            <a class="btn btn-outline-success" id="Register" asp-area="Identity" asp-page="/Account/Register">📝 Đăng ký</a>
         </li>
     }
 </ul>

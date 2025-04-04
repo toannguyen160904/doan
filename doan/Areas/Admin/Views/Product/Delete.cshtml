@@ -1,0 +1,48 @@
+﻿@model doan.Models.Product
+
+@{
+    ViewData["Title"] = "Xác nhận xóa tài liệu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-danger mt-4">🗑️ Xóa tài liệu học</h2>
+<hr />
+
+<p class="fs-5">Bạn có chắc chắn muốn xóa tài liệu này không?</p>
+
+<div class="row mt-4">
+    <!-- Hình ảnh -->
+    <div class="col-md-4">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="Ảnh tài liệu" class="img-thumbnail" style="max-width: 100%;" />
+        }
+        else
+        {
+            <p class="text-muted fst-italic">Không có ảnh</p>
+        }
+    </div>
+
+    <!-- Thông tin tài liệu -->
+    <div class="col-md-8">
+        <dl class="row">
+            <dt class="col-sm-3">📘 Tên tài liệu</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">💴 Giá</dt>
+            <dd class="col-sm-9">@string.Format("{0:N0}₫", Model.Price)</dd>
+
+            <dt class="col-sm-3">📝 Mô tả</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3">📂 Danh mục</dt>
+            <dd class="col-sm-9">@Model.Category?.Name</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger me-2">✅ Xác nhận xóa</button>
+            <a asp-action="Index" class="btn btn-secondary">⬅ Hủy & quay lại</a>
+        </form>
+    </div>
+</div>
