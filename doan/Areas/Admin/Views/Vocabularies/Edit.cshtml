@@ -1,0 +1,31 @@
+﻿@model doan.Models.Vocabulary
+@{
+    ViewData["Title"] = "Sửa từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<h2>Sửa từ</h2>
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label asp-for="Tuvung"></label>
+        <input asp-for="Tuvung" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="PhatAm"></label>
+        <input asp-for="PhatAm" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="HanTu"></label>
+        <input asp-for="HanTu" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Nghia"></label>
+        <input asp-for="Nghia" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="LessonId"></label>
+        <select asp-for="LessonId" class="form-control" asp-items="ViewBag.LessonId"></select>
+    </div>
+    <input type="submit" value="Lưu" class="btn btn-primary" />
+</form>
+<a asp-action="Index">Quay lại</a>

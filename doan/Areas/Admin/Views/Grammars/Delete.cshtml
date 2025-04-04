@@ -1,0 +1,27 @@
+﻿@model doan.Models.GrammarStructure
+
+@{
+    ViewData["Title"] = "Xoá ngữ pháp";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-danger mb-3">🗑️ Xác nhận xoá ngữ pháp</h2>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-2">Cấu trúc</dt>
+    <dd class="col-sm-10">@Model.CongThuc</dd>
+
+    <dt class="col-sm-2">Giải thích</dt>
+    <dd class="col-sm-10">@Model.GiaiThich</dd>
+
+    <dt class="col-sm-2">Ví dụ</dt>
+    <dd class="col-sm-10">@Model.CauViDu</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">🗑️ Xoá</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">⬅ Huỷ bỏ</a>
+</form>

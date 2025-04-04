@@ -1,0 +1,42 @@
+﻿@model doan.Models.GrammarStructure
+
+@{
+    ViewData["Title"] = "Sửa ngữ pháp";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>✏️ Sửa ngữ pháp</h2>
+<hr />
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="LessonId">Bài học</label>
+        <select asp-for="LessonId" class="form-control" asp-items="ViewBag.LessonId"></select>
+        <span asp-validation-for="LessonId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="CongThuc">Cấu trúc</label>
+        <input asp-for="CongThuc" class="form-control" />
+        <span asp-validation-for="CongThuc" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="GiaiThich">Giải thích</label>
+        <textarea asp-for="GiaiThich" class="form-control"></textarea>
+        <span asp-validation-for="GiaiThich" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="CauViDu">Câu ví dụ</label>
+        <textarea asp-for="CauViDu" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Cập nhật</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Huỷ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

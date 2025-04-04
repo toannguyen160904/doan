@@ -1,0 +1,28 @@
+﻿@model doan.Models.Baihoc
+@{
+    ViewData["Title"] = "Chỉnh sửa Bài học";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Chỉnh sửa Bài học</h2>
+<hr />
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LevelId">Cấp độ</label>
+        <select asp-for="LevelId" class="form-control" asp-items="ViewBag.Levels">
+            <option value="">-- Chọn cấp độ --</option>
+        </select>
+        <span asp-validation-for="LevelId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>

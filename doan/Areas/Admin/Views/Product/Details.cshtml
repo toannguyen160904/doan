@@ -1,0 +1,45 @@
+﻿@model doan.Models.Product
+
+@{
+    ViewData["Title"] = "Chi tiết tài liệu học";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mt-4 text-primary">📘 Chi tiết tài liệu</h2>
+<hr />
+
+<div class="row mt-4">
+    <!-- Hình ảnh -->
+    <div class="col-md-5">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="Ảnh tài liệu" class="img-fluid rounded shadow-sm" />
+        }
+        else
+        {
+            <div class="text-muted fst-italic">Không có ảnh</div>
+        }
+    </div>
+
+    <!-- Thông tin chi tiết -->
+    <div class="col-md-7">
+        <h3 class="mb-3">@Model.Name</h3>
+        <p class="text-muted">
+            <strong>💴 Giá:</strong> @string.Format("{0:N0}₫", Model.Price)
+        </p>
+
+        <p>
+            <strong>📝 Mô tả:</strong><br />
+            @Model.Description
+        </p>
+
+        <p>
+            <strong>📂 Danh mục:</strong> @Model.Category?.Name
+        </p>
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">✏️ Chỉnh sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">⬅ Quay lại danh sách</a>
+        </div>
+    </div>
+</div>
