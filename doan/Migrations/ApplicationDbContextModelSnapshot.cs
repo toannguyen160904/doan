@@ -258,7 +258,7 @@ namespace doan.Migrations
 
                     b.HasIndex("LevelId");
 
-                    b.ToTable("Baihoc");
+                    b.ToTable("Baihoc", (string)null);
                 });
 
             modelBuilder.Entity("doan.Models.Category", b =>
@@ -276,7 +276,7 @@ namespace doan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("doan.Models.GrammarStructure", b =>
@@ -310,7 +310,7 @@ namespace doan.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("nguphap");
+                    b.ToTable("nguphap", (string)null);
                 });
 
             modelBuilder.Entity("doan.Models.Level", b =>
@@ -336,7 +336,7 @@ namespace doan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Levels");
+                    b.ToTable("Levels", (string)null);
 
                     b.HasData(
                         new
@@ -392,7 +392,7 @@ namespace doan.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("doan.Models.ProductImage", b =>
@@ -414,7 +414,7 @@ namespace doan.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages");
+                    b.ToTable("ProductImages", (string)null);
                 });
 
             modelBuilder.Entity("doan.Models.Vocabulary", b =>
@@ -457,7 +457,7 @@ namespace doan.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("tuvung");
+                    b.ToTable("tuvung", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
