@@ -1,0 +1,67 @@
+﻿@model doan.Models.Vocabulary
+@{
+    ViewData["Title"] = "Tạo từ vựng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Tạo từ vựng</h2>
+<hr />
+<form asp-action="Create">
+    <div class="form-group">
+        <label>Cấp độ</label>
+        <select id="levelSelect" class="form-control">
+            <option value="">-- Chọn cấp độ --</option>
+            @foreach (var level in (SelectList)ViewBag.Levels)
+            {
+                <option value="@level.Value">@level.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Bài học</label>
+        <select asp-for="LessonId" class="form-control" id="lessonSelect">
+            <option value="">-- Chọn bài học --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Tuvung"></label>
+        <input asp-for="Tuvung" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PhatAm"></label>
+        <input asp-for="PhatAm" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Nghia"></label>
+        <textarea asp-for="Nghia" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu từ vựng</button>
+</form>
+
+@section Scripts {
+    <script>
+        $("#levelSelect").change(function () {
+            var levelId = $(this).val();
+            if (levelId) {
+                $.get("/api/BaihocApi/GetByLevel/" + levelId, function (data) {
+                    var lessonSelect = $("#lessonSelect");
+                    lessonSelect.empty();
+                    lessonSelect.append('<option value="">-- Chọn bài học --</option>');
+                    $.each(data, function (i, lesson) {
+                        lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
+                    });
+                });
+            } else {
+                $("#lessonSelect").empty().append('<option value="">-- Chọn bài học --</option>');
+            }
+        });
+    </script>
+}
+
+
+

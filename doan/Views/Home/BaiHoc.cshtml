@@ -1,0 +1,23 @@
+﻿@model IEnumerable<doan.Models.Baihoc>
+
+<h2>📘 Danh sách bài học</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên bài học</th>
+            <th>Tiêu đề</th>
+            <th>Cấp độ</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lesson in Model)
+        {
+            <tr>
+                <td>@lesson.Name</td>
+                <td>@lesson.Title</td>
+                <td>@lesson.Level?.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>

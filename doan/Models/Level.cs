@@ -12,9 +12,11 @@ namespace doan.Models
         public string Name { get; set; }  // Tên Level (N5, N4, N3)
 
         [StringLength(500)]
-        public string Description { get; set; }  // Mô tả cấp độ
+        [Required]
+        public string Description { get; set; } = "";  // Mô tả cấp độ
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ICollection<Baihoc>? Lessons { get; set; } = new List<Baihoc>();
+        public ICollection<Baihoc> Lessons { get; set; } = new List<Baihoc>();
+
     }
 }

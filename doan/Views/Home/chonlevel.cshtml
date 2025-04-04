@@ -11,7 +11,7 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="container mx-auto p-5"> 
+    <div class="container mx-auto p-5">
         <!-- Thanh điều hướng -->
         <div class="flex flex-wrap items-center justify-between bg-white p-4 rounded-lg shadow-md">
             <a href="/Home/Index" class="text-blue-600 font-bold text-lg">🏠 Trang chủ</a>
@@ -33,33 +33,34 @@
         <!-- Danh sách bài học -->
         @foreach (var level in Model)
         {
-            <div class="mt-6">
+            <div class="mt-6 level-section" data-level="@level.Name">
                 <h2 class="text-xl font-bold text-gray-800">@level.Name - Danh sách bài học</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                     @foreach (var lesson in level.Lessons)
                     {
-                        <div class="grid-item level-@level.Name relative bg-white p-4 rounded-lg shadow-md hidden" data-lesson-id="@lesson.Id">
+                        <div class="grid-item level-@level.Name relative bg-white p-4 rounded-lg shadow-md">
                             <img src="https://dongphucvina.vn/wp-content/uploads/2023/05/hutech-logo.jpeg" alt="@lesson.Name" class="w-full rounded-lg">
                             <h3 class="lesson-title text-lg font-bold mt-2">@lesson.Name</h3>
                             <p class="text-gray-600">Bài học trong cấp độ @level.Name</p>
                             <a asp-controller="Lesson" asp-action="Details" asp-route-id="@lesson.Id" class="block bg-blue-500 text-white px-4 py-2 mt-2 text-center rounded-lg hover:bg-blue-700">Học ngay</a>
                         </div>
                     }
-                    </div>
                 </div>
-            
+            </div>
         }
+
     </div>
 
     <!-- Script xử lý logic -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Lấy cấp độ đã chọn từ URL hoặc từ localStorage
             let params = new URLSearchParams(window.location.search);
             let level = params.get("level") || localStorage.getItem("selectedLevel") || "N5";
             changeLevel(level);
 
-            // Thêm sự kiện tìm kiếm
+            // Sắp xếp bài học khi trang được tải
+            sortLessons();
+
             document.getElementById("searchInput").addEventListener("input", function () {
                 let keyword = this.value.toLowerCase();
                 document.querySelectorAll(".lesson-title").forEach(title => {
@@ -69,23 +70,43 @@
             });
         });
 
-        // Hàm thay đổi cấp độ bài học
+        // Hàm thay đổi cấp độ
         function changeLevel(level) {
-            history.pushState({}, "", "?level=" + level);  // Cập nhật URL
-            localStorage.setItem("selectedLevel", level);  // Lưu cấp độ vào localStorage
+            history.pushState({}, "", "?level=" + level);
+            localStorage.setItem("selectedLevel", level);
 
-            // Ẩn tất cả bài học
+            document.querySelectorAll(".level-section").forEach(section => {
+                section.style.display = section.getAttribute('data-level') === level ? "block" : "none";
+            });
+
             document.querySelectorAll(".grid-item").forEach(el => el.style.display = "none");
-
-            // Hiển thị bài học của Level được chọn
             document.querySelectorAll(".level-" + level).forEach(el => el.style.display = "block");
 
-            // Cập nhật trạng thái nút chọn cấp độ
+            document.querySelectorAll("[id^='addLessonButtonContainer']").forEach(el => el.style.display = "none");
+            document.getElementById("addLessonButtonContainer-" + level).style.display = "block";
+
             document.querySelectorAll(".level-btn").forEach(btn => btn.classList.remove("bg-blue-700"));
             document.querySelector(`button[onclick="changeLevel('${level}')"]`).classList.add("bg-blue-700");
         }
 
-        // Hàm xóa từ khóa tìm kiếm và hiển thị lại bài học của cấp độ đã chọn
+        // Hàm sắp xếp bài học theo tên
+        function sortLessons() {
+            document.querySelectorAll(".level-section").forEach(section => {
+                let lessons = Array.from(section.querySelectorAll(".grid-item"));
+                lessons.sort((a, b) => {
+                    let nameA = a.querySelector(".lesson-title").textContent.trim().toLowerCase();
+                    let nameB = b.querySelector(".lesson-title").textContent.trim().toLowerCase();
+                    return nameA.localeCompare(nameB);  // Sắp xếp theo tên
+                });
+
+                // Thêm bài học đã sắp xếp lại vào container
+                lessons.forEach(lesson => {
+                    section.querySelector(".grid").appendChild(lesson);
+                });
+            });
+        }
+
+        // Hàm xóa tìm kiếm
         function clearSearch() {
             document.getElementById("searchInput").value = "";
             changeLevel(localStorage.getItem("selectedLevel") || "N5");
@@ -107,5 +128,23 @@
             .level-btn:hover {
                 transform: scale(1.1);
             }
+
+        .grid-item {
+            position: relative;
+        }
+
+            .grid-item .absolute {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 10;
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+                .grid-item .absolute:hover {
+                    background-color: #FFCC00;
+                }
+
     </style>
 </body>

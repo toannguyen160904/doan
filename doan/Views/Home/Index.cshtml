@@ -44,7 +44,7 @@
                     <a href="/" class="text-xl font-bold text-blue-600 flex items-center">
                         <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
-                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ N5</a>
+                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ </a>
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -68,13 +68,26 @@
                     <li><a href="/Home/ChonLevel" class="block text-lg text-blue-600 hover:underline">📚 Chọn cấp độ</a></li>
                     <li><a href="/Home/Privacy" class="block text-lg text-blue-600 hover:underline">🔒 Chính sách</a></li>
 
-                    <!-- Nếu chưa đăng nhập -->
-                    <li class="border-t pt-2 mt-2">
-                        <a asp-area="Identity" asp-page="/Account/Login" class="btn bg-blue-500 text-white px-4 py-2 rounded">Đăng nhập</a>
-                    </li>
-                    <li>
-                        <a asp-area="Identity" asp-page="/Account/Register" class="btn bg-green-500 text-white px-4 py-2 rounded">Đăng ký</a>
-                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="border-t pt-2 mt-2">
+                            <span class="block text-lg text-gray-700">👤 @User.Identity.Name</span>
+                        </li>
+                        <li>
+                            <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                                <button type="submit" class="btn bg-red-500 text-white px-4 py-2 rounded">Đăng xuất</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="border-t pt-2 mt-2">
+                            <a asp-area="Identity" asp-page="/Account/Login" class="btn bg-blue-500 text-white px-4 py-2 rounded">Đăng nhập</a>
+                        </li>
+                        <li>
+                            <a asp-area="Identity" asp-page="/Account/Register" class="btn bg-green-500 text-white px-4 py-2 rounded">Đăng ký</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
@@ -122,31 +135,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function toggleMenu() {
-            document.getElementById("menuDropdown").classList.toggle("hidden");
-        }
-
-        function searchDocuments() {
-            var input = document.getElementById('searchInput').value.toLowerCase();
-            var lessons = document.getElementsByClassName('lesson-item');
-
-            for (var i = 0; i < lessons.length; i++) {
-                var lesson = lessons[i];
-                var title = lesson.getAttribute('data-title').toLowerCase();
-
-                if (title.includes(input)) {
-                    lesson.style.display = "";
-                } else {
-                    lesson.style.display = "none";
-                }
-            }
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = "";
-            searchDocuments();
-        }
-    </script>
 </body>

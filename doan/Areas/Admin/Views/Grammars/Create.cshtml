@@ -1,0 +1,45 @@
+﻿@model doan.Models.GrammarStructure
+
+@{
+    ViewData["Title"] = "Thêm ngữ pháp mới";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="CongThuc" class="form-label">Cấu trúc ngữ pháp</label>
+        <input asp-for="CongThuc" class="form-control" />
+        <span asp-validation-for="CongThuc" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="GiaiThich" class="form-label">Giải thích</label>
+        <textarea asp-for="GiaiThich" class="form-control"></textarea>
+        <span asp-validation-for="GiaiThich" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="CauViDu" class="form-label">Câu ví dụ</label>
+        <textarea asp-for="CauViDu" class="form-control"></textarea>
+        <span asp-validation-for="CauViDu" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="LessonId" class="form-label">Bài học</label>
+        <select asp-for="LessonId" class="form-control" asp-items="ViewBag.LessonId">
+            <option value="">-- Chọn bài học --</option>
+        </select>
+        <span asp-validation-for="LessonId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">➕ Thêm ngữ pháp</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
