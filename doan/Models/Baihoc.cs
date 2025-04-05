@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System;
-
+using doan.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 namespace doan.Models
 {
     public class Baihoc
@@ -10,16 +10,17 @@ namespace doan.Models
 
         [Required]
         [StringLength(255)]
-        public string Name { get; set; }  // Tên bài học
+        public string Name { get; set; }
 
         [Required]
         [StringLength(255)]
-        public string Title { get; set; }  // Tiêu đề chi tiết
+        public string Title { get; set; }
 
         [Required]
-        public int LevelId { get; set; }   // FK tự động
+        public int LevelId { get; set; }
 
-        public Level Level { get; set; }   // Navigation Property
+        [ValidateNever] // 👈 Bỏ qua validation cho navigation property
+        public Level Level { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

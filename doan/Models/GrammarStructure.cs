@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace doan.Models
 {
@@ -8,36 +8,22 @@ namespace doan.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập cấu trúc.")]
         [StringLength(255)]
-        public string CongThuc { get; set; } // Công thức ngữ pháp (〜ている, 〜たことがある)
+        public string CongThuc { get; set; }
 
-        [Required]
-        public string GiaiThich { get; set; } // Giải thích cách dùng
+        [Required(ErrorMessage = "Vui lòng nhập giải thích.")]
+        public string GiaiThich { get; set; }
 
-        public string CauViDu { get; set; } // Câu ví dụ minh họa
+        public string CauViDu { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn bài học.")]
         public int LessonId { get; set; }
 
         [ForeignKey("LessonId")]
-        public Baihoc Lesson { get; set; }
+        public Baihoc? Lesson { get; set; } // DẤU HỎI: Cho phép null để tránh lỗi binding
+
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // ✅ Aliases for compatibility in Razor Views
-        [NotMapped]
-        public string Structure
-        {
-            get => CongThuc;
-            set => CongThuc = value;
-        }
-
-        [NotMapped]
-        public string Explanation
-        {
-            get => GiaiThich;
-            set => GiaiThich = value;
-        }
     }
 }

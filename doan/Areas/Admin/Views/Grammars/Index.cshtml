@@ -15,6 +15,7 @@
             <th>Bài học</th>
             <th>Cấu trúc</th>
             <th>Giải thích</th>
+            <th>Câu ví dụ</th>
             <th>Thao tác</th>
         </tr>
     </thead>
@@ -27,6 +28,7 @@
                     <td>@item.Lesson?.Name</td>
                     <td>@item.CongThuc</td>
                     <td>@item.GiaiThich</td>
+                    <td>@item.CauViDu</td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">✏️ Sửa</a>
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">📄 Chi tiết</a>

@@ -1,12 +1,13 @@
 ﻿@model doan.Models.Vocabulary
 @{
-    ViewData["Title"] = "Tạo từ vựng";
+    ViewData["Title"] = "Thêm từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Tạo từ vựng</h2>
-<hr />
-<form asp-action="Create">
+<h2 class="mb-3">Thêm từ vựng</h2>
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<form asp-action="Create" method="post">
     <div class="form-group">
         <label>Cấp độ</label>
         <select id="levelSelect" class="form-control">
@@ -19,15 +20,18 @@
     </div>
 
     <div class="form-group">
-        <label>Bài học</label>
-        <select asp-for="LessonId" class="form-control" id="lessonSelect">
+        <label asp-for="LessonId">Bài học</label>
+        <select class="form-control" id="lessonSelect">
             <option value="">-- Chọn bài học --</option>
         </select>
+        <input type="hidden" asp-for="LessonId" />
+        <span asp-validation-for="LessonId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="Tuvung"></label>
         <input asp-for="Tuvung" class="form-control" />
+        <span asp-validation-for="Tuvung" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -36,32 +40,43 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Nghia"></label>
-        <textarea asp-for="Nghia" class="form-control"></textarea>
+        <label asp-for="AmHan"></label>
+        <input asp-for="AmHan" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Lưu từ vựng</button>
+    <div class="form-group">
+        <label asp-for="HanTu"></label>
+        <input asp-for="HanTu" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Nghia"></label>
+        <textarea asp-for="Nghia" class="form-control"></textarea>
+        <span asp-validation-for="Nghia" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Lưu từ vựng</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
 </form>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $("#levelSelect").change(function () {
             var levelId = $(this).val();
-            if (levelId) {
-                $.get("/api/BaihocApi/GetByLevel/" + levelId, function (data) {
-                    var lessonSelect = $("#lessonSelect");
-                    lessonSelect.empty();
-                    lessonSelect.append('<option value="">-- Chọn bài học --</option>');
-                    $.each(data, function (i, lesson) {
-                        lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
-                    });
+            $.get("/api/BaihocApi/GetByLevel/" + levelId, function (data) {
+                var lessonSelect = $("#lessonSelect");
+                lessonSelect.empty();
+                lessonSelect.append('<option value="">-- Chọn bài học --</option>');
+                $.each(data, function (i, lesson) {
+                    lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
                 });
-            } else {
-                $("#lessonSelect").empty().append('<option value="">-- Chọn bài học --</option>');
-            }
+                $("#LessonId").val("");
+            });
+        });
+
+        $("#lessonSelect").change(function () {
+            $("#LessonId").val($(this).val());
         });
     </script>
 }
-
-
-
