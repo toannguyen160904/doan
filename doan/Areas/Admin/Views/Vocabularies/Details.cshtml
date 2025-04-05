@@ -3,16 +3,29 @@
     ViewData["Title"] = "Chi tiết từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-<h2>Chi tiết</h2>
+
+<h2>Chi tiết từ vựng</h2>
+<hr />
+
 <dl class="row">
-    <dt class="col-sm-3">Từ vựng</dt>
-    <dd class="col-sm-9">@Model.Tuvung</dd>
-    <dt class="col-sm-3">Phát âm</dt>
-    <dd class="col-sm-9">@Model.PhatAm</dd>
-    <dt class="col-sm-3">Nghĩa</dt>
-    <dd class="col-sm-9">@Model.Nghia</dd>
-    <dt class="col-sm-3">Hán tự</dt>
-    <dd class="col-sm-9">@Model.HanTu</dd>
+    <dt class="col-sm-2">Từ vựng</dt>
+    <dd class="col-sm-10">@Model.Tuvung</dd>
+
+    <dt class="col-sm-2">Phát âm</dt>
+    <dd class="col-sm-10">@Model.PhatAm</dd>
+
+    <dt class="col-sm-2">Âm Hán</dt>
+    <dd class="col-sm-10">@Model.AmHan</dd>
+
+    <dt class="col-sm-2">Hán tự</dt>
+    <dd class="col-sm-10">@Model.HanTu</dd>
+
+    <dt class="col-sm-2">Nghĩa</dt>
+    <dd class="col-sm-10">@Model.Nghia</dd>
+
+    <dt class="col-sm-2">Bài học</dt>
+    <dd class="col-sm-10">@Model.Lesson?.Title</dd>
 </dl>
-<a asp-action="Edit" asp-route-id="@Model.Id">Sửa</a> |
-<a asp-action="Index">Quay lại</a>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>

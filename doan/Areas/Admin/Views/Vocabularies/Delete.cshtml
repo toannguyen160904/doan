@@ -1,12 +1,26 @@
 ﻿@model doan.Models.Vocabulary
 @{
-    ViewData["Title"] = "Xoá từ vựng";
+    ViewData["Title"] = "Xóa từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-<h2>Xoá từ</h2>
-<h4>Bạn chắc chắn muốn xoá "@Model.Tuvung"?</h4>
+
+<h3>Bạn có chắc chắn muốn xóa từ vựng này không?</h3>
+<div>
+    <h4>@Model.Tuvung</h4>
+    <dl class="row">
+        <dt class="col-sm-2">Phát âm</dt>
+        <dd class="col-sm-10">@Model.PhatAm</dd>
+
+        <dt class="col-sm-2">Nghĩa</dt>
+        <dd class="col-sm-10">@Model.Nghia</dd>
+
+        <dt class="col-sm-2">Bài học</dt>
+        <dd class="col-sm-10">@Model.Lesson?.Title</dd>
+    </dl>
+</div>
+
 <form asp-action="Delete">
     <input type="hidden" asp-for="Id" />
-    <input type="submit" value="Xoá" class="btn btn-danger" /> |
-    <a asp-action="Index">Huỷ</a>
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
 </form>

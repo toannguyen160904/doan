@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using doan.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
 
 public class LessonController : Controller
 {
     private readonly ApplicationDbContext _context;
-
 
     public LessonController(ApplicationDbContext context)
     {
@@ -32,55 +32,99 @@ public class LessonController : Controller
 
         return View("~/Views/Level/Details.cshtml", lesson);
     }
+
     public IActionResult Create()
     {
-        // Lấy danh sách cấp độ để hiển thị trong dropdown
-        ViewBag.Levels = new SelectList(new List<string> { "N5", "N4", "N3" });
+        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
         return View();
     }
 
-    // POST: Lesson/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(LessonViewModel model)
+    public async Task<IActionResult> Create(Baihoc lesson)
     {
         if (ModelState.IsValid)
         {
-            // Lấy LevelId từ cấp độ người dùng chọn
-            int levelId = GetLevelId(model.LevelName);
-
-            // Tạo bài học mới
-            var lesson = new Baihoc
-            {
-                Name = model.Name,
-                LevelId = levelId,  // Gán LevelId cho bài học
-            };
-
-            // Lưu bài học vào cơ sở dữ liệu
-            _context.Add(lesson);
+            _context.Baihoc.Add(lesson);
             await _context.SaveChangesAsync();
-
-            // Chuyển hướng về trang danh sách bài học
             return RedirectToAction(nameof(Index));
         }
 
-        // Nếu có lỗi, trả lại view
-        ViewBag.Levels = new SelectList(new List<string> { "N5", "N4", "N3" });
-        return View(model);
+        var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+        foreach (var err in errors)
+        {
+            Console.WriteLine("⚠️ Model Error: " + err);
+        }
+
+        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
+        return View(lesson);
     }
 
-    private int GetLevelId(string level)
+    public async Task<IActionResult> Index()
     {
-        switch (level)
+        var lessons = await _context.Baihoc.Include(l => l.Level).ToListAsync();
+        return View(lessons);
+    }
+
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var lesson = await _context.Baihoc.FindAsync(id);
+        if (lesson == null) return NotFound();
+
+        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
+        return View(lesson);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Baihoc lesson)
+    {
+        if (id != lesson.Id) return NotFound();
+
+        if (ModelState.IsValid)
         {
-            case "N5":
-                return 1;  // LevelId cho N5 là 1
-            case "N4":
-                return 2;  // LevelId cho N4 là 2
-            case "N3":
-                return 3;  // LevelId cho N3 là 3
-            default:
-                return 1;  // Mặc định là N5 nếu không chọn
+            _context.Update(lesson);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
+        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
+        return View(lesson);
+    }
+
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var lesson = await _context.Baihoc.Include(l => l.Level).FirstOrDefaultAsync(l => l.Id == id);
+        if (lesson == null) return NotFound();
+
+        return View(lesson);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var lesson = await _context.Baihoc.FindAsync(id);
+        if (lesson != null)
+        {
+            _context.Baihoc.Remove(lesson);
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> DetailsFull(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var lesson = await _context.Baihoc.Include(l => l.Level)
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (lesson == null) return NotFound();
+
+        return View(lesson);
     }
 }
