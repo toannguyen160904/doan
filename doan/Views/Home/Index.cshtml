@@ -68,26 +68,7 @@
                     <li><a href="/Home/ChonLevel" class="block text-lg text-blue-600 hover:underline">📚 Chọn cấp độ</a></li>
                     <li><a href="/Home/Privacy" class="block text-lg text-blue-600 hover:underline">🔒 Chính sách</a></li>
 
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li class="border-t pt-2 mt-2">
-                            <span class="block text-lg text-gray-700">👤 @User.Identity.Name</span>
-                        </li>
-                        <li>
-                            <form method="post" asp-area="Identity" asp-page="/Account/Logout">
-                                <button type="submit" class="btn bg-red-500 text-white px-4 py-2 rounded">Đăng xuất</button>
-                            </form>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="border-t pt-2 mt-2">
-                            <a asp-area="Identity" asp-page="/Account/Login" class="btn bg-blue-500 text-white px-4 py-2 rounded">Đăng nhập</a>
-                        </li>
-                        <li>
-                            <a asp-area="Identity" asp-page="/Account/Register" class="btn bg-green-500 text-white px-4 py-2 rounded">Đăng ký</a>
-                        </li>
-                    }
+
                 </ul>
             </div>
         </div>
