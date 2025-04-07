@@ -1,17 +1,15 @@
-﻿@model doan.Models.GrammarStructure
+﻿@model doan.Models.Baihoc
 
 @{
-    ViewData["Title"] = "Thêm ngữ pháp mới";
+    ViewData["Title"] = "Thêm bài học";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2 class="mb-3">Thêm ngữ pháp mới</h2>
+<h2 class="mb-3">Thêm bài học mới</h2>
 <hr />
 
-@* Hiển thị lỗi tổng thể *@
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
-@* Debug lỗi nếu cần thiết *@
 @if (!ViewData.ModelState.IsValid)
 {
     foreach (var key in ViewData.ModelState.Keys)
@@ -25,32 +23,26 @@
 
 <form asp-action="Create" method="post">
     <div class="form-group">
-        <label asp-for="CongThuc" class="form-label">Cấu trúc ngữ pháp</label>
-        <input asp-for="CongThuc" class="form-control" placeholder="VD: ～ている" autocomplete="off" />
-        <span asp-validation-for="CongThuc" class="text-danger"></span>
+        <label asp-for="Name" class="form-label">Tên bài học</label>
+        <input asp-for="Name" class="form-control" placeholder="Nhập tên bài học" autocomplete="off" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
-        <label asp-for="GiaiThich" class="form-label">Giải thích</label>
-        <textarea asp-for="GiaiThich" class="form-control" placeholder="Giải thích ý nghĩa, cách dùng"></textarea>
-        <span asp-validation-for="GiaiThich" class="text-danger"></span>
+        <label asp-for="Title" class="form-label">Tiêu đề</label>
+        <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề bài học (hiển thị ngắn)" autocomplete="off" />
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
-        <label asp-for="CauViDu" class="form-label">Câu ví dụ</label>
-        <textarea asp-for="CauViDu" class="form-control" placeholder="VD: わたしはべんきょうしています。"></textarea>
-        <span asp-validation-for="CauViDu" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mt-2">
-        <label asp-for="LessonId" class="form-label">Bài học</label>
-        <select asp-for="LessonId" class="form-control" asp-items="ViewBag.LessonList">
-            <option value="">-- Chọn bài học --</option>
+        <label asp-for="LevelId" class="form-label">Cấp độ</label>
+        <select asp-for="LevelId" class="form-control" asp-items="ViewBag.Levels">
+            <option value="">-- Chọn cấp độ --</option>
         </select>
-        <span asp-validation-for="LessonId" class="text-danger"></span>
+        <span asp-validation-for="LevelId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success mt-3">➕ Thêm ngữ pháp</button>
+    <button type="submit" class="btn btn-success mt-3">➕ Thêm bài học</button>
     <a asp-action="Index" class="btn btn-secondary mt-3 ms-2">Quay lại</a>
 </form>
 
