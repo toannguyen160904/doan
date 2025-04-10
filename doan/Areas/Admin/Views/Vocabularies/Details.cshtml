@@ -1,18 +1,50 @@
 ﻿@model doan.Models.Vocabulary
+
 @{
     ViewData["Title"] = "Chi tiết từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-<h2>Chi tiết</h2>
-<dl class="row">
-    <dt class="col-sm-3">Từ vựng</dt>
-    <dd class="col-sm-9">@Model.Tuvung</dd>
-    <dt class="col-sm-3">Phát âm</dt>
-    <dd class="col-sm-9">@Model.PhatAm</dd>
-    <dt class="col-sm-3">Nghĩa</dt>
-    <dd class="col-sm-9">@Model.Nghia</dd>
-    <dt class="col-sm-3">Hán tự</dt>
-    <dd class="col-sm-9">@Model.HanTu</dd>
-</dl>
-<a asp-action="Edit" asp-route-id="@Model.Id">Sửa</a> |
-<a asp-action="Index">Quay lại</a>
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-orange-400 text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-info-circle"></i> Chi tiết từ vựng</h4>
+            <a asp-action="Index" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left-circle"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-secondary">Từ vựng:</dt>
+                <dd class="col-sm-9 fw-semibold">@Model.Tuvung</dd>
+
+                <dt class="col-sm-3 text-secondary">Phát âm:</dt>
+                <dd class="col-sm-9">@Model.PhatAm</dd>
+
+                <dt class="col-sm-3 text-secondary">Âm Hán:</dt>
+                <dd class="col-sm-9">@Model.AmHan</dd>
+
+                <dt class="col-sm-3 text-secondary">Hán tự:</dt>
+                <dd class="col-sm-9">@Model.HanTu</dd>
+
+                <dt class="col-sm-3 text-secondary">Nghĩa:</dt>
+                <dd class="col-sm-9">@Model.Nghia</dd>
+
+                <dt class="col-sm-3 text-secondary">Thuộc bài học:</dt>
+                <dd class="col-sm-9">@Model.Lesson?.Title</dd>
+            </dl>
+        </div>
+
+        <div class="card-footer text-end">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                <i class="bi bi-pencil-square"></i> Sửa
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+</div>

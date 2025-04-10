@@ -1,39 +1,73 @@
 ﻿@model doan.Models.Baihoc
+
 @{
-    ViewData["Title"] = "Tạo bài học";
+    ViewData["Title"] = "Thêm bài học";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2 class="mb-3">Tạo bài học</h2>
-<hr />
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(45deg, #198754, #28a745);">
+                    <h4 class="mb-0"><i class="bi bi-journal-plus me-2"></i>Thêm bài học mới</h4>
+                </div>
 
-@* Hiển thị lỗi tổng thể *@
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body p-4">
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Name" class="form-label">Tên bài học</label>
-        <input asp-for="Name" class="form-control" placeholder="VD: Chào hỏi" autocomplete="off" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        foreach (var key in ViewData.ModelState.Keys)
+                        {
+                            foreach (var error in ViewData.ModelState[key].Errors)
+                            {
+                                <div class="alert alert-danger py-1 px-2 mb-2 rounded-2">
+                                    <strong>@key:</strong> @error.ErrorMessage
+                                </div>
+                            }
+                        }
+                    }
+
+                    <form asp-action="Create" method="post" class="needs-validation" novalidate>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold">Tên bài học <span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control shadow-sm" placeholder="Nhập tên bài học" autocomplete="off" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-semibold">Tiêu đề ngắn <span class="text-danger">*</span></label>
+                            <input asp-for="Title" class="form-control shadow-sm" placeholder="Nhập tiêu đề ngắn" autocomplete="off" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LevelId" class="form-label fw-semibold">Cấp độ <span class="text-danger">*</span></label>
+                            <select asp-for="LevelId" class="form-select shadow-sm" asp-items="ViewBag.Levels">
+                                <option value="">-- Chọn cấp độ --</option>
+                            </select>
+                            <span asp-validation-for="LevelId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="bi bi-check-circle"></i> Lưu lại
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group mt-2">
-        <label asp-for="Title" class="form-label">Tiêu đề</label>
-        <input asp-for="Title" class="form-control" placeholder="VD: Giới thiệu bản thân" autocomplete="off" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mt-2">
-        <label asp-for="LevelId" class="form-label">Cấp độ</label>
-        <select asp-for="LevelId" class="form-control" asp-items="ViewBag.Levels">
-            <option value="">-- Chọn cấp độ --</option>
-        </select>
-        <span asp-validation-for="LevelId" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Lưu bài học</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3 ms-2">Quay lại</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

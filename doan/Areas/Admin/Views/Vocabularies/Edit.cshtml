@@ -1,31 +1,86 @@
 ﻿@model doan.Models.Vocabulary
+
 @{
     ViewData["Title"] = "Sửa từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-<h2>Sửa từ</h2>
-<form asp-action="Edit">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label asp-for="Tuvung"></label>
-        <input asp-for="Tuvung" class="form-control" />
+
+<div class="max-w-xl mx-auto mt-10">
+    <div class="bg-white shadow-md border border-gray-200 rounded-lg overflow-hidden">
+        <div class="bg-orange-500 text-white px-5 py-3 rounded-t-lg">
+            <h2 class="text-xl font-semibold flex items-center gap-2">
+                <i class="bi bi-pencil-square"></i> Sửa từ vựng
+            </h2>
+        </div>
+
+        <div class="p-6 space-y-5">
+
+            @Html.ValidationSummary(true, "", new { @class = "bg-red-50 border border-red-300 text-red-600 px-4 py-2 rounded text-sm text-center" })
+
+            <form asp-action="Edit" id="editForm">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="grid grid-cols-1 gap-4">
+
+                    <div>
+                        <label asp-for="LessonId" class="block text-sm font-medium text-gray-600 mb-1">Bài học *</label>
+                        <select asp-for="LessonId" asp-items="ViewBag.LessonId" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400"></select>
+                        <span asp-validation-for="LessonId" class="text-red-500 text-xs"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Tuvung" class="block text-sm font-medium text-gray-600 mb-1">Từ vựng *</label>
+                        <input asp-for="Tuvung" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập từ vựng" />
+                        <span asp-validation-for="Tuvung" class="text-red-500 text-xs"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="PhatAm" class="block text-sm font-medium text-gray-600 mb-1">Phát âm</label>
+                        <input asp-for="PhatAm" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập phát âm" />
+                    </div>
+
+                    <div>
+                        <label asp-for="AmHan" class="block text-sm font-medium text-gray-600 mb-1">Âm Hán</label>
+                        <input asp-for="AmHan" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập âm Hán" />
+                    </div>
+
+                    <div>
+                        <label asp-for="HanTu" class="block text-sm font-medium text-gray-600 mb-1">Hán Tự</label>
+                        <input asp-for="HanTu" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập Hán Tự" />
+                    </div>
+
+                    <div>
+                        <label asp-for="Nghia" class="block text-sm font-medium text-gray-600 mb-1">Nghĩa *</label>
+                        <textarea asp-for="Nghia" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400 resize-y" placeholder="Nhập nghĩa chi tiết"></textarea>
+                        <span asp-validation-for="Nghia" class="text-red-500 text-xs"></span>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <a asp-action="Index" class="inline-flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md transition">
+                        <i class="bi bi-arrow-left-circle"></i> Quay lại
+                    </a>
+
+                    <button type="submit" class="inline-flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">
+                        <i class="bi bi-save"></i> Lưu lại
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="PhatAm"></label>
-        <input asp-for="PhatAm" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="HanTu"></label>
-        <input asp-for="HanTu" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Nghia"></label>
-        <input asp-for="Nghia" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="LessonId"></label>
-        <select asp-for="LessonId" class="form-control" asp-items="ViewBag.LessonId"></select>
-    </div>
-    <input type="submit" value="Lưu" class="btn btn-primary" />
-</form>
-<a asp-action="Index">Quay lại</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const form = document.getElementById('editForm');
+        form.addEventListener('submit', function () {
+            const btn = form.querySelector('button[type="submit"]');
+            btn.innerHTML = '<span class="animate-pulse">Đang lưu...</span>';
+            btn.disabled = true;
+        })
+    </script>
+}
