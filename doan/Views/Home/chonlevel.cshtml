@@ -1,4 +1,4 @@
-﻿@model List<doan.Models.Level>
+@model List<doan.Models.Level>
 
 @{
     ViewData["Title"] = "Chọn Cấp Độ";
@@ -104,6 +104,15 @@
                     section.querySelector(".grid").appendChild(lesson);
                 });
             });
+
+
+        }
+
+        // Hàm xóa tìm kiếm
+        function clearSearch() {
+            document.getElementById("searchInput").value = "";
+            changeLevel(localStorage.getItem("selectedLevel") || "N5");
+
         }
 
         // Hàm xóa tìm kiếm
