@@ -19,7 +19,11 @@ namespace doan.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var lessons = await _context.Baihoc.Include(l => l.Level).ToListAsync();
+            var lessons = await _context.Baihoc
+                                .Include(l => l.Level)
+                                .OrderBy(l => l.LevelId) // Sắp xếp tăng dần theo LevelId
+                                .ToListAsync();
+
             return View(lessons);
         }
 

@@ -1,23 +1,45 @@
 ﻿@model doan.Models.Baihoc
+
 @{
     ViewData["Title"] = "Chi tiết Bài học";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Chi tiết Bài học</h2>
-<hr />
-<dl class="row">
-    <dt class="col-sm-2">Tên bài học</dt>
-    <dd class="col-sm-10">@Model.Name</dd>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="bi bi-info-circle me-2"></i>Chi tiết Bài học</h4>
+                </div>
 
-    <dt class="col-sm-2">Tiêu đề</dt>
-    <dd class="col-sm-10">@Model.Title</dd>
+                <div class="card-body">
 
-    <dt class="col-sm-2">Cấp độ</dt>
-    <dd class="col-sm-10">@Model.Level?.Name</dd>
+                    <dl class="row mb-4">
+                        <dt class="col-sm-4 text-end fw-semibold">Tên bài học:</dt>
+                        <dd class="col-sm-8 text-start">@Model.Name</dd>
 
-    <dt class="col-sm-2">Ngày tạo</dt>
-    <dd class="col-sm-10">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
-</dl>
-<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
-<a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                        <dt class="col-sm-4 text-end fw-semibold">Tiêu đề:</dt>
+                        <dd class="col-sm-8 text-start">@Model.Title</dd>
+
+                        <dt class="col-sm-4 text-end fw-semibold">Cấp độ:</dt>
+                        <dd class="col-sm-8 text-start">@Model.Level?.Name</dd>
+
+                        <dt class="col-sm-4 text-end fw-semibold">Ngày tạo:</dt>
+                        <dd class="col-sm-8 text-start">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4">
+                            <i class="bi bi-pencil-square me-1"></i> Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary px-4">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
