@@ -26,24 +26,54 @@ namespace doan.Areas.Admin.Controllers
         public IActionResult Create()
         {
             ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
-            ViewBag.Lessons = new SelectList(_context.Baihoc, "Id", "Name");
             return View();
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Vocabulary vocab)
         {
-            if (ModelState.IsValid)
+            Console.WriteLine("📥 FORM SUBMITTED ✅");
+
+            Console.WriteLine($"📌 LessonId: {vocab.LessonId}");
+            Console.WriteLine($"📌 Tuvung: {vocab.Tuvung}");
+            Console.WriteLine($"📌 Nghia: {vocab.Nghia}");
+
+            if (!ModelState.IsValid)
             {
-                _context.tuvung.Add(vocab);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Console.WriteLine("❌ ModelState không hợp lệ!");
+                foreach (var entry in ModelState)
+                {
+                    foreach (var error in entry.Value.Errors)
+                    {
+                        Console.WriteLine($"❗ Lỗi tại {entry.Key}: {error.ErrorMessage}");
+                    }
+                }
+
+                return View(vocab);
             }
-            ViewData["LessonId"] = new SelectList(_context.Baihoc, "Id", "Name", vocab.LessonId);
+
+            // Lưu thử
+            _context.tuvung.Add(vocab);
+            await _context.SaveChangesAsync();
+
+            Console.WriteLine("✅ Lưu thành công!");
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var vocab = await _context.tuvung.Include(v => v.Lesson)
+                                             .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (vocab == null) return NotFound();
+
             return View(vocab);
         }
+
+
 
         public async Task<IActionResult> Edit(int? id)
         {

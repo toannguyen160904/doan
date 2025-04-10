@@ -18,9 +18,13 @@ public class BaihocApiController : ControllerBase
     {
         var lessons = await _context.Baihoc
             .Where(b => b.LevelId == levelId)
-            .Select(b => new { b.Id, b.Name })
+            .Select(b => new {
+                id = b.Id,      
+                name = b.Name   
+            })
             .ToListAsync();
 
         return Ok(lessons);
     }
+
 }

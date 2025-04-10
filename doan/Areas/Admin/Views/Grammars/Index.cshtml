@@ -1,45 +1,111 @@
 ﻿@model IEnumerable<doan.Models.GrammarStructure>
 
 @{
-    ViewData["Title"] = "Ngữ pháp";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>📘 Danh sách ngữ pháp</h2>
-<p>
-    <a asp-action="Create" class="btn btn-success">+ Thêm ngữ pháp mới</a>
-</p>
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>Bài học</th>
-            <th>Cấu trúc</th>
-            <th>Giải thích</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.Any())
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Lesson?.Name</td>
-                    <td>@item.CongThuc</td>
-                    <td>@item.GiaiThich</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">✏️ Sửa</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">📄 Chi tiết</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">🗑 Xoá</a>
-                    </td>
-                </tr>
-            }
+<style>
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s;
+    }
+
+        .action-btn span {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 50%;
+            left: 120%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            background-color: #000;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.3s;
         }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">Chưa có dữ liệu ngữ pháp nào.</td>
-            </tr>
+
+        .action-btn:hover span {
+            opacity: 1;
+            visibility: visible;
         }
-    </tbody>
-</table>
+</style>
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-journal-text me-2"></i> Danh sách ngữ pháp</h4>
+            <a asp-action="Create" class="btn btn-light text-success fw-semibold">
+                <i class="bi bi-plus-circle"></i> Thêm ngữ pháp
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Bài học</th>
+                            <th>Cấp độ</th>
+                            <th>Cấu trúc</th>
+                            <th>Giải thích</th>
+                            <th>Câu ví dụ</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Lesson?.Name</td>
+                                    <td>@item.Lesson?.Level?.Name</td>
+                                    <td class="fw-semibold">@item.CongThuc</td>
+                                    <td>@item.GiaiThich</td>
+                                    <td>@item.CauViDu</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary action-btn" title="Sửa">
+                                                <i class="bi bi-pencil-square"></i><span>Sửa</span>
+                                            </a>
+
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info action-btn" title="Chi tiết">
+                                                <i class="bi bi-info-circle"></i><span>Chi tiết</span>
+                                            </a>
+
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger action-btn" onclick="return confirm('Xác nhận xoá?')" title="Xoá">
+                                                <i class="bi bi-trash"></i><span>Xoá</span>
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-exclamation-circle fs-4"></i><br />
+                                    Chưa có dữ liệu ngữ pháp nào.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
