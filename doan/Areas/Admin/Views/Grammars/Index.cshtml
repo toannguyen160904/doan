@@ -5,25 +5,38 @@
 }
 
 <style>
-    /* Hover hiện chữ mượt - không nhảy layout */
-    .action-btn span {
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        margin-left: 5px;
-        white-space: nowrap;
-    }
-
-    .action-btn:hover span {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Đảm bảo nút đều nhau đẹp hơn */
     .action-btn {
-        min-width: 80px;
-        text-align: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s;
     }
+
+        .action-btn span {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 50%;
+            left: 120%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            background-color: #000;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover span {
+            opacity: 1;
+            visibility: visible;
+        }
 </style>
 
 <div class="container mt-4">
@@ -64,15 +77,15 @@
                                         <div class="d-flex justify-content-center gap-2 flex-wrap">
 
                                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary action-btn" title="Sửa">
-                                                <i class="bi bi-pencil-square"></i><span> Sửa</span>
+                                                <i class="bi bi-pencil-square"></i><span>Sửa</span>
                                             </a>
 
                                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info action-btn" title="Chi tiết">
-                                                <i class="bi bi-info-circle"></i><span> Chi tiết</span>
+                                                <i class="bi bi-info-circle"></i><span>Chi tiết</span>
                                             </a>
 
-                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger action-btn" onclick="return confirm('Xác nhận xoá?')" title="Xóa">
-                                                <i class="bi bi-trash"></i><span> Xóa</span>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger action-btn" onclick="return confirm('Xác nhận xoá?')" title="Xoá">
+                                                <i class="bi bi-trash"></i><span>Xoá</span>
                                             </a>
 
                                         </div>
