@@ -16,19 +16,23 @@ namespace doan.Areas.Admin.Controllers
         {
             _context = context;
         }
-
         public async Task<IActionResult> Index()
         {
-            var grammars = await _context.nguphap.Include(g => g.Lesson).ToListAsync();
-            return View(grammars);
+            var grammar = await _context.nguphap
+                .Include(v => v.Lesson)
+                .ThenInclude(l => l.Level) 
+                .OrderBy(x => x.Lesson.LevelId) 
+                .ToListAsync();
+
+            return View(grammar);
         }
 
         public IActionResult Create()
         {
-            ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title");
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name"); 
+            ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title"); 
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GrammarStructure model)
@@ -40,6 +44,7 @@ namespace doan.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
             ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title", model.LessonId);
             return View(model);
         }
@@ -52,7 +57,9 @@ namespace doan.Areas.Admin.Controllers
             var grammar = await _context.nguphap.FindAsync(id);
             if (grammar == null) return NotFound();
 
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
             ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title", grammar.LessonId);
+          
             return View(grammar);
         }
 
@@ -68,6 +75,7 @@ namespace doan.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
 
             ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title", model.LessonId);
             return View(model);
@@ -77,7 +85,11 @@ namespace doan.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var grammar = await _context.nguphap.Include(g => g.Lesson).FirstOrDefaultAsync(m => m.Id == id);
+            var grammar = await _context.nguphap
+                .Include(g => g.Lesson)
+                .ThenInclude(l => l.Level)  // Lấy thêm cấp độ
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (grammar == null) return NotFound();
 
             return View(grammar);
@@ -100,7 +112,11 @@ namespace doan.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var grammar = await _context.nguphap.Include(g => g.Lesson).FirstOrDefaultAsync(g => g.Id == id);
+            var grammar = await _context.nguphap
+                .Include(g => g.Lesson)
+                .ThenInclude(l => l.Level) // load thêm cấp độ
+                .FirstOrDefaultAsync(g => g.Id == id);
+
             if (grammar == null) return NotFound();
 
             return View(grammar);

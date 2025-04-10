@@ -5,23 +5,52 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2 class="text-danger mb-3">🗑️ Xác nhận xoá ngữ pháp</h2>
-<hr />
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="bi bi-trash-fill me-2"></i> Xác nhận xoá ngữ pháp</h4>
+        </div>
 
-<dl class="row">
-    <dt class="col-sm-2">Cấu trúc</dt>
-    <dd class="col-sm-10">@Model.CongThuc</dd>
+        <div class="card-body">
 
-    <dt class="col-sm-2">Giải thích</dt>
-    <dd class="col-sm-10">@Model.GiaiThich</dd>
+            <p class="text-danger mb-3 fw-semibold">
+                Bạn có chắc chắn muốn xoá ngữ pháp này không? Thao tác này không thể hoàn tác!
+            </p>
 
-    <dt class="col-sm-2">Ví dụ</dt>
-    <dd class="col-sm-10">@Model.CauViDu</dd>
-</dl>
+            <div class="mb-3 border rounded p-3 bg-light">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 fw-semibold">Cấp độ</dt>
+                    <dd class="col-sm-9">@Model.Lesson?.Level?.Name</dd>
 
-<form asp-action="Delete" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">🗑️ Xoá</button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">⬅ Huỷ bỏ</a>
-</form>
+                    <dt class="col-sm-3 fw-semibold">Bài học</dt>
+                    <dd class="col-sm-9">@Model.Lesson?.Name</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Cấu trúc</dt>
+                    <dd class="col-sm-9">@Model.CongThuc</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Giải thích</dt>
+                    <dd class="col-sm-9">@Model.GiaiThich</dd>
+
+                    <dt class="col-sm-3 fw-semibold">Ví dụ</dt>
+                    <dd class="col-sm-9">@Model.CauViDu</dd>
+                </dl>
+            </div>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary px-4">
+                        <i class="bi bi-arrow-left-circle"></i> Huỷ bỏ
+                    </a>
+
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash-fill"></i> Xoá ngay
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
