@@ -30,6 +30,20 @@ public class LessonController : Controller
             return NotFound();
         }
 
+        // Lấy danh sách flashcard từ các từ vựng và ngữ pháp của bài học
+        var vocabIds = lesson.tuvung.Select(v => v.Id).ToList();
+        var grammarIds = lesson.nguphap.Select(g => g.Id).ToList();
+
+        var flashcards = _context.Flashcards
+            .Include(f => f.Vocabulary)
+            .Include(f => f.GrammarStructure)
+            .Where(f =>
+                (f.VocabularyId != null && vocabIds.Contains(f.VocabularyId.Value)) ||
+                (f.GrammarStructureId != null && grammarIds.Contains(f.GrammarStructureId.Value)))
+            .ToList();
+
+        ViewBag.Flashcards = flashcards;
+
         return View("~/Views/Level/Details.cshtml", lesson);
     }
 

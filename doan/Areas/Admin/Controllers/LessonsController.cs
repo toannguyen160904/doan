@@ -42,7 +42,7 @@ namespace doan.Areas.Admin.Controllers
 
             // Loại bỏ validation cho "Level" nếu nó không phải là input từ form
             ModelState.Remove("Level");
-
+            ModelState.Remove("Flashcards");
             // Kiểm tra ModelState hợp lệ hay không
             if (!ModelState.IsValid)
             {

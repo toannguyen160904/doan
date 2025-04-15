@@ -118,5 +118,53 @@ namespace doan.Controllers
 
             return View(nguPhap); // Sử dụng Views/Home/NguPhap.cshtml
         }
+        public IActionResult Flashcards(int baiHocId)
+        {
+            var baiHoc = _context.Baihoc
+                .Include(b => b.tuvung)
+                .Include(b => b.nguphap)
+                .FirstOrDefault(b => b.Id == baiHocId);
+
+            if (baiHoc == null)
+            {
+                return NotFound();
+            }
+
+            var flashcards = new List<doan.Models.flashcards>();
+
+            // Từ vựng
+            foreach (var word in baiHoc.tuvung)
+            {
+                flashcards.Add(new doan.Models.flashcards
+                {
+                    Vocabulary = new Vocabulary
+                    {
+                        Tuvung = word.Tuvung,
+                        PhatAm = word.PhatAm,
+                        AmHan = word.AmHan,
+                        HanTu = word.HanTu,
+                        Nghia = word.Nghia
+                    }
+                });
+            }
+
+            // Ngữ pháp
+            foreach (var grammar in baiHoc.nguphap)
+            {
+                flashcards.Add(new doan.Models.flashcards
+                {
+                    GrammarStructure = new GrammarStructure
+                    {
+                        CongThuc = grammar.CongThuc,
+                        GiaiThich = grammar.GiaiThich,
+                        CauViDu = grammar.CauViDu
+                    }
+                });
+            }
+
+            ViewData["BaiHocName"] = baiHoc.Name;
+            return View(flashcards);
+        }
+
     }
 }

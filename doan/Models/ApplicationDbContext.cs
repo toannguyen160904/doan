@@ -1,5 +1,4 @@
-﻿// File: ApplicationDbContext.cs
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace doan.Models
@@ -18,6 +17,7 @@ namespace doan.Models
         public DbSet<Baihoc> Baihoc { get; set; }
         public DbSet<Vocabulary> tuvung { get; set; }
         public DbSet<GrammarStructure> nguphap { get; set; }
+        public DbSet<flashcards> Flashcards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +48,19 @@ namespace doan.Models
                 .HasOne(g => g.Lesson)
                 .WithMany(l => l.nguphap)
                 .HasForeignKey(g => g.LessonId);
+
+            // Quan hệ giữa Vocabulary và Flashcard (1-1)
+            modelBuilder.Entity<flashcards>()
+                .HasOne(f => f.GrammarStructure)
+                .WithOne() // không dùng navigation ở GrammarStructure
+                .HasForeignKey<flashcards>(f => f.GrammarStructureId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<flashcards>()
+                .HasOne(f => f.Vocabulary)
+                .WithOne() // không dùng navigation ở Vocabulary
+                .HasForeignKey<flashcards>(f => f.VocabularyId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
