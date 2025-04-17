@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using doan.Repository;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace doan.Controllers
 {
@@ -30,13 +31,13 @@ namespace doan.Controllers
             _userManager = userManager;
             _vocabularyRepository = vocabularyRepository;
         }
-
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var levels = await _context.Levels.ToListAsync();
             return View(levels);
         }
-
+        [Authorize]
         public async Task<IActionResult> ChonLevel()
         {
             var levels = await _context.Levels.Include(l => l.Lessons).ToListAsync();
@@ -90,7 +91,7 @@ namespace doan.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
+        [Authorize]
         // ✅ NEW: Action xem từ vựng theo Level
         public async Task<IActionResult> TuVung(int? levelId)
         {
@@ -104,7 +105,7 @@ namespace doan.Controllers
 
             return View(tuVung); // Sử dụng Views/Home/TuVung.cshtml
         }
-
+        [Authorize]
         // ✅ NEW: Action xem ngữ pháp theo Level
         public async Task<IActionResult> NguPhap(int? levelId)
         {
@@ -118,6 +119,7 @@ namespace doan.Controllers
 
             return View(nguPhap); // Sử dụng Views/Home/NguPhap.cshtml
         }
+        [Authorize]
         public IActionResult Flashcards(int baiHocId)
         {
             var baiHoc = _context.Baihoc
