@@ -457,7 +457,9 @@ namespace doan.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("tuvung", (string)null);
+                    b.HasIndex("UserLearningPlanId");
+
+                    b.ToTable("tuvung");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
