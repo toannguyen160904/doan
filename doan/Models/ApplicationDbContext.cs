@@ -19,9 +19,11 @@ namespace doan.Models
         public DbSet<Vocabulary> tuvung { get; set; }
         public DbSet<GrammarStructure> nguphap { get; set; }
 
+
         public DbSet<TestQuestion> TestQuestions { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

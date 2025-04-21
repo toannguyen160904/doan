@@ -419,6 +419,7 @@ namespace doan.Migrations
 
                 });
 
+
             modelBuilder.Entity("doan.Models.TestQuestion", b =>
                 {
                     b.Property<int>("Id")
@@ -691,6 +692,7 @@ namespace doan.Migrations
 
                 });
 
+
             modelBuilder.Entity("doan.Models.Vocabulary", b =>
                 {
                     b.Property<int>("Id")
@@ -716,6 +718,7 @@ namespace doan.Migrations
                     b.Property<string>("Nghia")
 
 
+
                         .IsRequired()
 
                         .IsRequired()
@@ -727,11 +730,17 @@ namespace doan.Migrations
                         .HasColumnType("nvarchar(500)");
 
 
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+
                     b.Property<string>("PhatAm")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Tuvung")
+
 
 
                         .IsRequired()
@@ -748,11 +757,20 @@ namespace doan.Migrations
                         .HasColumnType("nvarchar(255)");
 
 
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");
 
+
                     b.ToTable("tuvung", (string)null);
+
+                    b.ToTable("tuvung");
+
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -852,6 +870,7 @@ namespace doan.Migrations
 
 
 
+
             modelBuilder.Entity("doan.Models.TestResult", b =>
                 {
                     b.HasOne("doan.Models.ApplicationUser", "User")
@@ -913,6 +932,7 @@ namespace doan.Migrations
                 });
 
 
+
             modelBuilder.Entity("doan.Models.Vocabulary", b =>
                 {
                     b.HasOne("doan.Models.Baihoc", "Lesson")
@@ -922,9 +942,11 @@ namespace doan.Migrations
                         .IsRequired();
 
 
+
                     b.HasOne("doan.Models.UserLearningPlan", null)
                         .WithMany("VocabularyList")
                         .HasForeignKey("UserLearningPlanId");
+
 
                     b.HasOne("doan.Models.UserLearningPlan", null)
                         .WithMany("VocabularyList")

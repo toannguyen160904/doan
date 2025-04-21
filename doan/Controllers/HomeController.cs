@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using doan.Repository;
 using System.Diagnostics;
+<<<<<<< HEAD
 
 using System.Collections.Generic;
 using System.Linq;
 
 using System.Collections.Generic;
 using System.Linq;
+
 
 
 namespace doan.Controllers
@@ -93,6 +95,7 @@ namespace doan.Controllers
             if (levelId == null) return NotFound();
 
 
+
             var user = await _userManager.GetUserAsync(User);
             var learnedVocabIds = new List<int>();
 
@@ -103,6 +106,7 @@ namespace doan.Controllers
                     .Select(p => p.VocabularyId)
                     .ToListAsync();
             }
+
 
 
             var tuVung = await _context.tuvung
