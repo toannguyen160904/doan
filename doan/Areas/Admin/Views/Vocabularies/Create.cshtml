@@ -8,26 +8,35 @@
 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 <form asp-action="Create" method="post">
+    <!-- Chọn cấp độ -->
     <div class="form-group">
         <label>Cấp độ</label>
         <select id="levelSelect" class="form-control">
             <option value="">-- Chọn cấp độ --</option>
-            @foreach (var level in (SelectList)ViewBag.Levels)
+            @if (ViewBag.Levels != null)
             {
-                <option value="@level.Value">@level.Text</option>
+                foreach (var level in (SelectList)ViewBag.Levels)
+                {
+                    <option value="@level.Value">@level.Text</option>
+                }
+            }
+            else
+            {
+                <option disabled>⚠ Không tải được danh sách cấp độ</option>
             }
         </select>
     </div>
 
+    <!-- Chọn bài học (đã fix) -->
     <div class="form-group">
         <label asp-for="LessonId">Bài học</label>
-        <select class="form-control" id="lessonSelect">
+        <select asp-for="LessonId" class="form-control" id="lessonSelect">
             <option value="">-- Chọn bài học --</option>
         </select>
-        <input type="hidden" asp-for="LessonId" />
         <span asp-validation-for="LessonId" class="text-danger"></span>
     </div>
 
+    <!-- Các trường thông tin từ vựng -->
     <div class="form-group">
         <label asp-for="Tuvung"></label>
         <input asp-for="Tuvung" class="form-control" />
@@ -55,6 +64,7 @@
         <span asp-validation-for="Nghia" class="text-danger"></span>
     </div>
 
+    <!-- Nút hành động -->
     <button type="submit" class="btn btn-success">Lưu từ vựng</button>
     <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
 </form>
@@ -62,6 +72,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Khi chọn cấp độ → gọi API lấy danh sách bài học
         $("#levelSelect").change(function () {
             var levelId = $(this).val();
             $.get("/api/BaihocApi/GetByLevel/" + levelId, function (data) {
@@ -71,12 +82,7 @@
                 $.each(data, function (i, lesson) {
                     lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
                 });
-                $("#LessonId").val("");
             });
-        });
-
-        $("#lessonSelect").change(function () {
-            $("#LessonId").val($(this).val());
         });
     </script>
 }

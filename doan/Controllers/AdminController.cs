@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using doan.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace doan.Controllers
 {
@@ -15,34 +16,37 @@ namespace doan.Controllers
             _context = context;
         }
 
-        // ✅ Trang danh sách từ vựng
-        public IActionResult Index()
-        {
-            var vocabularies = _context.tuvung.ToList();
-            return View(vocabularies);
-        }
-
-        // ✅ Tạo từ vựng (GET)
+        // GET: /Admin/Create
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
             return View();
         }
 
-        // ✅ Tạo từ vựng (POST)
+        // POST: /Admin/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Vocabulary model)
         {
             if (ModelState.IsValid)
             {
+                model.CreatedAt = DateTime.Now;
                 _context.tuvung.Add(model);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
+
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
+
+            // In lỗi nếu có
+            foreach (var err in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine("❌ Lỗi ModelState: " + err.ErrorMessage);
+            }
+
             return View(model);
         }
-
         // ✅ Chỉnh sửa từ vựng (GET)
         [HttpGet]
         public IActionResult Edit(int id)
