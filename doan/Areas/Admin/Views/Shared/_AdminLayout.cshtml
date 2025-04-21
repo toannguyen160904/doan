@@ -12,6 +12,7 @@
     <title>@ViewData["Title"] - Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+<<<<<<< HEAD
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
@@ -39,11 +40,21 @@
             background: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', sans-serif;
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+
         }
 
         .sidebar {
             width: 250px;
             min-height: 100vh;
+
             background: var(--sidebar-bg);
             position: fixed;
             left: 0;
@@ -70,10 +81,19 @@
                 gap: 10px;
                 border-radius: 6px;
                 transition: all 0.3s;
+
+            background-color: #212529;
+        }
+
+            .sidebar .nav-link {
+                color: #adb5bd;
+                transition: all 0.3s ease;
+
             }
 
                 .sidebar .nav-link:hover,
                 .sidebar .nav-link.active {
+
                     background-color: var(--sidebar-hover);
                     color: #fff;
                 }
@@ -180,6 +200,81 @@
     <div class="main-content" id="main">
         <div class="content">
             @RenderBody()
+
+                    color: #fff;
+                    background-color: #343a40;
+                    border-radius: 5px;
+                }
+
+            .sidebar h4 {
+                color: #fff;
+            }
+
+        .content {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="d-flex">
+
+        <!-- Sidebar -->
+        <div class="sidebar p-3">
+            <h4 class="text-center mb-4">🎓 Admin Panel</h4>
+            <ul class="nav flex-column gap-1">
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">
+                        📁 Danh mục
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">
+                        🛒 Sản phẩm
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#learningSubmenu" role="button">
+                        📚 Quản lý học ▾
+                    </a>
+                    <div class="collapse ps-3" id="learningSubmenu">
+                        <ul class="nav flex-column gap-1">
+                            <li><a class="nav-link" asp-area="Admin" asp-controller="Lessons" asp-action="Index">📖 Bài học</a></li>
+                            <li><a class="nav-link" asp-area="Admin" asp-controller="Vocabularies" asp-action="Index">📘 Từ vựng</a></li>
+                            <li><a class="nav-link" asp-area="Admin" asp-controller="Grammars" asp-action="Index">📙 Ngữ pháp</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item mt-3">
+                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                        🏠 Về trang chính
+                    </a>
+                </li>
+
+                <li class="nav-item mt-3">
+                    <a class="btn btn-danger w-100" asp-area="Identity" asp-page="/Account/Logout">
+                        Đăng xuất
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-grow-1 p-4">
+            <div class="content">
+                <h2 class="mb-4">@ViewData["Title"]</h2>
+                @RenderBody()
+            </div>
+
         </div>
     </div>
 
