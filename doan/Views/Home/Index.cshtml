@@ -18,6 +18,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>
+        // Function to search documents by title
         function searchDocuments() {
             var input = document.getElementById('searchInput').value.toLowerCase();
             var lessons = document.getElementsByClassName('lesson-item');
@@ -34,11 +35,13 @@
             }
         }
 
+        // Function to clear the search input
         function clearSearch() {
             document.getElementById('searchInput').value = "";
             searchDocuments();
         }
 
+        // Function to toggle the dropdown menu visibility
         function toggleMenu() {
             document.getElementById("menuDropdown").classList.toggle("hidden");
         }
@@ -54,7 +57,8 @@
                     <a href="/" class="text-xl font-bold text-blue-600 flex items-center">
                         <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
-                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ </a>
+                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ</a>
+                    <a href="/Learning/Daily" class="text-lg text-blue-500 hover:underline">Lộ Trình Học</a> <!-- Thêm "Lộ Trình Học" -->
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -72,50 +76,12 @@
             </div>
 
             <!-- Menu dropdown -->
-            <div id="menuDropdown" class="hidden mt-4 bg-white border border-gray-300 p-4 rounded-lg shadow-lg">
-
-                <ul class="space-y-3 text-center">
-
-                    <li>
-                        <a href="/" class="block py-2 text-gray-700 hover:text-blue-600 transition-all duration-200">
-                            🏠 Trang chủ
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/Home/ChonLevel" class="block py-2 text-gray-700 hover:text-blue-600 transition-all duration-200">
-                            📚 Chọn cấp độ
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/Home/Privacy" class="block py-2 text-gray-700 hover:text-blue-600 transition-all duration-200">
-                            🔒 Chính sách
-                        </a>
-                    </li>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li>
-                            <a asp-area="Admin" asp-controller="Categories" asp-action="Index"
-                               class="block py-2 text-gray-700 hover:text-blue-600 transition-all duration-200">
-                                🛠️ Trang chủ Admin
-                            </a>
-                        </li>
-                    }
-
-                    <li>
-                        <hr class="my-2 border-gray-300">
-                    </li>
-
-                    <li>
-                        <div class="text-gray-500 text-sm mb-1 uppercase tracking-widest text-center">Tài khoản</div>
-                        <div class="flex justify-center">
-                            <div class="inline-block">
-                                <partial name="_LoginPartial" />
-                            </div>
-                        </div>
-                    </li>
-
+            <div id="menuDropdown" class="hidden mt-4 bg-gray-100 p-3 rounded-lg shadow-lg">
+                <ul class="space-y-2 text-center">
+                    <li><a href="/" class="block text-lg text-blue-600 hover:underline">🏠 Trang chủ</a></li>
+                    <li><a href="/Home/ChonLevel" class="block text-lg text-blue-600 hover:underline">📚 Chọn cấp độ</a></li>
+                    <li><a href="/Learning/Daily" class="block text-lg text-blue-600 hover:underline">📚 Lộ Trình Học</a></li> <!-- Thêm "Lộ Trình Học" -->
+                    <li><a href="/Home/Privacy" class="block text-lg text-blue-600 hover:underline">🔒 Chính sách</a></li>
                 </ul>
 
             </div>
