@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using doan.Repository;
 using System.Diagnostics;
-<<<<<<< HEAD
+
 
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +14,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
+
+
+using doan.Models.ViewModels;
 
 
 namespace doan.Controllers
@@ -109,13 +112,33 @@ namespace doan.Controllers
 
 
 
+            var user = await _userManager.GetUserAsync(User);
+            var learnedVocabIds = new List<int>();
+
+            if (user != null)
+            {
+                learnedVocabIds = await _context.UserVocabularyProgresses
+                    .Where(p => p.UserId == user.Id && p.IsLearned)
+                    .Select(p => p.VocabularyId)
+                    .ToListAsync();
+            }
+
             var tuVung = await _context.tuvung
                 .Include(v => v.Lesson)
                 .Where(v => v.Lesson.LevelId == levelId)
+                .Select(v => new VocabularyWithStatus
+                {
+                    Id = v.Id,
+                    Word = v.Tuvung,
+                    Meaning = v.Nghia,
+                    LessonName = v.Lesson.Name,
+                    IsLearned = learnedVocabIds.Contains(v.Id)
+                })
                 .ToListAsync();
 
-            return View(tuVung); // Sử dụng Views/Home/TuVung.cshtml
+            return View("~/Views/Home/TuVung.cshtml", tuVung);
         }
+
 
 
         public async Task<IActionResult> NguPhap(int? levelId)

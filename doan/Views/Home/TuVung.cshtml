@@ -1,41 +1,92 @@
-﻿@model IEnumerable<doan.Models.Vocabulary>
+﻿@using Microsoft.AspNetCore.Identity
+@using doan.Models
 
+@model List<doan.Models.ViewModels.VocabularyWithStatus>
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext Context
 @{
-    ViewData["Title"] = "Từ vựng";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Từ vựng theo cấp độ";
+
+    var user = await UserManager.GetUserAsync(User);
+    var plan = Context.UserLearningPlans.FirstOrDefault(p => p.UserId == user.Id);
+    int done = plan?.CompletedToday ?? 0;
+    int goal = plan?.DailyTarget ?? 10;
+    int percent = goal == 0 ? 0 : (int)((double)done / goal * 100);
 }
 
-<h2 class="mt-4">📘 Danh sách từ vựng</h2>
+<div class="container py-5">
+    <h2 class="mb-4 fw-bold text-primary">📚 Danh sách từ vựng hôm nay</h2>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">Không có từ vựng nào được tìm thấy.</div>
-}
-else
-{
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Từ vựng</th>
-                <th>Phát âm</th>
-                <th>Hán tự</th>
-                <th>Âm Hán</th>
-                <th>Nghĩa</th>
-                <th>Bài học</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Tuvung</td>
-                    <td>@item.PhatAm</td>
-                    <td>@item.HanTu</td>
-                    <td>@item.AmHan</td>
-                    <td>@item.Nghia</td>
-                    <td>@item.Lesson?.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    <!-- Progress -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between">
+            <span><strong>🎯 Tiến độ hôm nay:</strong> @done / @goal từ</span>
+            <span class="text-muted">@percent%</span>
+        </div>
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: @percent%;" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                @percent%
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">Không có từ vựng nào được tìm thấy trong cấp độ này.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover shadow-sm align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Từ</th>
+                        <th>Nghĩa</th>
+                        <th>Bài học</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var item = Model[i];
+                        <tr class="text-center">
+                            <td>@(i + 1)</td>
+                            <td class="text-start">@item.Word</td>
+                            <td class="text-start">@item.Meaning</td>
+                            <td>@item.LessonName</td>
+                            <td>
+                                @if (item.IsLearned)
+                                {
+                                    <span class="badge bg-success px-3 py-2">✅ Đã học</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary px-3 py-2">❌ Chưa học</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!item.IsLearned)
+                                {
+                                    <form asp-controller="Learning" asp-action="MarkLearned" method="post">
+                                        <input type="hidden" name="VocabId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Đánh dấu đã học</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Learning" asp-action="MarkUnlearned" method="post">
+                                        <input type="hidden" name="VocabId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-warning">Đánh dấu chưa học</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

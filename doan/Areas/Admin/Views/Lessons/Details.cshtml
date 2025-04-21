@@ -20,11 +20,21 @@
                         <dd class="col-sm-8 text-start">@Model.Name</dd>
 
 
+
                         <dt class="col-sm-4 text-end fw-semibold">Tiêu đề:</dt>
                         <dd class="col-sm-8 text-start">@Model.Title</dd>
 
-                        <dt class="col-sm-4 text-end fw-semibold">Cấp độ:</dt>
-                        <dd class="col-sm-8 text-start">@Model.Level?.Name</dd>
+    <dt class="col-sm-2">Ngày tạo</dt>
+    <dd class="col-sm-10">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+</dl>
+
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+<a asp-controller="Home" asp-action="TuVung" asp-route-levelId="@Model.LevelId" class="btn btn-success ms-2">
+    🔥 Học từ vựng theo cấp độ
+</a>
+
 
                         <dt class="col-sm-4 text-end fw-semibold">Ngày tạo:</dt>
                         <dd class="col-sm-8 text-start">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
@@ -50,4 +60,9 @@
 </dl>
 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
 <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
->>>>>>> 0052216 (Revert "Tien do hoc tap")
+
+
+<a asp-controller="Learning" asp-action="Daily" class="btn btn-info mt-2">
+    📘 Lộ Trình Học Hôm Nay
+</a>
+
