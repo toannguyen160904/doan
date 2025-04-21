@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using doan.Models
+
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext Context
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -16,9 +24,21 @@
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">🏠 Trang chủ</a>
 
-                <div class="d-flex ms-auto">
-                    <partial name="_LoginPartial" />
+                <div class="d-flex ms-auto align-items-center">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        var plan = Context.UserLearningPlans.FirstOrDefault(p => p.UserId == user.Id);
+                        var completed = plan?.CompletedToday ?? 0;
+                        var target = plan?.DailyTarget ?? 0;
 
+                        <div class="me-3 text-nowrap text-success small fw-bold">
+                            📘 Học hôm nay: @completed / @target từ
+                        </div>
+                    }
+
+                    <partial name="_LoginPartial" />
+                </div>
             </div>
         </nav>
     </header>

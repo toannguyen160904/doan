@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>
+        // Function to search documents by title
         function searchDocuments() {
             var input = document.getElementById('searchInput').value.toLowerCase();
             var lessons = document.getElementsByClassName('lesson-item');
@@ -24,11 +25,13 @@
             }
         }
 
+        // Function to clear the search input
         function clearSearch() {
             document.getElementById('searchInput').value = "";
             searchDocuments();
         }
 
+        // Function to toggle the dropdown menu visibility
         function toggleMenu() {
             document.getElementById("menuDropdown").classList.toggle("hidden");
         }
@@ -44,7 +47,8 @@
                     <a href="/" class="text-xl font-bold text-blue-600 flex items-center">
                         <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
-                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ </a>
+                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ</a>
+                    <a href="/Learning/Daily" class="text-lg text-blue-500 hover:underline">Lộ Trình Học</a> <!-- Thêm "Lộ Trình Học" -->
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -66,9 +70,8 @@
                 <ul class="space-y-2 text-center">
                     <li><a href="/" class="block text-lg text-blue-600 hover:underline">🏠 Trang chủ</a></li>
                     <li><a href="/Home/ChonLevel" class="block text-lg text-blue-600 hover:underline">📚 Chọn cấp độ</a></li>
+                    <li><a href="/Learning/Daily" class="block text-lg text-blue-600 hover:underline">📚 Lộ Trình Học</a></li> <!-- Thêm "Lộ Trình Học" -->
                     <li><a href="/Home/Privacy" class="block text-lg text-blue-600 hover:underline">🔒 Chính sách</a></li>
-
-
                 </ul>
             </div>
         </div>
