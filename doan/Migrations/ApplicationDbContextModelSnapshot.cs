@@ -417,6 +417,7 @@ namespace doan.Migrations
                     b.ToTable("ProductImages");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("doan.Models.TestQuestion", b =>
                 {
                     b.Property<int>("Id")
@@ -518,6 +519,8 @@ namespace doan.Migrations
                     b.ToTable("UserAnswers");
                 });
 
+=======
+>>>>>>> 280a209 (Tien do hoc tap)
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
                 {
                     b.Property<int>("Id")
@@ -599,21 +602,27 @@ namespace doan.Migrations
                     b.Property<string>("HanTu")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LessonId")
+                    b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("NextReviewDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nghia")
+<<<<<<< HEAD
                         .IsRequired()
+=======
+>>>>>>> 280a209 (Tien do hoc tap)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhatAm")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tuvung")
+<<<<<<< HEAD
                         .IsRequired()
+=======
+>>>>>>> 280a209 (Tien do hoc tap)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("UserLearningPlanId")
@@ -723,6 +732,7 @@ namespace doan.Migrations
                     b.Navigation("Product");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("doan.Models.TestResult", b =>
                 {
                     b.HasOne("doan.Models.ApplicationUser", "User")
@@ -753,6 +763,8 @@ namespace doan.Migrations
                     b.Navigation("TestResult");
                 });
 
+=======
+>>>>>>> 280a209 (Tien do hoc tap)
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
                 {
                     b.HasOne("doan.Models.ApplicationUser", "User")
@@ -787,9 +799,11 @@ namespace doan.Migrations
                 {
                     b.HasOne("doan.Models.Baihoc", "Lesson")
                         .WithMany("tuvung")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LessonId");
+
+                    b.HasOne("doan.Models.UserLearningPlan", null)
+                        .WithMany("VocabularyList")
+                        .HasForeignKey("UserLearningPlanId");
 
                     b.HasOne("doan.Models.UserLearningPlan", null)
                         .WithMany("VocabularyList")
