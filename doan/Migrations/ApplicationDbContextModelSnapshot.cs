@@ -417,70 +417,6 @@ namespace doan.Migrations
                     b.ToTable("ProductImages", (string)null);
                 });
 
-            modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompletedToday")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DailyTarget")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserLearningPlans");
-                });
-
-            modelBuilder.Entity("doan.Models.UserVocabularyProgress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsLearned")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LearnedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("NextReviewDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ReviewLevel")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("VocabularyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("VocabularyId");
-
-                    b.ToTable("UserVocabularyProgresses");
-                });
-
             modelBuilder.Entity("doan.Models.Vocabulary", b =>
                 {
                     b.Property<int>("Id")
@@ -490,39 +426,38 @@ namespace doan.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AmHan")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("HanTu")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("LessonId")
+                    b.Property<int>("LessonId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("NextReviewDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Nghia")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("PhatAm")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Tuvung")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UserLearningPlanId")
-                        .HasColumnType("int");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");
 
-                    b.HasIndex("UserLearningPlanId");
-
-                    b.ToTable("tuvung");
+                    b.ToTable("tuvung", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -620,45 +555,13 @@ namespace doan.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
-                {
-                    b.HasOne("doan.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("doan.Models.UserVocabularyProgress", b =>
-                {
-                    b.HasOne("doan.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("doan.Models.Vocabulary", "Vocabulary")
-                        .WithMany("UserVocabularyProgresses")
-                        .HasForeignKey("VocabularyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("Vocabulary");
-                });
-
             modelBuilder.Entity("doan.Models.Vocabulary", b =>
                 {
                     b.HasOne("doan.Models.Baihoc", "Lesson")
                         .WithMany("tuvung")
-                        .HasForeignKey("LessonId");
-
-                    b.HasOne("doan.Models.UserLearningPlan", null)
-                        .WithMany("VocabularyList")
-                        .HasForeignKey("UserLearningPlanId");
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Lesson");
                 });
@@ -683,16 +586,6 @@ namespace doan.Migrations
             modelBuilder.Entity("doan.Models.Product", b =>
                 {
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
-                {
-                    b.Navigation("VocabularyList");
-                });
-
-            modelBuilder.Entity("doan.Models.Vocabulary", b =>
-                {
-                    b.Navigation("UserVocabularyProgresses");
                 });
 #pragma warning restore 612, 618
         }
