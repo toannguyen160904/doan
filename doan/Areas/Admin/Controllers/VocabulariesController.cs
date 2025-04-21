@@ -49,7 +49,7 @@ namespace doan.Areas.Admin.Controllers
                         Console.WriteLine($"❗ Lỗi tại {entry.Key}: {error.ErrorMessage}");
                     }
                 }
-
+                ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
                 return View(vocab);
             }
 

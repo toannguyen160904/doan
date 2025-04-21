@@ -1,0 +1,122 @@
+﻿@using doan.Models
+@model doan.Models.UserLearningPlan
+
+@{
+    ViewData["Title"] = "Lộ Trình Học Hôm Nay";
+    var learnedIds = ViewBag.LearnedIds as List<int> ?? new List<int>();
+    var completed = ViewData["CompletedToday"] as int? ?? 0;
+    var target = ViewData["DailyTarget"] as int? ?? 10;
+    var percent = target > 0 ? (int)((double)completed / target * 100) : 0;
+    var reviewList = ViewBag.ReviewList as List<doan.Models.UserVocabularyProgress> ?? new List<doan.Models.UserVocabularyProgress>();
+}
+
+<div class="container py-5">
+    <h2 class="fw-bold mb-4 text-primary">📘 Lộ Trình Học Hôm Nay</h2>
+
+    @if (completed >= target)
+    {
+        <div class="alert alert-success">🎉 Chúc mừng bạn đã hoàn thành lộ trình hôm nay!</div>
+    }
+    else
+    {
+        <div class="alert alert-warning">⏳ Bạn còn <strong>@(target - completed)</strong> từ để hoàn thành hôm nay!</div>
+    }
+
+    <div class="mb-4">
+        <div class="d-flex justify-content-between">
+            <span><strong>🎯 Tiến độ hôm nay:</strong> @completed / @target từ</span>
+            <span class="text-muted">@percent%</span>
+        </div>
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: @percent%" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                @percent%
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover shadow-sm">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Từ</th>
+                    <th>Nghĩa</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày ôn tập</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.VocabularyList)
+                {
+                    <tr class="text-center">
+                        <td>@item.Id</td>
+                        <td>@item.Tuvung</td>
+                        <td>@item.Nghia</td>
+                        <td>
+                            @if (learnedIds.Contains(item.Id))
+                            {
+                                <span class="badge bg-success">✅ Đã học</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">❌ Chưa học</span>
+                            }
+                        </td>
+                        <td>
+                            @(item.NextReviewDate != null ? item.NextReviewDate.Value.ToString("dd/MM/yyyy") : "Chưa có lịch")
+                        </td>
+                        <td>
+                            @if (learnedIds.Contains(item.Id))
+                            {
+                                <form asp-action="MarkUnlearned" method="post">
+                                    <input type="hidden" name="VocabId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-warning btn-sm">Đánh dấu chưa học</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="MarkLearned" method="post">
+                                    <input type="hidden" name="VocabId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">Đánh dấu đã học</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (reviewList.Any())
+    {
+        <div class="mt-5">
+            <h3 class="text-warning">🔁 Từ cần ôn lại hôm nay (Spaced Repetition)</h3>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th>Từ</th>
+                        <th>Nghĩa</th>
+                        <th>Hán tự</th>
+                        <th>Âm Hán</th>
+                        <th>Ngày học</th>
+                        <th>Ngày ôn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in reviewList)
+                    {
+                        <tr class="table-warning text-center">
+                            <td>@item.Vocabulary.Tuvung</td>
+                            <td>@item.Vocabulary.Nghia</td>
+                            <td>@item.Vocabulary.HanTu</td>
+                            <td>@item.Vocabulary.AmHan</td>
+                            <td>@item.LearnedDate?.ToString("dd/MM/yyyy")</td>
+                            <td>@item.NextReviewDate?.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

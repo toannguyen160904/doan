@@ -1,0 +1,43 @@
+﻿@model List<doan.Models.ViewModels.VocabularyWithStatus>
+@{
+    ViewData["Title"] = "Từ vựng theo cấp độ";
+}
+<div class="container py-4">
+    <h2 class="mb-4 text-xl font-bold">📚 Danh sách từ vựng</h2>
+
+    <!-- ✅ Nút Lộ Trình Học Hôm Nay -->
+    <div class="mb-3">
+        <a asp-controller="Learning" asp-action="Daily" class="btn btn-info">
+            📘 Lộ Trình Học Hôm Nay
+        </a>
+    </div>
+
+    <table class="table table-hover border">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Từ</th>
+                <th scope="col">Nghĩa</th>
+                <th scope="col">Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="align-middle">@item.Word</td>
+                    <td class="align-middle">@item.Meaning</td>
+                    <td class="align-middle">
+                        @if (item.IsLearned)
+                        {
+                            <span class="badge bg-success">Đã học</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Chưa học</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
