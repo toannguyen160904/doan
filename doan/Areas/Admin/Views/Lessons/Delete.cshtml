@@ -1,26 +1,51 @@
 ﻿@model doan.Models.Baihoc
+
 @{
     ViewData["Title"] = "Xoá Bài học";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Xoá Bài học</h2>
-<hr />
-<div>
-    <h4>Bạn có chắc muốn xoá bài học này?</h4>
-    <dl class="row">
-        <dt class="col-sm-2">Tên bài học</dt>
-        <dd class="col-sm-10">@Model.Name</dd>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xoá bài học</h4>
+                </div>
 
-        <dt class="col-sm-2">Tiêu đề</dt>
-        <dd class="col-sm-10">@Model.Title</dd>
+                <div class="card-body text-center">
 
-        <dt class="col-sm-2">Cấp độ</dt>
-        <dd class="col-sm-10">@Model.Level?.Name</dd>
-    </dl>
+                    <p class="text-danger fs-5 fw-bold">
+                        Bạn có chắc chắn muốn xoá bài học này không?
+                    </p>
+
+                    <div class="mb-4">
+                        <dl class="row">
+                            <dt class="col-sm-4 text-end fw-semibold">Tên bài học:</dt>
+                            <dd class="col-sm-8 text-start">@Model.Name</dd>
+
+                            <dt class="col-sm-4 text-end fw-semibold">Tiêu đề:</dt>
+                            <dd class="col-sm-8 text-start">@Model.Title</dd>
+
+                            <dt class="col-sm-4 text-end fw-semibold">Cấp độ:</dt>
+                            <dd class="col-sm-8 text-start">@Model.Level?.Name</dd>
+                        </dl>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash3 me-1"></i> Xoá
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary px-4">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Huỷ
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<form asp-action="Delete">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Xoá</button>
-    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
-</form>
