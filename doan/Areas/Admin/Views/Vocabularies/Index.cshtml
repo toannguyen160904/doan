@@ -1,41 +1,58 @@
 ﻿@model IEnumerable<doan.Models.Vocabulary>
+
 @{
     ViewData["Title"] = "Danh sách từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2 class="mb-3">📘 Danh sách từ vựng</h2>
+<div class="container mt-4">
 
-<a class="btn btn-success mb-3" asp-action="Create">+ Thêm từ vựng</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 text-primary fw-bold"><i class="bi bi-book"></i> Danh sách từ vựng</h2>
+        <a class="btn btn-success shadow-sm" asp-action="Create">
+            <i class="bi bi-plus-circle"></i> Thêm từ vựng
+        </a>
+    </div>
 
-<table class="table table-bordered table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Từ vựng</th>
-            <th>Phát âm</th>
-            <th>Âm Hán</th>
-            <th>Hán tự</th>
-            <th>Nghĩa</th>
-            <th>Bài học</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Tuvung</td>
-                <td>@item.PhatAm</td>
-                <td>@item.AmHan</td>
-                <td>@item.HanTu</td>
-                <td>@item.Nghia</td>
-                <td>@item.Lesson?.Title</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Chi tiết</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="table-responsive shadow-sm border rounded overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Từ vựng</th>
+                    <th>Phát âm</th>
+                    <th>Âm Hán</th>
+                    <th>Hán tự</th>
+                    <th>Nghĩa</th>
+                    <th>Bài học</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="text-center">
+                        <td class="fw-semibold">@item.Tuvung</td>
+                        <td>@item.PhatAm</td>
+                        <td>@item.AmHan</td>
+                        <td>@item.HanTu</td>
+                        <td class="text-wrap" style="max-width:150px">@item.Nghia</td>
+                        <td>@item.Lesson?.Title</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-info-circle"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xoá?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
