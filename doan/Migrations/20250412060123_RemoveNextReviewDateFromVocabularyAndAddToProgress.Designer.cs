@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using doan.Models;
 
@@ -11,9 +12,11 @@ using doan.Models;
 namespace doan.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250412060123_RemoveNextReviewDateFromVocabularyAndAddToProgress")]
+    partial class RemoveNextReviewDateFromVocabularyAndAddToProgress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,7 +261,7 @@ namespace doan.Migrations
 
                     b.HasIndex("LevelId");
 
-                    b.ToTable("Baihoc", (string)null);
+                    b.ToTable("Baihoc");
                 });
 
             modelBuilder.Entity("doan.Models.Category", b =>
@@ -276,7 +279,7 @@ namespace doan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("doan.Models.GrammarStructure", b =>
@@ -310,7 +313,7 @@ namespace doan.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("nguphap", (string)null);
+                    b.ToTable("nguphap");
                 });
 
             modelBuilder.Entity("doan.Models.Level", b =>
@@ -336,7 +339,7 @@ namespace doan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Levels", (string)null);
+                    b.ToTable("Levels");
 
                     b.HasData(
                         new
@@ -392,7 +395,7 @@ namespace doan.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("doan.Models.ProductImage", b =>
@@ -414,7 +417,7 @@ namespace doan.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages", (string)null);
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
