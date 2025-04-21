@@ -1,28 +1,22 @@
 ﻿@model IEnumerable<doan.Models.Baihoc>
 
-<h2 class="mb-4 text-primary">📘 Danh sách bài học</h2>
+<h2>📘 Danh sách bài học</h2>
 
-<table class="table table-bordered table-hover shadow-sm">
-    <thead class="table-light text-center">
+<table class="table">
+    <thead>
         <tr>
             <th>Tên bài học</th>
             <th>Tiêu đề</th>
             <th>Cấp độ</th>
-            <th>Hành động</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var lesson in Model)
         {
-            <tr class="text-center">
+            <tr>
                 <td>@lesson.Name</td>
                 <td>@lesson.Title</td>
                 <td>@lesson.Level?.Name</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-sm btn-info">
-                        👁️ Xem chi tiết
-                    </a>
-                </td>
             </tr>
         }
     </tbody>
