@@ -5,23 +5,45 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>🔍 Chi tiết ngữ pháp</h2>
-<hr />
-<dl class="row">
-    <dt class="col-sm-2">Bài học</dt>
-    <dd class="col-sm-10">@Model.Lesson?.Name</dd>
+<div class="container mt-4">
 
-    <dt class="col-sm-2">Cấu trúc</dt>
-    <dd class="col-sm-10">@Model.CongThuc</dd>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="bi bi-eye-fill me-2"></i> Chi tiết ngữ pháp</h4>
+        </div>
 
-    <dt class="col-sm-2">Giải thích</dt>
-    <dd class="col-sm-10">@Model.GiaiThich</dd>
+        <div class="card-body">
 
-    <dt class="col-sm-2">Ví dụ</dt>
-    <dd class="col-sm-10">@Model.CauViDu</dd>
-</dl>
+            <dl class="row mb-0">
 
-<div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Sửa</a>
-    <a asp-action="Index" class="btn btn-secondary ms-2">⬅ Quay lại</a>
+                <dt class="col-sm-3 fw-semibold">Cấp độ</dt>
+                <dd class="col-sm-9">@Model.Lesson?.Level?.Name</dd>
+
+                <dt class="col-sm-3 fw-semibold">Bài học</dt>
+                <dd class="col-sm-9">@Model.Lesson?.Name</dd>
+
+                <dt class="col-sm-3 fw-semibold">Cấu trúc ngữ pháp</dt>
+                <dd class="col-sm-9">@Model.CongThuc</dd>
+
+                <dt class="col-sm-3 fw-semibold">Giải thích</dt>
+                <dd class="col-sm-9">@Model.GiaiThich</dd>
+
+                <dt class="col-sm-3 fw-semibold">Câu ví dụ</dt>
+                <dd class="col-sm-9">@Model.CauViDu</dd>
+
+            </dl>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil-square me-1"></i> Sửa
+                </a>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
+                </a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
