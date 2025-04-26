@@ -18,6 +18,7 @@ namespace doan.Models
         public DbSet<Vocabulary> tuvung { get; set; }
         public DbSet<GrammarStructure> nguphap { get; set; }
         public DbSet<flashcards> Flashcards { get; set; }
+        public DbSet<Diendanmodel> Diendan { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,6 +62,8 @@ namespace doan.Models
                 .WithOne() // không dùng navigation ở Vocabulary
                 .HasForeignKey<flashcards>(f => f.VocabularyId)
                 .OnDelete(DeleteBehavior.Restrict);
+           
         }
+
     }
 }

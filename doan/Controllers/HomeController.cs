@@ -79,10 +79,6 @@ namespace doan.Controllers
             return View();
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
 
         public IActionResult Privacy() => View();
 
@@ -91,34 +87,7 @@ namespace doan.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        [Authorize]
-        // ✅ NEW: Action xem từ vựng theo Level
-        public async Task<IActionResult> TuVung(int? levelId)
-        {
-            if (levelId == null)
-                return NotFound();
-
-            var tuVung = await _context.tuvung
-                .Include(v => v.Lesson)
-                .Where(v => v.Lesson.LevelId == levelId)
-                .ToListAsync();
-
-            return View(tuVung); // Sử dụng Views/Home/TuVung.cshtml
-        }
-        [Authorize]
-        // ✅ NEW: Action xem ngữ pháp theo Level
-        public async Task<IActionResult> NguPhap(int? levelId)
-        {
-            if (levelId == null)
-                return NotFound();
-
-            var nguPhap = await _context.nguphap
-                .Include(g => g.Lesson)
-                .Where(g => g.Lesson.LevelId == levelId)
-                .ToListAsync();
-
-            return View(nguPhap); // Sử dụng Views/Home/NguPhap.cshtml
-        }
+       
         [Authorize]
         public IActionResult Flashcards(int baiHocId)
         {
