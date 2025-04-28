@@ -12,8 +12,8 @@ public class LessonController : Controller
 
     public LessonController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        _context = context;
+        _userManager = userManager;
     }
 
     public IActionResult Details(int id)
@@ -56,7 +56,9 @@ public class LessonController : Controller
     {
         if (ModelState.IsValid)
         {
-            var baiHoc = _context.Baihoc.Include(b => b.Diendan).FirstOrDefault(b => b.Id == BaiHocId);
+            var baiHoc = _context.Baihoc
+                .Include(b => b.Diendan)
+                .FirstOrDefault(b => b.Id == BaiHocId);
             if (baiHoc != null)
             {
                 var userId = _userManager.GetUserId(User);
