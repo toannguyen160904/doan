@@ -4,6 +4,7 @@
     ViewData["Title"] = "Chọn Cấp Độ";
 }
 
+<!-- Head -->
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="~/css/chonlevel.css" asp-append-version="true" />
 </head>
 
+<!-- Body -->
 <body class="bg-gray-100">
     <div class="container mx-auto p-5">
 
@@ -18,18 +20,25 @@
         <div class="flex flex-wrap items-center justify-between bg-white p-4 rounded-lg shadow-md">
             <a href="/Home/Index" class="text-blue-600 font-bold text-lg">🏠 Trang chủ</a>
 
+            <!-- Ô tìm kiếm -->
             <div class="relative w-1/2">
-                <input type="text" id="searchInput" class="w-full p-2 pl-3 pr-10 border rounded-lg shadow-sm focus:ring focus:ring-blue-300" placeholder="Tìm kiếm bài học...">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm bài học..."
+                       class="w-full p-2 pl-3 pr-10 border rounded-lg shadow-sm focus:ring focus:ring-blue-300" />
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <i class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-black" onclick="clearSearch()"></i>
+                <i class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-black"
+                   onclick="clearSearch()"></i>
             </div>
         </div>
 
-        <!-- Nút chọn Level -->
+        <!-- Nút chọn cấp độ -->
         <div class="flex space-x-4 mt-5">
-            <button onclick="changeLevel('N5')" class="level-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">N5</button>
-            <button onclick="changeLevel('N4')" class="level-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">N4</button>
-            <button onclick="changeLevel('N3')" class="level-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">N3</button>
+            @foreach (var capDo in new[] { "N5", "N4", "N3" })
+            {
+                <button onclick="changeLevel('@capDo')"
+                        class="level-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    @capDo
+                </button>
+            }
         </div>
 
         <!-- Loading Icon -->
@@ -37,28 +46,36 @@
             <i class="fas fa-spinner fa-spin text-blue-500 text-3xl"></i>
         </div>
 
-        <!-- Danh sách bài học -->
+        <!-- Danh sách bài học theo cấp độ -->
         @foreach (var level in Model)
         {
             <div class="mt-6 level-section" data-level="@level.Name">
-                <h2 class="text-2xl font-bold text-gray-800 typing-title"></h2>
+                <h2 class="text-2xl font-bold text-gray-800 typing-title">@level.Name</h2>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                     @foreach (var lesson in level.Lessons)
                     {
                         <div class="grid-item level-@level.Name relative bg-white p-4 rounded-lg shadow-md">
-                            <img src="https://dongphucvina.vn/wp-content/uploads/2023/05/hutech-logo.jpeg" alt="@lesson.Name" class="w-full rounded-lg">
+                            <img src="https://dongphucvina.vn/wp-content/uploads/2023/05/hutech-logo.jpeg"
+                                 alt="@lesson.Name" class="w-full rounded-lg" />
+
                             <h3 class="lesson-title text-lg font-bold mt-2">@lesson.Name</h3>
                             <p class="text-gray-600">Bài học trong cấp độ @level.Name</p>
-                            <a asp-controller="Lesson" asp-action="Details" asp-route-id="@lesson.Id" class="block bg-blue-500 text-white px-4 py-2 mt-2 text-center rounded-lg hover:bg-blue-700">Học ngay</a>
+
+                            <a asp-controller="Lesson"
+                               asp-action="Details"
+                               asp-route-id="@lesson.Id"
+                               class="block bg-blue-500 text-white px-4 py-2 mt-2 text-center rounded-lg hover:bg-blue-700">
+                                Học ngay
+                            </a>
                         </div>
                     }
                 </div>
             </div>
         }
-
     </div>
 
-    <!-- CSS Animation -->
+    <!-- CSS nội dòng -->
     <style>
         .animate-fadeInUp {
             animation: fadeInUp 0.5s ease forwards;
@@ -71,6 +88,9 @@
 
         .grid-item:hover {
             border: 2px solid #3b82f6;
+            transform: scale(1.05);
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .level-section h2 {
@@ -87,12 +107,5 @@
             transition: 0.2s;
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
-
-        .grid-item:hover {
-            transform: scale(1.05);
-            transition: 0.3s;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-        }
     </style>
-
 </body>

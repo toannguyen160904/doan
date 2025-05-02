@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using doan.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
 using Microsoft.AspNetCore.Identity;
+using doan.Models;
+using System;
+using System.Linq;
 
 public class LessonController : Controller
 {
@@ -16,18 +16,15 @@ public class LessonController : Controller
         _userManager = userManager;
     }
 
+    // Hiển thị chi tiết bài học
     public IActionResult Details(int id)
     {
-        if (_context == null)
-        {
-            return Problem("Database context is not available.");
-        }
-
+        // Lấy bài học theo ID, bao gồm từ vựng, ngữ pháp và diễn đàn liên quan
         var lesson = _context.Baihoc
             .Include(l => l.tuvung)
             .Include(l => l.nguphap)
             .Include(l => l.Diendan)
-            .ThenInclude(d => d.User)
+                .ThenInclude(d => d.User)
             .FirstOrDefault(l => l.Id == id);
 
         if (lesson == null)
@@ -35,10 +32,11 @@ public class LessonController : Controller
             return NotFound();
         }
 
-        // Lấy danh sách flashcard từ các từ vựng và ngữ pháp của bài học
+        // Lấy danh sách ID từ vựng và ngữ pháp của bài học
         var vocabIds = lesson.tuvung.Select(v => v.Id).ToList();
         var grammarIds = lesson.nguphap.Select(g => g.Id).ToList();
 
+        // Lấy các flashcard liên quan đến từ vựng hoặc ngữ pháp
         var flashcards = _context.Flashcards
             .Include(f => f.Vocabulary)
             .Include(f => f.GrammarStructure)
@@ -51,33 +49,39 @@ public class LessonController : Controller
 
         return View("~/Views/Level/Details.cshtml", lesson);
     }
+
+    // Đăng bài viết lên diễn đàn của bài học
     [HttpPost]
     public IActionResult DangBai(int BaiHocId, string TieuDe, string NoiDung)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var baiHoc = _context.Baihoc
-                .Include(b => b.Diendan)
-                .FirstOrDefault(b => b.Id == BaiHocId);
-            if (baiHoc != null)
-            {
-                var userId = _userManager.GetUserId(User);
-                var newPost = new Diendanmodel
-                {
-                    BaiHocId = BaiHocId,
-                    UserId = userId,
-                    TieuDe = TieuDe,
-                    NoiDung = NoiDung,
-                    CreatedAt = DateTime.Now
-                };
-
-                baiHoc.Diendan.Add(newPost);
-                _context.SaveChanges();
-
-                return RedirectToAction("Details", new { id = BaiHocId });
-            }
+            return RedirectToAction("Details", new { id = BaiHocId });
         }
 
-        return RedirectToAction("Index");
+        var baiHoc = _context.Baihoc
+            .Include(b => b.Diendan)
+            .FirstOrDefault(b => b.Id == BaiHocId);
+
+        if (baiHoc == null)
+        {
+            return NotFound();
+        }
+
+        var userId = _userManager.GetUserId(User);
+
+        var newPost = new Diendanmodel
+        {
+            BaiHocId = BaiHocId,
+            UserId = userId,
+            TieuDe = TieuDe,
+            NoiDung = NoiDung,
+            CreatedAt = DateTime.Now
+        };
+
+        baiHoc.Diendan.Add(newPost);
+        _context.SaveChanges();
+
+        return RedirectToAction("Details", new { id = BaiHocId });
     }
 }

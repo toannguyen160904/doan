@@ -22,7 +22,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Cấp độ <span class="text-danger">*</span></label>
-                        <select id="levelSelect" class="form-select">
+                        <select id="levelSelect" class="form-select" data-current-level-id="@ViewBag.CurrentLevelId">
                             <option value="">-- Chọn cấp độ --</option>
                             @foreach (var level in (SelectList)ViewBag.Levels)
                             {
@@ -34,7 +34,7 @@
                     <div class="col-md-6 mb-3">
                         <label asp-for="LessonId" class="form-label fw-semibold">Bài học <span class="text-danger">*</span></label>
                         <select id="lessonSelect" class="form-select"></select>
-                        <input type="hidden" asp-for="LessonId" />
+                        <input type="hidden" asp-for="LessonId" data-current-lesson-id="@Model.LessonId" />
                         <span asp-validation-for="LessonId" class="text-danger small"></span>
                     </div>
                 </div>
@@ -75,44 +75,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        var currentLessonId = '@Model.LessonId';
-
-        $(document).ready(function () {
-
-            // Tự load bài học của cấp độ hiện tại khi load form
-            loadLessonsByLevel('@ViewBag.CurrentLevelId', currentLessonId);
-
-            $('#levelSelect').val('@ViewBag.CurrentLevelId');
-
-            $('#levelSelect').change(function () {
-                var levelId = $(this).val();
-                loadLessonsByLevel(levelId, "");
-            });
-
-            $('#lessonSelect').change(function () {
-                $('#LessonId').val($(this).val());
-            });
-        });
-
-        function loadLessonsByLevel(levelId, selectedLessonId) {
-            if (levelId) {
-                $.get('/api/BaihocApi/GetByLevel/' + levelId, function (data) {
-                    var lessonSelect = $('#lessonSelect');
-                    lessonSelect.empty();
-                    lessonSelect.append('<option value="">-- Chọn bài học --</option>');
-
-                    $.each(data, function (i, lesson) {
-                        if (lesson.id == selectedLessonId) {
-                            lessonSelect.append(`<option value="${lesson.id}" selected>${lesson.name}</option>`);
-                        } else {
-                            lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
-                        }
-                    });
-                    $('#LessonId').val(selectedLessonId);
-                });
-            }
-        }
-    </script>
+    <script src="~/js/sua-ngu-phap.js"></script>
 }
