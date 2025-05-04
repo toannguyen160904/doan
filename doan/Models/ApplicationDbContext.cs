@@ -34,6 +34,7 @@ namespace doan.Models
                 new Level { Id = 3, Name = "N3", Description = "Trung cấp", CreatedAt = new DateTime(2024, 1, 1) }
             );
 
+           
             // Quan hệ: Baihoc - Level (1 - nhiều)
             modelBuilder.Entity<Baihoc>()
                 .HasOne(b => b.Level)
@@ -41,6 +42,9 @@ namespace doan.Models
                 .HasForeignKey(b => b.LevelId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Baihoc>()
+                .HasIndex(b => new { b.Name, b.LevelId })
+                .IsUnique();
             // Quan hệ: Baihoc - Vocabulary (1 - nhiều)
             modelBuilder.Entity<Vocabulary>()
                 .HasOne(v => v.Lesson)
@@ -59,6 +63,7 @@ namespace doan.Models
                 .WithOne()
                 .HasForeignKey<flashcards>(f => f.GrammarStructureId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Baihoc>().HasQueryFilter(b => !b.IsDeleted);
 
             // Quan hệ: Flashcards - Vocabulary (1 - 1)
             modelBuilder.Entity<flashcards>()

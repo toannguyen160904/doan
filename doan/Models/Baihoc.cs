@@ -16,6 +16,8 @@ namespace doan.Models
         [StringLength(255)]
         public string Title { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         [Required]
         public int LevelId { get; set; }
 

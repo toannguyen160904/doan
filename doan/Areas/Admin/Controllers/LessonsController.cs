@@ -36,7 +36,6 @@ namespace doan.Areas.Admin.Controllers
             ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
             return View();
         }
-
         // POST: Admin/Lessons/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -46,9 +45,17 @@ namespace doan.Areas.Admin.Controllers
 
             ModelState.Remove("Level");
             ModelState.Remove("Flashcards");
+            if (await _context.Baihoc.AnyAsync(b => b.Name == lesson.Name && b.LevelId == lesson.LevelId))
+
+            {
+                ModelState.AddModelError("Name", "Tên bài học đã tồn tại.");
+                ViewBag.Levels = new SelectList(await _context.Levels.ToListAsync(), "Id", "Name", lesson.LevelId);
+                return View(lesson);
+            }
 
             if (!ModelState.IsValid)
             {
+
                 _logger.LogWarning("ModelState không hợp lệ.");
                 ViewBag.Levels = new SelectList(await _context.Levels.ToListAsync(), "Id", "Name", lesson.LevelId);
                 return View(lesson);
@@ -81,7 +88,6 @@ namespace doan.Areas.Admin.Controllers
             ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
             return View(lesson);
         }
-
         // POST: Admin/Lessons/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -91,6 +97,13 @@ namespace doan.Areas.Admin.Controllers
 
             ModelState.Remove("Flashcards");
             ModelState.Remove("Level");
+            bool tentrung = await _context.Baihoc.AnyAsync(b =>b.Name == lesson.Name&& b.Id !=lesson.Id);
+            if (tentrung)
+            {
+                ModelState.AddModelError("Name", "Tên bài học đã tồn tại.");
+                ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
+                return View(lesson);
+            }
 
             if (ModelState.IsValid)
             {
@@ -98,11 +111,9 @@ namespace doan.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
             ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
             return View(lesson);
         }
-
         // GET: Admin/Lessons/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -124,13 +135,13 @@ namespace doan.Areas.Admin.Controllers
             var lesson = await _context.Baihoc.FindAsync(id);
             if (lesson != null)
             {
-                _context.Baihoc.Remove(lesson);
+               lesson.IsDeleted = true;
+                _context.Baihoc.Update(lesson);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
-
-        // GET: Admin/Lessons/Details/5
+            // GET: Admin/Lessons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -140,6 +151,54 @@ namespace doan.Areas.Admin.Controllers
             if (lesson == null) return NotFound();
 
             return View(lesson);
+        }
+        public async Task<IActionResult> IndexThungrac()
+        {
+            var deletedLessons = await _context.Baihoc
+                .IgnoreQueryFilters()
+                .Where(b => b.IsDeleted)
+                .Include(b => b.Level)
+                .ToListAsync();
+
+            return View(deletedLessons);
+        }
+        public async Task<IActionResult> Restore(int id)
+        {
+            var lesson = await _context.Baihoc
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (lesson != null)
+            {
+                lesson.IsDeleted = false;
+                _context.Update(lesson);
+                await _context.SaveChangesAsync();
+            }
+
+            // Sau khi khôi phục, điều hướng về trang Trash để làm mới danh sách
+            return RedirectToAction("IndexThungrac");
+        }
+        private async Task<List<Baihoc>> GetDeletedLessons()
+        {
+            return await _context.Baihoc
+                .IgnoreQueryFilters()
+                .Where(b => b.IsDeleted)
+                .Include(b => b.Level)
+                .ToListAsync();
+        }
+        public async Task<IActionResult> DeletePermanent(int id)
+        {
+            var lesson = await _context.Baihoc
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (lesson != null)
+            {
+                _context.Baihoc.Remove(lesson); // Xóa khỏi DB
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("IndexThungrac"); // Quay lại trang thùng rác
         }
     }
 }
