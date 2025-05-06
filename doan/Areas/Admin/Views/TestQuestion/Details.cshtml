@@ -1,0 +1,30 @@
+﻿@model doan.Models.TestQuestion
+
+@{
+    ViewData["Title"] = "Chi tiết câu hỏi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Chi tiết câu hỏi</h2>
+
+<div class="card">
+    <div class="card-header"><strong>@Model.QuestionText</strong></div>
+    <div class="card-body">
+        <p><strong>Chủ đề:</strong> @Model.Topic</p>
+        <p><strong>Trình độ:</strong> @Model.Level</p>
+        <p><strong>Đáp án đúng:</strong> @Model.CorrectAnswer</p>
+        <p><strong>Lựa chọn:</strong></p>
+        <ul>
+            @foreach (var choice in Model.Choices)
+            {
+                <li>@choice</li>
+            }
+        </ul>
+        @if (!string.IsNullOrWhiteSpace(Model.Explanation))
+        {
+            <p><strong>Giải thích:</strong> @Model.Explanation</p>
+        }
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Quay lại danh sách</a>

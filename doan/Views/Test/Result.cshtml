@@ -1,0 +1,17 @@
+﻿@model doan.Models.TestResult
+
+@{
+    ViewData["Title"] = "Kết quả bài kiểm tra đầu vào";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>✅ Kết quả kiểm tra đầu vào</h2>
+
+<p><strong>Số câu đúng:</strong> @Model.CorrectAnswers / 20</p>
+<p><strong>Điểm tổng:</strong> @Model.TotalScore</p>
+<p><strong>Trình độ gợi ý:</strong> <span class="badge bg-success">@Model.SuggestedLevel</span></p>
+
+<hr />
+
+<a class="btn btn-success" asp-controller="Learning" asp-action="Start">Bắt đầu học ngay</a>
+<a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Về trang chính</a>

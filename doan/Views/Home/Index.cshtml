@@ -18,7 +18,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>
-        // Function to search documents by title
         function searchDocuments() {
             var input = document.getElementById('searchInput').value.toLowerCase();
             var lessons = document.getElementsByClassName('lesson-item');
@@ -26,22 +25,15 @@
             for (var i = 0; i < lessons.length; i++) {
                 var lesson = lessons[i];
                 var title = lesson.getAttribute('data-title').toLowerCase();
-
-                if (title.includes(input)) {
-                    lesson.style.display = "";
-                } else {
-                    lesson.style.display = "none";
-                }
+                lesson.style.display = title.includes(input) ? "" : "none";
             }
         }
 
-        // Function to clear the search input
         function clearSearch() {
             document.getElementById('searchInput').value = "";
             searchDocuments();
         }
 
-        // Function to toggle the dropdown menu visibility
         function toggleMenu() {
             document.getElementById("menuDropdown").classList.toggle("hidden");
         }
@@ -58,7 +50,7 @@
                         <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
                     <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ</a>
-                    <a href="/Learning/Daily" class="text-lg text-blue-500 hover:underline">Lộ Trình Học</a> <!-- Thêm "Lộ Trình Học" -->
+                    <a href="/Learning/Daily" class="text-lg text-blue-500 hover:underline">Lộ Trình Học</a>
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -80,10 +72,9 @@
                 <ul class="space-y-2 text-center">
                     <li><a href="/" class="block text-lg text-blue-600 hover:underline">🏠 Trang chủ</a></li>
                     <li><a href="/Home/ChonLevel" class="block text-lg text-blue-600 hover:underline">📚 Chọn cấp độ</a></li>
-                    <li><a href="/Learning/Daily" class="block text-lg text-blue-600 hover:underline">📚 Lộ Trình Học</a></li> <!-- Thêm "Lộ Trình Học" -->
+                    <li><a href="/Learning/Daily" class="block text-lg text-blue-600 hover:underline">📈 Lộ Trình Học</a></li>
                     <li><a href="/Home/Privacy" class="block text-lg text-blue-600 hover:underline">🔒 Chính sách</a></li>
                 </ul>
-
             </div>
         </div>
 
@@ -100,7 +91,18 @@
             </div>
         </div>
 
-        <!-- Danh sách bài học -->
+        <!-- Test đầu vào -->
+        <div class="flex justify-center mb-8">
+            <div class="w-full md:w-2/3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-xl shadow-lg text-center">
+                <h3 class="text-2xl font-bold mb-2">🎯 Test đầu vào</h3>
+                <p class="mb-4 text-lg">Làm bài kiểm tra để đánh giá trình độ và nhận lộ trình học cá nhân hoá</p>
+                <a href="/Test/Start" class="inline-block bg-white text-indigo-600 px-5 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    Bắt đầu bài kiểm tra
+                </a>
+            </div>
+        </div>
+
+        <!-- Danh sách học phần -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="lesson-item bg-white p-4 rounded-lg shadow-md text-center" data-title="Học từ vựng">
                 <h2 class="text-xl font-semibold text-gray-700">Học từ vựng</h2>

@@ -1,0 +1,35 @@
+﻿@model List<doan.Models.TestQuestion>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_TestLayout.cshtml";
+    ViewData["Title"] = "Làm bài kiểm tra đầu vào";
+}
+
+<form asp-action="Submit" method="post">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        var question = Model[i];
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>Câu @(i + 1):</strong> @question.QuestionText
+            </div>
+            <div class="card-body">
+                @foreach (var choice in question.Choices)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="answers[@i].SelectedAnswer"
+                               value="@choice"
+                               required />
+                        <label class="form-check-label">@choice</label>
+                    </div>
+                }
+
+                <input type="hidden" name="answers[@i].QuestionId" value="@question.Id" />
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Nộp bài</button>
+</form>

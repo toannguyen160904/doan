@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using doan.Repository;
 using System.Diagnostics;
 using doan.Models.ViewModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace doan.Controllers
 {
@@ -41,17 +43,8 @@ namespace doan.Controllers
         public async Task<IActionResult> ChonLevel()
         {
             var levels = await _context.Levels.Include(l => l.Lessons).ToListAsync();
-
             if (levels == null || !levels.Any())
-            {
-                Console.WriteLine("Không có dữ liệu Level nào!");
                 return View(new List<Level>());
-            }
-
-            foreach (var level in levels)
-            {
-                Console.WriteLine($"Level: {level.Name} - Số bài học: {level.Lessons?.Count ?? 0}");
-            }
 
             return View(levels);
         }
@@ -60,15 +53,13 @@ namespace doan.Controllers
         public async Task<IActionResult> Login(string email, string password)
         {
             var user = await _userManager.FindByNameAsync(email);
-
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
                 if (result.Succeeded)
-                {
                     return RedirectToAction("Index1");
-                }
             }
+
             ViewBag.ErrorMessage = "Invalid username or password.";
             return View("Login");
         }
@@ -92,11 +83,10 @@ namespace doan.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // ✅ NEW: Action xem từ vựng theo Level
+        // ✅ Xem từ vựng theo Level
         public async Task<IActionResult> TuVung(int? levelId)
         {
-            if (levelId == null)
-                return NotFound();
+            if (levelId == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
             var learnedVocabIds = new List<int>();
@@ -125,19 +115,55 @@ namespace doan.Controllers
             return View("~/Views/Home/TuVung.cshtml", tuVung);
         }
 
-
-        // ✅ NEW: Action xem ngữ pháp theo Level
+        // ✅ Xem ngữ pháp theo Level
         public async Task<IActionResult> NguPhap(int? levelId)
         {
-            if (levelId == null)
-                return NotFound();
+            if (levelId == null) return NotFound();
 
             var nguPhap = await _context.nguphap
                 .Include(g => g.Lesson)
                 .Where(g => g.Lesson.LevelId == levelId)
                 .ToListAsync();
 
-            return View(nguPhap); // Sử dụng Views/Home/NguPhap.cshtml
+            return View(nguPhap);
+        }
+
+        // ✅ Giao diện làm bài test đầu vào
+        public async Task<IActionResult> Test()
+        {
+            var questions = await _context.TestQuestions
+                .Where(q => q.IsActive)
+                .OrderBy(q => Guid.NewGuid())
+                .Take(20)
+                .ToListAsync();
+
+            return View("~/Views/Home/Test.cshtml", questions);
+        }
+
+        // ✅ Xử lý nộp bài test đầu vào
+        [HttpPost]
+        public async Task<IActionResult> Submit(List<TestAnswerInput> answers)
+        {
+            int correct = 0;
+            foreach (var ans in answers)
+            {
+                var question = await _context.TestQuestions.FindAsync(ans.QuestionId);
+                if (question != null && question.CorrectAnswer == ans.SelectedAnswer)
+                    correct++;
+            }
+
+            string level = "N5";
+            if (correct >= 15) level = "N3";
+            else if (correct >= 8) level = "N4";
+
+            var result = new TestResult
+            {
+                CorrectAnswers = correct,
+                TotalScore = correct,
+                SuggestedLevel = level
+            };
+
+            return View("~/Views/Home/TestResult.cshtml", result);
         }
     }
 }
