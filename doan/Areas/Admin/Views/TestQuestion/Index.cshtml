@@ -1,0 +1,39 @@
+﻿@model List<doan.Models.TestQuestion>
+
+@{
+    ViewData["Title"] = "Danh sách câu hỏi test đầu vào";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">+ Thêm mới</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>#</th>
+            <th>Câu hỏi</th>
+            <th>Chủ đề</th>
+            <th>Trình độ</th>
+            <th>Đáp án đúng</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var q in Model)
+        {
+            <tr>
+                <td>@q.Id</td>
+                <td>@q.QuestionText</td>
+                <td>@q.Topic</td>
+                <td>@q.Level</td>
+                <td>@q.CorrectAnswer</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@q.Id" class="btn btn-info btn-sm">Chi tiết</a>
+                    <a asp-action="Edit" asp-route-id="@q.Id" class="btn btn-warning btn-sm">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@q.Id" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xoá?')">Xoá</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

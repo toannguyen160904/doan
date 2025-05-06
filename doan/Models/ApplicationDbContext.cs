@@ -20,6 +20,10 @@ namespace doan.Models
         public DbSet<GrammarStructure> nguphap { get; set; }
         public DbSet<UserLearningPlan> UserLearningPlans { get; set; }
         public DbSet<UserVocabularyProgress> UserVocabularyProgresses { get; set; }
+        public DbSet<TestQuestion> TestQuestions { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

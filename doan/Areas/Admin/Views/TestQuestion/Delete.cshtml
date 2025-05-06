@@ -1,0 +1,28 @@
+﻿@model doan.Models.TestQuestion
+
+@{
+    ViewData["Title"] = "Xoá câu hỏi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Xác nhận xoá</h2>
+
+<div class="alert alert-danger">
+    Bạn có chắc chắn muốn xoá câu hỏi này?
+</div>
+
+<div>
+    <strong>Câu hỏi:</strong> @Model.QuestionText
+</div>
+<div>
+    <strong>Chủ đề:</strong> @Model.Topic
+</div>
+<div>
+    <strong>Trình độ:</strong> @Model.Level
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Xoá</button>
+    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
+</form>
