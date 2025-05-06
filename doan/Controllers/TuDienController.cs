@@ -37,6 +37,7 @@ namespace doan.Controllers
                 query = query.Where(v => 
                     (v.Tuvung != null && v.Tuvung.ToLower().Contains(searchTerm)) || // Use Tuvung property
                     (v.Nghia != null && v.Nghia.ToLower().Contains(searchTerm)) || // Use Nghia property
+                    (v.HanTu != null && v.HanTu.ToLower().Contains(searchTerm)) || // Use HanTu property
                     (v.PhatAm != null && v.PhatAm.ToLower().Contains(searchTerm)) // Use PhatAm property
                 );
             }
