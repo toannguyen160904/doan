@@ -415,9 +415,112 @@ namespace doan.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages");
+
                 });
 
-<<<<<<< HEAD
+            modelBuilder.Entity("doan.Models.TestQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChoicesJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrectAnswer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Explanation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TestQuestions");
+                });
+
+            modelBuilder.Entity("doan.Models.TestResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CorrectAnswers")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SuggestedLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestResults");
+                });
+
+            modelBuilder.Entity("doan.Models.UserAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("SelectedAnswer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TestQuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TestResultId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestQuestionId");
+
+                    b.HasIndex("TestResultId");
+
+                    b.ToTable("UserAnswers");
+
+                });
+
+
             modelBuilder.Entity("doan.Models.TestQuestion", b =>
                 {
                     b.Property<int>("Id")
@@ -519,8 +622,7 @@ namespace doan.Migrations
                     b.ToTable("UserAnswers");
                 });
 
-=======
->>>>>>> 280a209 (Tien do hoc tap)
+
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
                 {
                     b.Property<int>("Id")
@@ -602,27 +704,29 @@ namespace doan.Migrations
                     b.Property<string>("HanTu")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LessonId")
+                    b.Property<int>("LessonId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("NextReviewDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nghia")
-<<<<<<< HEAD
+
                         .IsRequired()
-=======
->>>>>>> 280a209 (Tien do hoc tap)
+
+                        .IsRequired()
+
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhatAm")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tuvung")
-<<<<<<< HEAD
+
                         .IsRequired()
-=======
->>>>>>> 280a209 (Tien do hoc tap)
+
+                        .IsRequired()
+
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("UserLearningPlanId")
@@ -732,7 +836,7 @@ namespace doan.Migrations
                     b.Navigation("Product");
                 });
 
-<<<<<<< HEAD
+
             modelBuilder.Entity("doan.Models.TestResult", b =>
                 {
                     b.HasOne("doan.Models.ApplicationUser", "User")
@@ -763,8 +867,6 @@ namespace doan.Migrations
                     b.Navigation("TestResult");
                 });
 
-=======
->>>>>>> 280a209 (Tien do hoc tap)
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
                 {
                     b.HasOne("doan.Models.ApplicationUser", "User")
@@ -799,7 +901,9 @@ namespace doan.Migrations
                 {
                     b.HasOne("doan.Models.Baihoc", "Lesson")
                         .WithMany("tuvung")
-                        .HasForeignKey("LessonId");
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("doan.Models.UserLearningPlan", null)
                         .WithMany("VocabularyList")

@@ -7,11 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using doan.Repository;
 using System.Diagnostics;
 using doan.Models.ViewModels;
-<<<<<<< HEAD
+
 using System.Collections.Generic;
 using System.Linq;
-=======
->>>>>>> 280a209 (Tien do hoc tap)
+
+using System.Collections.Generic;
+using System.Linq;
+
 
 namespace doan.Controllers
 {
@@ -91,6 +93,7 @@ namespace doan.Controllers
         {
             if (levelId == null) return NotFound();
 
+
             var user = await _userManager.GetUserAsync(User);
             var learnedVocabIds = new List<int>();
 
@@ -101,6 +104,7 @@ namespace doan.Controllers
                     .Select(p => p.VocabularyId)
                     .ToListAsync();
             }
+
 
             var user = await _userManager.GetUserAsync(User);
             var learnedVocabIds = new List<int>();
@@ -129,12 +133,6 @@ namespace doan.Controllers
             return View("~/Views/Home/TuVung.cshtml", tuVung);
         }
 
-<<<<<<< HEAD
-        // ✅ Xem ngữ pháp theo Level
-=======
-
-        // ✅ NEW: Action xem ngữ pháp theo Level
->>>>>>> 280a209 (Tien do hoc tap)
         public async Task<IActionResult> NguPhap(int? levelId)
         {
             if (levelId == null) return NotFound();
