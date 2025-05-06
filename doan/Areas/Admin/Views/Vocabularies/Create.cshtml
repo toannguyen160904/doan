@@ -1,7 +1,6 @@
 ﻿@model doan.Models.Vocabulary
 
 @{
-    ViewData["Title"] = "Thêm từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -79,22 +78,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        $("#levelSelect").change(function () {
-            var levelId = $(this).val();
-            $.get("/api/BaihocApi/GetByLevel/" + levelId, function (data) {
-                var lessonSelect = $("#lessonSelect");
-                lessonSelect.empty();
-                lessonSelect.append('<option value="">-- Chọn bài học --</option>');
-                $.each(data, function (i, lesson) {
-                    lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
-                });
-                $("#LessonId").val("");
-            });
-        });
-
-        $("#lessonSelect").change(function () {
-            $("#LessonId").val($(this).val());
-        });
-    </script>
+    <script src="~/js/them-tu-vung.js"></script>
 }

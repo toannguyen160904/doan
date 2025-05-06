@@ -32,5 +32,6 @@ namespace doan.Models
         public Baihoc? Lesson { get; set; } = null!; // Navigation property
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+       
     }
 }

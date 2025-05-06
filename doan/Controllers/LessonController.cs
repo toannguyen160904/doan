@@ -1,28 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using doan.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Linq;
 
 public class LessonController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public LessonController(ApplicationDbContext context)
+    public LessonController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _context = context;
+        _userManager = userManager;
     }
 
+    // Hiển thị chi tiết bài học
     public IActionResult Details(int id)
     {
-        if (_context == null)
-        {
-            return Problem("Database context is not available.");
-        }
-
+        // Lấy bài học theo ID, bao gồm từ vựng, ngữ pháp và diễn đàn liên quan
         var lesson = _context.Baihoc
             .Include(l => l.tuvung)
             .Include(l => l.nguphap)
+            .Include(l => l.Diendan)
+                .ThenInclude(d => d.User)
             .FirstOrDefault(l => l.Id == id);
 
         if (lesson == null)
@@ -30,101 +32,56 @@ public class LessonController : Controller
             return NotFound();
         }
 
+        // Lấy danh sách ID từ vựng và ngữ pháp của bài học
+        var vocabIds = lesson.tuvung.Select(v => v.Id).ToList();
+        var grammarIds = lesson.nguphap.Select(g => g.Id).ToList();
+
+        // Lấy các flashcard liên quan đến từ vựng hoặc ngữ pháp
+        var flashcards = _context.Flashcards
+            .Include(f => f.Vocabulary)
+            .Include(f => f.GrammarStructure)
+            .Where(f =>
+                (f.VocabularyId != null && vocabIds.Contains(f.VocabularyId.Value)) ||
+                (f.GrammarStructureId != null && grammarIds.Contains(f.GrammarStructureId.Value)))
+            .ToList();
+
+        ViewBag.Flashcards = flashcards;
+
         return View("~/Views/Level/Details.cshtml", lesson);
     }
 
-    public IActionResult Create()
-    {
-        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
-        return View();
-    }
-
+    // Đăng bài viết lên diễn đàn của bài học
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Baihoc lesson)
+    public IActionResult DangBai(int BaiHocId, string TieuDe, string NoiDung)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            _context.Baihoc.Add(lesson);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", new { id = BaiHocId });
         }
 
-        var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-        foreach (var err in errors)
+        var baiHoc = _context.Baihoc
+            .Include(b => b.Diendan)
+            .FirstOrDefault(b => b.Id == BaiHocId);
+
+        if (baiHoc == null)
         {
-            Console.WriteLine("⚠️ Model Error: " + err);
+            return NotFound();
         }
 
-        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
-        return View(lesson);
-    }
+        var userId = _userManager.GetUserId(User);
 
-    public async Task<IActionResult> Index()
-    {
-        var lessons = await _context.Baihoc.Include(l => l.Level).ToListAsync();
-        return View(lessons);
-    }
-
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null) return NotFound();
-
-        var lesson = await _context.Baihoc.FindAsync(id);
-        if (lesson == null) return NotFound();
-
-        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
-        return View(lesson);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, Baihoc lesson)
-    {
-        if (id != lesson.Id) return NotFound();
-
-        if (ModelState.IsValid)
+        var newPost = new Diendanmodel
         {
-            _context.Update(lesson);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            BaiHocId = BaiHocId,
+            UserId = userId,
+            TieuDe = TieuDe,
+            NoiDung = NoiDung,
+            CreatedAt = DateTime.Now
+        };
 
-        ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name", lesson.LevelId);
-        return View(lesson);
-    }
+        baiHoc.Diendan.Add(newPost);
+        _context.SaveChanges();
 
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null) return NotFound();
-
-        var lesson = await _context.Baihoc.Include(l => l.Level).FirstOrDefaultAsync(l => l.Id == id);
-        if (lesson == null) return NotFound();
-
-        return View(lesson);
-    }
-
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var lesson = await _context.Baihoc.FindAsync(id);
-        if (lesson != null)
-        {
-            _context.Baihoc.Remove(lesson);
-            await _context.SaveChangesAsync();
-        }
-        return RedirectToAction(nameof(Index));
-    }
-
-    public async Task<IActionResult> DetailsFull(int? id)
-    {
-        if (id == null) return NotFound();
-
-        var lesson = await _context.Baihoc.Include(l => l.Level)
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (lesson == null) return NotFound();
-
-        return View(lesson);
+        return RedirectToAction("Details", new { id = BaiHocId });
     }
 }

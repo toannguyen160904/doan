@@ -1,11 +1,13 @@
 ﻿using doan.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using doan.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace doan.Controllers
 {
@@ -25,41 +27,40 @@ namespace doan.Controllers
             UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _vocabularyRepository = vocabularyRepository;
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
-            _vocabularyRepository = vocabularyRepository;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var levels = await _context.Levels.ToListAsync();
             return View(levels);
         }
 
+        [Authorize]
         public async Task<IActionResult> ChonLevel()
         {
-            var levels = await _context.Levels.Include(l => l.Lessons).ToListAsync();
+            var levels = await _context.Levels
+                .Include(l => l.Lessons)
+                .ToListAsync();
 
             if (levels == null || !levels.Any())
             {
-                Console.WriteLine("Không có dữ liệu Level nào!");
+                _logger.LogWarning("Không có dữ liệu Level nào!");
                 return View(new List<Level>());
-            }
-
-            foreach (var level in levels)
-            {
-                Console.WriteLine($"Level: {level.Name} - Số bài học: {level.Lessons?.Count ?? 0}");
             }
 
             return View(levels);
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(string email, string password)
         {
             var user = await _userManager.FindByNameAsync(email);
-
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
@@ -68,7 +69,8 @@ namespace doan.Controllers
                     return RedirectToAction("Index1");
                 }
             }
-            ViewBag.ErrorMessage = "Invalid username or password.";
+
+            ViewBag.ErrorMessage = "Tên đăng nhập hoặc mật khẩu không đúng.";
             return View("Login");
         }
 
@@ -78,45 +80,56 @@ namespace doan.Controllers
             return View();
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
-
         public IActionResult Privacy() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
 
-        // ✅ NEW: Action xem từ vựng theo Level
-        public async Task<IActionResult> TuVung(int? levelId)
+        [Authorize]
+        public IActionResult Flashcards(int baiHocId)
         {
-            if (levelId == null)
+            var baiHoc = _context.Baihoc
+                .Include(b => b.tuvung)
+                .Include(b => b.nguphap)
+                .FirstOrDefault(b => b.Id == baiHocId);
+
+            if (baiHoc == null)
                 return NotFound();
 
-            var tuVung = await _context.tuvung
-                .Include(v => v.Lesson)
-                .Where(v => v.Lesson.LevelId == levelId)
-                .ToListAsync();
+            var flashcards = new List<flashcards>();
 
-            return View(tuVung); // Sử dụng Views/Home/TuVung.cshtml
-        }
+            // Thêm flashcard từ từ vựng
+            flashcards.AddRange(baiHoc.tuvung.Select(word => new flashcards
+            {
+                Vocabulary = new Vocabulary
+                {
+                    Tuvung = word.Tuvung,
+                    PhatAm = word.PhatAm,
+                    AmHan = word.AmHan,
+                    HanTu = word.HanTu,
+                    Nghia = word.Nghia
+                }
+            }));
 
-        // ✅ NEW: Action xem ngữ pháp theo Level
-        public async Task<IActionResult> NguPhap(int? levelId)
-        {
-            if (levelId == null)
-                return NotFound();
+            // Thêm flashcard từ ngữ pháp
+            flashcards.AddRange(baiHoc.nguphap.Select(grammar => new flashcards
+            {
+                GrammarStructure = new GrammarStructure
+                {
+                    CongThuc = grammar.CongThuc,
+                    GiaiThich = grammar.GiaiThich,
+                    CauViDu = grammar.CauViDu
+                }
+            }));
 
-            var nguPhap = await _context.nguphap
-                .Include(g => g.Lesson)
-                .Where(g => g.Lesson.LevelId == levelId)
-                .ToListAsync();
-
-            return View(nguPhap); // Sử dụng Views/Home/NguPhap.cshtml
+            ViewData["BaiHocName"] = baiHoc.Name;
+            return View(flashcards);
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using doan.Models;
 
@@ -11,9 +12,11 @@ using doan.Models;
 namespace doan.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415044524_addflashcardtable")]
+    partial class addflashcardtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,9 +244,6 @@ namespace doan.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("LevelId")
                         .HasColumnType("int");
 
@@ -260,9 +260,6 @@ namespace doan.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LevelId");
-
-                    b.HasIndex("Name", "LevelId")
-                        .IsUnique();
 
                     b.ToTable("Baihoc");
                 });
@@ -283,42 +280,6 @@ namespace doan.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("doan.Models.Diendanmodel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BaiHocId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NoiDung")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TieuDe")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BaiHocId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Diendan");
                 });
 
             modelBuilder.Entity("doan.Models.GrammarStructure", b =>
@@ -599,25 +560,6 @@ namespace doan.Migrations
                     b.Navigation("Level");
                 });
 
-            modelBuilder.Entity("doan.Models.Diendanmodel", b =>
-                {
-                    b.HasOne("doan.Models.Baihoc", "Baihoc")
-                        .WithMany("Diendan")
-                        .HasForeignKey("BaiHocId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("doan.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Baihoc");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("doan.Models.GrammarStructure", b =>
                 {
                     b.HasOne("doan.Models.Baihoc", "Lesson")
@@ -689,8 +631,6 @@ namespace doan.Migrations
 
             modelBuilder.Entity("doan.Models.Baihoc", b =>
                 {
-                    b.Navigation("Diendan");
-
                     b.Navigation("Flashcards");
 
                     b.Navigation("nguphap");
