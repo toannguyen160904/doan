@@ -11,106 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <!-- Tailwind CSS (if not already in _Layout) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom styles to mimic Mazii */
-        .search-container {
-            background-color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-        .lang-dropdown {
-            background-color: #4a90e2; /* Blue background */
-            color: white;
-        }
-        .search-input-wrapper {
-            border: 1px solid #d1d5db; /* Gray border */
-            border-radius: 0.375rem;
-            display: flex;
-            align-items: center;
-        }
-        .search-input {
-            border: none;
-            outline: none;
-            flex-grow: 1;
-            padding: 0.75rem;
-            padding-left: 2.5rem; /* Space for icon */
-        }
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            color: #6b7280; /* Gray icon */
-        }
-        .search-actions button {
-            background: none;
-            border: none;
-            color: #6b7280;
-            padding: 0.5rem;
-        }
-        .filter-tabs button {
-            padding: 0.5rem 1rem;
-            border-radius: 9999px; /* Pill shape */
-            border: 1px solid transparent;
-            color: #6b7280;
-            transition: all 0.2s ease;
-        }
-        .filter-tabs button.active,
-        .filter-tabs button:hover {
-            border-color: #4a90e2;
-            color: #4a90e2;
-            background-color: #ebf4ff;
-        }
-        .vocabulary-list {
-            background-color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .vocab-item {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 1rem 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .vocab-item:last-child {
-            border-bottom: none;
-        }
-        .vocab-japanese .word {
-            font-size: 1.125rem; /* text-lg */
-            font-weight: 500;
-            color: #111827;
-        }
-        .vocab-japanese .reading {
-            font-size: 0.875rem; /* text-sm */
-            color: #6b7280;
-        }
-        .vocab-meaning {
-            font-size: 1rem;
-            color: #374151;
-            text-align: right;
-        }
-        .vocab-actions button {
-            background: none;
-            border: none;
-            color: #6b7280;
-            font-size: 1.25rem; /* text-xl */
-            margin-left: 0.75rem;
-        }
-        .no-results {
-            text-align: center;
-            padding: 2rem;
-            color: #6b7280;
-        }
-        .page-header {
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-    </style>
+    <link rel=" stylesheet" href = "~/css/TuDien.css" />
 </head>
 
 <div class="container mx-auto p-4 max-w-4xl">
@@ -133,10 +34,10 @@
             <input type="hidden" name="filter" value="@currentFilter" />
             <div class="flex flex-col sm:flex-row items-center gap-4 mb-4">
                 <!-- Language Dropdown (Static Example) -->
-                <button type="button" class="lang-dropdown px-4 py-2 rounded-md font-semibold flex items-center">
-                    Nhật - Việt
-                    <i class="fas fa-caret-down ml-2"></i>
-                </button>
+                @* <button type="button" class="lang-dropdown px-4 py-2 rounded-md font-semibold flex items-center"> *@
+                @*     Nhật - Việt *@
+                @*     <i class="fas fa-caret-down ml-2"></i> *@
+                @* </button> *@
                 
                 <!-- Search Input -->
                 <div class="search-input-wrapper flex-grow relative">
@@ -156,14 +57,7 @@
             </div>
         </form>
 
-        <!-- Filter Tabs -->
-        <div class="filter-tabs flex flex-wrap gap-2">
-            <button type="button" onclick="setFilter('TuVung')" class="@(currentFilter == "TuVung" ? "active" : "")">Từ vựng</button>
-            <button type="button" onclick="setFilter('HanTu')" class="@(currentFilter == "HanTu" ? "active" : "")">Hán tự</button>
-            <button type="button" onclick="setFilter('MauCau')" class="@(currentFilter == "MauCau" ? "active" : "")">Mẫu câu</button>
-            <button type="button" onclick="setFilter('NguPhap')" class="@(currentFilter == "NguPhap" ? "active" : "")">Ngữ pháp</button>
-            <button type="button" onclick="setFilter('NhatNhat')" class="@(currentFilter == "NhatNhat" ? "active" : "")">Nhật - Nhật</button>
-        </div>
+
     </div>
 
     <!-- Vocabulary List -->
@@ -188,15 +82,21 @@
             {
                 <div class="vocab-item">
                     <div class="vocab-left flex items-center">
-                        <div class="vocab-actions">
-                            <button type="button" title="Phát âm"><i class="fas fa-volume-up"></i></button>
-                        </div>
+                        @* <div class="vocab-actions"> *@
+                        @*     <button type="button" title="Phát âm"><i class="fas fa-volume-up"></i></button> *@
+                        @* </div> *@
                         <div class="vocab-japanese ml-4">
-                            <div class="word">@word.Tuvung</div> 
+                            <div class="word">@word.HanTu</div> 
                             @if (!string.IsNullOrEmpty(word.PhatAm))
                             {
                                 <div class="reading">@word.PhatAm</div> 
                             }
+                            @if (!string.IsNullOrEmpty(word.Tuvung))
+                            {
+                                <div class="vocab-japanese ml-4">@word.Tuvung</div>
+                            }
+
+
                         </div>
                     </div>
                     <div class="vocab-meaning">
@@ -209,41 +109,4 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Function to change the filter and resubmit the form
-        function setFilter(filterValue) {
-            // Create a form dynamically or use an existing one
-            const form = document.createElement('form');
-            form.method = 'get';
-            form.action = '@Url.Action("Index", "TuDien")'; // Ensure correct URL
-            
-            const filterInput = document.createElement('input');
-            filterInput.type = 'hidden';
-            filterInput.name = 'filter';
-            filterInput.value = filterValue;
-            form.appendChild(filterInput);
-            
-            // Include current search term if it exists
-            const searchInput = document.querySelector('input[name="searchTerm"]');
-            if (searchInput && searchInput.value) {
-                const searchInputHidden = document.createElement('input');
-                searchInputHidden.type = 'hidden';
-                searchInputHidden.name = 'searchTerm';
-                searchInputHidden.value = searchInput.value;
-                form.appendChild(searchInputHidden);
-            }
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Add JS for audio playback later if needed
-        // document.querySelectorAll('.vocab-actions button').forEach(button => {
-        //     button.addEventListener('click', function() {
-        //         // Find the word/audio source and play
-        //         alert('Audio playback not implemented yet.'); 
-        //     });
-        // });
-    </script>
-} 
+<script src="~/js/TuDien.js"></script>
