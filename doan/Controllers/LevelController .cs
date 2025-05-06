@@ -14,49 +14,46 @@ namespace doan.Controllers
         {
             _context = context;
         }
+
+        // Hiển thị danh sách bài học theo cấp độ
         public IActionResult ChonLevel(string level)
         {
-            // Lấy dữ liệu bài học theo cấp độ
-            var selectedLevel = level ?? "N5";  // Mặc định là N5
+            var selectedLevel = level ?? "N5"; // Mặc định là N5 nếu không chọn
             var levelId = GetLevelId(selectedLevel);
 
+            // Lọc bài học theo cấp độ
             var lessons = _context.Baihoc
-                .Where(l => l.LevelId == levelId) // Lọc bài học theo LevelId
+                .Where(l => l.LevelId == levelId)
                 .ToList();
 
-            // Lấy thông tin cấp độ từ cơ sở dữ liệu, ví dụ:
-            var levels = _context.Levels.ToList();
-
-            ViewBag.Levels = levels;
+            // Lấy danh sách tất cả cấp độ
+            ViewBag.Levels = _context.Levels.ToList();
             ViewData["Level"] = selectedLevel;
 
             return View(lessons);
         }
-        private int GetLevelId(string level)
-        {
-            switch (level)
-            {
-                case "N5": return 1;  // Cấp độ N5 có LevelId = 1
-                case "N4": return 2;  // Cấp độ N4 có LevelId = 2
-                case "N3": return 3;  // Cấp độ N3 có LevelId = 3
-                default: return 1;    // Mặc định là N5
-            }
 
-        }
+        // Trả về thông tin chi tiết của một cấp độ
         public async Task<IActionResult> Details(int id)
         {
             var level = await _context.Levels
-                                      .Include(l => l.Lessons) 
-                                      .ThenInclude(b => b.Level) 
-                                      .FirstOrDefaultAsync(l => l.Id == id);
+                .Include(l => l.Lessons)
+                .ThenInclude(b => b.Level)
+                .FirstOrDefaultAsync(l => l.Id == id);
 
             if (level == null)
-            {
                 return NotFound();
-            }
 
             return View(level);
         }
 
+        // Hàm ánh xạ tên cấp độ thành ID (giả định ID cố định trong DB)
+        private int GetLevelId(string level) => level switch
+        {
+            "N5" => 1,
+            "N4" => 2,
+            "N3" => 3,
+            _ => 1 // Mặc định là N5
+        };
     }
 }

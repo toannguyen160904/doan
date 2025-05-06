@@ -5,6 +5,7 @@
 @inject ApplicationDbContext Context
 @inject IHttpContextAccessor HttpContextAccessor
 
+
 @model doan.Models.Baihoc
 
 @{
@@ -124,3 +125,152 @@ else
     <a asp-controller="Learning" asp-action="Daily" class="btn btn-info">📘 Lộ Trình Học Hôm Nay</a>
     <a asp-controller="Learning" asp-action="LearnedWords" class="btn btn-info">📖 Xem danh sách từ đã học</a>
 </div>
+
+<!-- Animate.css cho hiệu ứng động -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<div class="container my-5 animate__animated animate__fadeIn">
+
+    <!-- Tiêu đề bài học -->
+    <h1 class="text-center text-primary fw-bold animate__fadeInDown mb-5">
+        📘 Bài học: @Model.Name
+    </h1>
+
+    <!-- Từ vựng -->
+    <h2 class="text-success">📚 Từ vựng</h2>
+    @if (Model.tuvung.Any())
+    {
+        <div class="table-responsive mt-3 animate__fadeInUp">
+            <table class="table table-hover table-bordered border-primary text-center align-middle rounded-4 overflow-hidden">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Từ vựng</th>
+                        <th>Phát âm</th>
+                        <th>Âm Hán</th>
+                        <th>Hán tự</th>
+                        <th>Nghĩa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var word in Model.tuvung)
+                    {
+                        <tr>
+                            <td>@word.Tuvung</td>
+                            <td>@(string.IsNullOrEmpty(word.PhatAm) ? "-" : word.PhatAm)</td>
+                            <td>@(string.IsNullOrEmpty(word.AmHan) ? "-" : word.AmHan)</td>
+                            <td>@(string.IsNullOrEmpty(word.HanTu) ? "-" : word.HanTu)</td>
+                            <td>@word.Nghia</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning animate__fadeInUp">Chưa có từ vựng cho bài học này.</div>
+    }
+
+    <!-- Ngữ pháp -->
+    <h2 class="text-success mt-5">📖 Ngữ pháp</h2>
+    @if (Model.nguphap.Any())
+    {
+        <div class="table-responsive mt-3 animate__fadeInUp">
+            <table class="table table-hover table-bordered border-success text-center align-middle rounded-4 overflow-hidden">
+                <thead class="table-success">
+                    <tr>
+                        <th>Công thức</th>
+                        <th>Giải thích</th>
+                        <th>Câu ví dụ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var grammar in Model.nguphap)
+                    {
+                        <tr>
+                            <td>@grammar.CongThuc</td>
+                            <td>@grammar.GiaiThich</td>
+                            <td>@grammar.CauViDu</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning animate__fadeInUp">Chưa có ngữ pháp cho bài học này.</div>
+    }
+
+    <!-- Diễn đàn -->
+    <h2 class="text-success mt-5">🗣️ Diễn Đàn</h2>
+    @if (Model.Diendan.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4 mt-3 animate__fadeInUp">
+            @foreach (var post in Model.Diendan)
+            {
+                <div class="col">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow animate__fadeInUp">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 class="card-title text-primary">@post.TieuDe</h5>
+                                <small class="text-muted">@post.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                            <p class="card-text">@post.NoiDung</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-end">
+                            <small class="text-secondary">
+                                Người đăng: @(post.User?.Name ?? "Không xác định")
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3 animate__fadeInUp">Chưa có bài viết nào trong diễn đàn.</div>
+    }
+
+    <!-- Form đăng bài -->
+    <h2 class="text-success mt-5">✍️ Đăng bài mới</h2>
+    <form asp-action="DangBai" asp-controller="Lesson" method="post"
+          class="p-4 mt-3 border rounded-4 shadow-sm bg-light animate__fadeInUp">
+        <input type="hidden" name="BaiHocId" value="@Model.Id" />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tiêu đề bài viết</label>
+            <input type="text" name="TieuDe" class="form-control rounded-pill" placeholder="Nhập tiêu đề..." required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Nội dung</label>
+            <textarea name="NoiDung" class="form-control" placeholder="Viết nội dung bài đăng..." rows="4" required></textarea>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-success rounded-pill">🚀 Gửi bài viết</button>
+        </div>
+    </form>
+
+    <!-- Điều hướng -->
+    <div class="d-flex justify-content-center gap-3 mt-5 animate__fadeIn">
+        <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-outline-primary rounded-pill">
+            🔙 Quay lại Chọn Level
+        </a>
+        <a asp-controller="Home" asp-action="Flashcards" asp-route-baiHocId="@Model.Id" class="btn btn-success rounded-pill">
+            🎴 Học Flashcards
+        </a>
+    </div>
+</div>
+
+<!-- CSS thêm -->
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+</style>
+

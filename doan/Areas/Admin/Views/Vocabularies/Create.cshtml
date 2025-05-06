@@ -1,7 +1,6 @@
 ﻿@model doan.Models.Vocabulary
 
 @{
-    ViewData["Title"] = "Thêm từ vựng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -75,6 +74,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         // Khi chọn cấp độ → gọi API lấy danh sách bài học
         $("#levelSelect").change(function () {
@@ -89,4 +89,7 @@
             });
         });
     </script>
+
+    <script src="~/js/them-tu-vung.js"></script>
+
 }

@@ -158,11 +158,58 @@
         </ul>
     </div>
 
+
     <!-- Topbar -->
     <div class="topbar" id="topbar">
         <div class="d-flex align-items-center gap-3">
             <button class="toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
             <strong>@ViewData["Title"]</strong>
+
+        <!-- Sidebar -->
+        <div class="sidebar p-3">
+            <h4 class="text-center mb-4">🎓 Admin Panel</h4>
+            <ul class="nav flex-column gap-1">
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">
+                        📁 Danh mục
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">
+                        🛒 Sản phẩm
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#learningSubmenu" role="button">
+                        📚 Quản lý học ▾
+                    </a>
+                    <div class="collapse ps-3" id="learningSubmenu">
+                        <ul class="nav flex-column gap-1">
+                            <li><a class="nav-link" asp-area="Admin" asp-controller="Lessons" asp-action="Index">📖 Bài học</a></li>
+                            <li><a class="nav-link" asp-area="Admin" asp-controller="Vocabularies" asp-action="Index">📘 Từ vựng</a></li>
+                            <li><a class="nav-link" asp-area="Admin" asp-controller="Grammars" asp-action="Index">📙 Ngữ pháp</a></li>
+                            <li><a class="nav-link text-danger" asp-area="Admin" asp-controller="Lessons" asp-action="Indexthungrac">🗑️ Thùng rác bài học</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item mt-3">
+                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                        🏠 Về trang chính
+                    </a>
+                </li>
+
+                <li class="nav-item mt-3">
+                    <a class="btn btn-danger w-100" asp-area="Identity" asp-page="/Account/Logout">
+                        Đăng xuất
+                    </a>
+                </li>
+
+            </ul>
+
         </div>
 
         <div class="d-flex align-items-center gap-3">

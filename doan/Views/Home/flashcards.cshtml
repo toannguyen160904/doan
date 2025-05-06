@@ -1,0 +1,76 @@
+﻿@model List<doan.Models.flashcards>
+
+@{
+    ViewData["Title"] = "Flashcards";
+    var cardCount = Model.Count;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="~/css/flascards.css" asp-append-version="true" />
+    <script src="~/js/flashcard.js" asp-append-version="true"></script>
+</head>
+<body>
+
+    <h2 class="text-2xl font-bold mb-4">🧠 Flashcards - Từng Thẻ</h2>
+
+    <!-- Danh sách flashcard -->
+    <div class="flashcard-wrapper">
+        @for (int i = 0; i < cardCount; i++)
+        {
+            var card = Model[i];
+            <div class="flashcard" onclick="flipCard(this)">
+                <div class="flashcard-inner">
+
+                    @* Nếu là flashcard từ vựng *@
+                    @if (card.Vocabulary != null)
+                    {
+                        <div class="flashcard-face vocabulary-front">
+                            <h5>📘 Từ vựng</h5>
+                            <h3>@(card.Vocabulary.Tuvung ?? "Không có")</h3>
+                        </div>
+                        <div class="flashcard-face flashcard-back">
+                            <p><strong>📣 Phát âm:</strong> @(card.Vocabulary.PhatAm ?? "Không có")</p>
+                            <p><strong>🔤 Âm Hán:</strong> @(card.Vocabulary.AmHan ?? "Không có")</p>
+                            <p><strong>🈶 Hán Tự:</strong> @(card.Vocabulary.HanTu ?? "Không có")</p>
+                            <p><strong>📖 Nghĩa:</strong> @(card.Vocabulary.Nghia ?? "Không có")</p>
+                        </div>
+                    }
+                    @* Nếu là flashcard ngữ pháp *@
+                    else if (card.GrammarStructure != null)
+                    {
+                        <div class="flashcard-face grammar-front">
+                            <h5>📖 Ngữ pháp</h5>
+                            <h4>@(card.GrammarStructure.CongThuc ?? "Không có công thức")</h4>
+                        </div>
+                        <div class="flashcard-face flashcard-back">
+                            <p><strong>🧠 Giải thích:</strong> @(card.GrammarStructure.GiaiThich ?? "Không có")</p>
+                            <p><strong>💬 Ví dụ:</strong> @(card.GrammarStructure.CauViDu ?? "Không có")</p>
+                        </div>
+                    }
+                    @* Nếu không có dữ liệu phù hợp *@
+                    else
+                    {
+                        <div class="flashcard-face flashcard-back text-red-600">
+                            ⚠️ Không rõ loại thẻ
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Nút điều hướng -->
+    <div class="controls mt-6 flex space-x-4 justify-center">
+        <button onclick="prevCard()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">⬅️ Quay lại</button>
+        <button onclick="nextCard()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">➡️ Tiếp theo</button>
+        <a asp-controller="Home" asp-action="ChonLevel" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">🔙 Chọn cấp độ</a>
+    </div>
+
+</body>
+</html>

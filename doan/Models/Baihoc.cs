@@ -16,6 +16,8 @@ namespace doan.Models
         [StringLength(255)]
         public string Title { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         [Required]
         public int LevelId { get; set; }
 
@@ -26,5 +28,7 @@ namespace doan.Models
 
         public ICollection<Vocabulary> tuvung { get; set; } = new List<Vocabulary>();
         public List<GrammarStructure> nguphap { get; set; } = new List<GrammarStructure>();
+        public ICollection<flashcards> Flashcards { get; set; }
+        public ICollection<Diendanmodel> Diendan { get; set; } = new List<Diendanmodel>();
     }
 }
