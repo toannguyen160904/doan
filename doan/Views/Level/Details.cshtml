@@ -1,4 +1,130 @@
-﻿@model doan.Models.Baihoc
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http
+@using doan.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext Context
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+@model doan.Models.Baihoc
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var learnedIds = Context.UserVocabularyProgresses
+        .Where(p => p.UserId == user.Id && p.IsLearned)
+        .Select(p => p.VocabularyId)
+        .ToHashSet();
+
+    int totalWords = Model.tuvung.Count();
+    int totalLearned = Model.tuvung.Count(w => learnedIds.Contains(w.Id));
+    int pageSize = 5;
+    int page = Convert.ToInt32(HttpContextAccessor.HttpContext?.Request.Query["page"].FirstOrDefault() ?? "1");
+    var pagedWords = Model.tuvung.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+    int totalPages = (int)Math.Ceiling((double)totalWords / pageSize);
+}
+
+<h1 class="mb-4">📘 Bài học: @Model.Name</h1>
+
+<h2 class="mb-3">📚 Từ vựng</h2>
+@if (pagedWords.Any())
+{
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light text-center">
+            <tr>
+                <th>Từ vựng</th>
+                <th>Phát âm</th>
+                <th>Âm Hán</th>
+                <th>Hán tự</th>
+                <th>Nghĩa</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var word in pagedWords)
+            {
+                <tr class="text-center">
+                    <td>@word.Tuvung</td>
+                    <td>@(string.IsNullOrEmpty(word.PhatAm) ? "" : word.PhatAm)</td>
+                    <td>@(string.IsNullOrEmpty(word.AmHan) ? "" : word.AmHan)</td>
+                    <td>@(string.IsNullOrEmpty(word.HanTu) ? "" : word.HanTu)</td>
+                    <td>@word.Nghia</td>
+                    <td>
+                        @if (learnedIds.Contains(word.Id))
+                        {
+                            <form asp-controller="Learning" asp-action="MarkUnlearned" method="post">
+                                <input type="hidden" name="VocabId" value="@word.Id" />
+                                <button type="submit" class="btn btn-sm btn-warning">Đánh dấu chưa học</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Learning" asp-action="MarkLearned" method="post">
+                                <input type="hidden" name="VocabId" value="@word.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Đánh dấu đã học</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == page ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+
+    <!-- Thống kê -->
+    <div class="text-end text-muted">
+        Đã học: <strong>@totalLearned</strong> / <strong>@totalWords</strong> từ vựng.
+    </div>
+}
+else
+{
+    <p>❌ Chưa có từ vựng cho bài học này.</p>
+}
+
+<h2 class="mt-4 mb-3">📖 Ngữ pháp</h2>
+@if (Model.nguphap.Any())
+{
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Công thức</th>
+                <th>Giải thích</th>
+                <th>Câu ví dụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var grammar in Model.nguphap)
+            {
+                <tr>
+                    <td>@grammar.CongThuc</td>
+                    <td>@grammar.GiaiThich</td>
+                    <td>@grammar.CauViDu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>❌ Chưa có ngữ pháp cho bài học này.</p>
+}
+
+<!-- Nút điều hướng -->
+<div class="mt-4 d-flex gap-2">
+    <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-primary">🔙 Quay lại Chọn Level</a>
+    <a asp-controller="Learning" asp-action="Daily" class="btn btn-info">📘 Lộ Trình Học Hôm Nay</a>
+    <a asp-controller="Learning" asp-action="LearnedWords" class="btn btn-info">📖 Xem danh sách từ đã học</a>
+</div>
 
 <!-- Animate.css cho hiệu ứng động -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
@@ -147,3 +273,4 @@
         transition: all 0.3s ease;
     }
 </style>
+
