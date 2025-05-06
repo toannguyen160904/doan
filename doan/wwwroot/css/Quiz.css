@@ -1,0 +1,13 @@
+﻿.quiz-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.quiz-card {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+}

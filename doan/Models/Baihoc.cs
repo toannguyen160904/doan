@@ -26,5 +26,6 @@ namespace doan.Models
 
         public ICollection<Vocabulary> tuvung { get; set; } = new List<Vocabulary>();
         public List<GrammarStructure> nguphap { get; set; } = new List<GrammarStructure>();
+        public Quiz ? Quiz { get; set; }
     }
 }
