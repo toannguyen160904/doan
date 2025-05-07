@@ -1,0 +1,112 @@
+@model IEnumerable<doan.Models.Vocabulary>
+@{
+    ViewData["Title"] = "Từ điển Mazii Style";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Assuming you have a main layout
+    string currentFilter = ViewBag.Filter ?? "TuVung";
+    string searchTerm = ViewBag.SearchTerm ?? "";
+}
+
+<head>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <!-- Tailwind CSS (if not already in _Layout) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel=" stylesheet" href = "~/css/TuDien.css" />
+</head>
+
+<div class="container mx-auto p-4 max-w-4xl">
+
+    <!-- Header Navigation -->
+    <div class="page-header flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <a href="/" class="text-lg font-semibold text-blue-600 flex items-center">
+                <i class="fas fa-home mr-2"></i> Trang chủ
+            </a>
+            <a href="/Home/ChonLevel" class="text-lg text-gray-700 hover:text-blue-600">Cấp độ</a>
+            <a href="/TuDien" class="text-lg text-blue-600 font-semibold border-b-2 border-blue-600">Từ điển</a> 
+        </div>
+        
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <form method="get" asp-action="Index">
+            <input type="hidden" name="filter" value="@currentFilter" />
+            <div class="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                <!-- Language Dropdown (Static Example) -->
+                @* <button type="button" class="lang-dropdown px-4 py-2 rounded-md font-semibold flex items-center"> *@
+                @*     Nhật - Việt *@
+                @*     <i class="fas fa-caret-down ml-2"></i> *@
+                @* </button> *@
+                
+                <!-- Search Input -->
+                <div class="search-input-wrapper flex-grow relative">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" 
+                           name="searchTerm" 
+                           value="@searchTerm" 
+                           class="search-input" 
+                           placeholder="つごう, thuận tiện, ..." />
+                    <!-- Add other icons like Mazii (keyboard, mic) here if needed -->
+                    <div class="search-actions px-2">
+                        <button type="button"><i class="fas fa-keyboard"></i></button>
+                        <button type="button"><i class="fas fa-microphone"></i></button>
+                        <button type="submit"><i class="fas fa-search"></i></button> 
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+
+    <!-- Vocabulary List -->
+    <div class="vocabulary-list">
+        <h2 class="text-xl font-semibold mb-4">Từ vựng</h2> 
+        @if (!Model.Any())
+        {
+            <div class="no-results">
+                @if (string.IsNullOrEmpty(searchTerm))
+                {
+                    <p>Không có từ vựng nào.</p>
+                }
+                else
+                {
+                    <p>Không tìm thấy kết quả cho "@searchTerm".</p>
+                }
+            </div>
+        }
+        else
+        {
+            foreach (var word in Model)
+            {
+                <div class="vocab-item">
+                    <div class="vocab-left flex items-center">
+                        @* <div class="vocab-actions"> *@
+                        @*     <button type="button" title="Phát âm"><i class="fas fa-volume-up"></i></button> *@
+                        @* </div> *@
+                        <div class="vocab-japanese ml-4">
+                            <div class="word">@word.HanTu</div> 
+                            @if (!string.IsNullOrEmpty(word.PhatAm))
+                            {
+                                <div class="reading">@word.PhatAm</div> 
+                            }
+                            @if (!string.IsNullOrEmpty(word.Tuvung))
+                            {
+                                <div class="vocab-japanese ml-4">@word.Tuvung</div>
+                            }
+
+
+                        </div>
+                    </div>
+                    <div class="vocab-meaning">
+                        <h2 class="text-xl font-semibold mb-4">Nghĩa</h2>
+                        @word.Nghia 
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<script src="~/js/TuDien.js"></script>

@@ -1,0 +1,34 @@
+﻿@model List<doan.Models.CauHoi>
+
+@{
+    ViewData["Title"] = "Tạo Quiz";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/CreateQuiz.css" />
+
+<div class="quiz-container">
+    <form id="quizForm" asp-action="CreateQuiz" method="post">
+        <input type="hidden" name="BaiHocId" value="@ViewData["BaiHocId"]" />
+        
+        <div class="quiz-header">
+            <h1 class="quiz-title">@ViewData["BaiHocName"]</h1>
+            <p class="text-muted">Quiz cho bài học</p>
+        </div>
+
+        <div id="questionContainer">
+            <!-- Questions will be added here -->
+        </div>
+    </form>
+</div>
+
+<button type="button" id="addQuestionButton" class="add-question-btn" title="Thêm câu hỏi">
+    <i class="bi bi-plus"></i>
+</button>
+
+<button type="submit" form="quizForm" class="save-quiz-btn">
+    <i class="bi bi-save me-2"></i>Lưu Quiz
+</button>
+
+<script src="/js/CreateCauHoi.js"></script>
+

@@ -1,0 +1,37 @@
+@model doan.Models.Quiz
+
+@{
+    ViewData["Title"] = "Xóa Quiz";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-trash me-2"></i>Xóa Quiz: @ViewData["BaiHocName"]</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-danger mb-4">Bạn có muốn xóa bài Quiz?</h5>
+                    <div class="mb-3">
+                        <strong>Quiz ID:</strong> @Model.Id <br />
+                        <strong>Ngày tạo:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy")
+                    </div>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-secondary px-4">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Không
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash me-1"></i> Có, xóa Quiz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+

@@ -52,11 +52,30 @@
                     <a href="/" class="text-xl font-bold text-blue-600 flex items-center">
                         <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
+
                 </div> 
                 
                 <button class="text-gray-600 text-2xl focus:outline-none" onclick="toggleMenu()">
                     <i class="fas fa-bars"></i>
                 </button>
+
+                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ</a>
+                    
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" id="searchInput" class="w-full p-2 pl-3 pr-10 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+                               placeholder="Tìm kiếm bài học..." onkeyup="searchDocuments()">
+                        <i class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-black"
+                           onclick="clearSearch()"></i>
+                    </div>
+
+                    <button class="text-gray-600 text-2xl focus:outline-none" onclick="toggleMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+
             </div>
 
 
@@ -143,16 +162,34 @@
                 <a href="/Home/Chonlevel" class="mt-3 block text-blue-500 text-lg font-semibold hover:underline">Click vào đây</a>
             </div>
 
+
             <div class="lesson-item bg-white p-4 rounded-lg shadow-md text-center">
                 <h2 class="text-xl font-semibold text-gray-700">Học ngữ pháp</h2>
                 <img class="w-full h-auto rounded-lg shadow-sm mt-3" src="https://storage.googleapis.com/a1aa/image/wnOhn2QS1Hkf3N5eoQxXj1LEOTqB4lSPQ6b9JuVM9Wk.jpg" />
                 <a href="/Home/Chonlevel" class="mt-3 block text-blue-500 text-lg font-semibold hover:underline">Click vào đây</a>
+
+            <div class="lesson-item bg-white p-4 rounded-lg shadow-md text-center" data-title="Học ngữ pháp">
+                <h2 class="text-xl font-semibold text-gray-700">Từ điển</h2>
+                <img class="w-full h-auto rounded-lg shadow-sm mt-3"
+                     src="https://storage.googleapis.com/a1aa/image/wnOhn2QS1Hkf3N5eoQxXj1LEOTqB4lSPQ6b9JuVM9Wk.jpg" />
+                <a href="/TuDien" class="mt-3 block text-blue-500 text-lg font-semibold hover:underline">
+                    Click vào đây
+                </a>
+
             </div>
 
             <div class="lesson-item bg-white p-4 rounded-lg shadow-md text-center">
                 <h2 class="text-xl font-semibold text-gray-700">Học MiniTest</h2>
+
                 <img class="w-full h-auto rounded-lg shadow-sm mt-3" src="https://storage.googleapis.com/a1aa/image/KMhXzNrEOBei-JTV3u_87_HMhtOVUtkrUEvCUPZDeng.jpg" />
                 <a href="/Home/MiniTest" class="mt-3 block text-blue-500 text-lg font-semibold hover:underline">Click vào đây</a>
+
+                <img class="w-full h-auto rounded-lg shadow-sm mt-3"
+                     src="https://storage.googleapis.com/a1aa/image/KMhXzNrEOBei-JTV3u_87_HMhtOVUtkrUEvCUPZDeng.jpg" />
+                <a href="/Home/DanhSachQuiz" class="mt-3 block text-blue-500 text-lg font-semibold hover:underline">
+                    Click vào đây
+                </a>
+
             </div>
         </div>
 

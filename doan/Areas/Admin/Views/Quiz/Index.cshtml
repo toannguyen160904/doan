@@ -1,0 +1,96 @@
+﻿@model IEnumerable<doan.Models.Baihoc>
+
+@{
+
+    ViewData["Title"] = "Quản lý bài học & Quiz";
+
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+        <style>
+    /* Optional: Add some basic styling */
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .action-buttons a {
+        margin-right: 5px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="card shadow border-0">
+        <div class="card-header bg-secondary bg-gradient text-white py-3">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="text-white mb-0">@ViewData["Title"]</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row pb-3">
+                <div class="col-6"></div>
+                <div class="col-6 text-end">
+                    @* Button to add a new Baihoc - assuming this is handled by BaihocController *@
+                    @* <a asp-controller="Baihoc" asp-action="Create" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Thêm bài học mới
+                    </a> *@
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Tên bài học</th>
+                            <th>Tiêu đề</th>
+                            <th>Cấp độ</th> @* Assuming CapDo is a property of Baihoc *@
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model) // item is a Baihoc
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.Title</td>
+                                <td>@item.Level</td> @* Display CapDo property *@
+                                <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                <td class="action-buttons">
+                                    @if (item.Quiz == null)
+                                    {
+                                        // If no quiz exists for this lesson, show 'Add Quiz' button
+                                        <a asp-action="CreateQuiz" asp-route-baiHocId="@item.Id" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Thêm Quiz cho bài học này">
+                                            <i class="bi bi-plus-square"></i> Thêm Quiz
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        // If quiz exists, show 'Edit Quiz' button
+                                        // Make sure item.Quiz is not null before accessing its Id
+                                        <a asp-action="Edit" asp-route-id="@item.Quiz.Id" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Sửa Quiz bài học này">
+                                            <i class="bi bi-pencil-square"></i> Sửa Quiz
+                                        </a>
+                                         // Optional: Add delete button if needed
+                                        <a asp-action="Delete" asp-route-id="@item.Quiz.Id" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Xóa Quiz bài học này" onclick="return confirm('Bạn có muốn xóa bài Quiz?');">
+                                            <i class="bi bi-trash"></i> Xóa Quiz
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+}

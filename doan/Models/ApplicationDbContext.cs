@@ -26,6 +26,7 @@ namespace doan.Models
         public DbSet<Vocabulary> tuvung { get; set; }
         public DbSet<GrammarStructure> nguphap { get; set; }
 
+
         public DbSet<UserLearningPlan> UserLearningPlans { get; set; }
         public DbSet<UserVocabularyProgress> UserVocabularyProgresses { get; set; }
         public DbSet<TestQuestion> TestQuestions { get; set; }
@@ -36,6 +37,11 @@ namespace doan.Models
         public DbSet<flashcards> Flashcards { get; set; }
         public DbSet<Diendanmodel> Diendan { get; set; }
 
+
+
+        public DbSet<Quiz> Quizzes { get; set; }
+        public DbSet<CauHoi> CauHois { get; set; }
+        public DbSet<CauTraLoi> CauTraLois { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +99,7 @@ namespace doan.Models
                 .WithMany(l => l.nguphap)
                 .HasForeignKey(g => g.LessonId);
 
+
             // Quan hệ: Flashcards - GrammarStructure (1 - 1)
             modelBuilder.Entity<flashcards>()
                 .HasOne(f => f.GrammarStructure)
@@ -107,6 +114,28 @@ namespace doan.Models
                 .WithOne()
                 .HasForeignKey<flashcards>(f => f.VocabularyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            //Baihoc - Quiz
+            modelBuilder.Entity<Baihoc>()
+               .HasOne(b => b.Quiz)
+               .WithOne(q => q.Baihoc)
+               .HasForeignKey<Quiz>(q => q.BaihocId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            // Quan hệ giữa Quiz và CauHoi (1-nhiều)
+            modelBuilder.Entity<CauHoi>()
+                .HasOne(ch => ch.Quiz)
+                .WithMany(q => q.CauHois)
+                .HasForeignKey(ch => ch.QuizId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Quan hệ giữa CauHoi và CauTraLoi (1-nhiều)
+            modelBuilder.Entity<CauTraLoi>()
+                .HasOne(ctl => ctl.CauHoi)
+                .WithMany(ch => ch.CauTraLois)
+                .HasForeignKey(ctl => ctl.CauHoiId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

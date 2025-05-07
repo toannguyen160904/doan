@@ -220,5 +220,44 @@ namespace doan.Controllers
             ViewData["BaiHocName"] = baiHoc.Name;
             return View(flashcards);
         }
+        // Action để hiển thị trang làm bài Quiz
+        public IActionResult Quiz(int baiHocId)
+        {
+            // Lấy Quiz dựa trên bài học
+            var quiz = _context.Quizzes
+                .Include(q => q.CauHois)
+                .ThenInclude(ch => ch.CauTraLois)
+                .FirstOrDefault(q => q.BaihocId == baiHocId);
+
+            if (quiz == null)
+            {
+                return NotFound("Quiz không tồn tại cho bài học này.");
+            }
+
+            var baiHoc = _context.Baihoc.FirstOrDefault(b => b.Id == baiHocId);
+            ViewData["BaiHocName"] = baiHoc.Name;
+
+            return View(quiz);
+        }
+
+        public async Task<IActionResult> DanhSachQuiz()
+        {
+            var levels = await _context.Levels.Include(l => l.Lessons).ToListAsync();
+
+            if (levels == null || !levels.Any())
+            {
+                Console.WriteLine("Không có dữ liệu Level nào!");
+                return View(new List<Level>());
+            }
+
+            foreach (var level in levels)
+            {
+                Console.WriteLine($"Level: {level.Name} - Số bài học: {level.Lessons?.Count ?? 0}");
+            }
+
+            return View(levels);
+        }
+
+
     }
 }

@@ -1,0 +1,59 @@
+﻿@model doan.Models.Quiz
+
+@{
+    ViewData["Title"] = "Làm bài Quiz";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/Quiz.css" />
+
+<div class="quiz-wrapper">
+    <div class="quiz-container">
+        <div class="quiz-card shadow">
+            <div class="quiz-header">
+                <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>@ViewData["BaiHocName"]</h4>
+            </div>
+
+            <div class="quiz-content">
+                <form asp-action="ChamDiem" asp-controller="Quiz" method="post">
+                    <input type="hidden" name="quizId" value="@Model.Id" />
+                    @foreach (var question in Model.CauHois)
+                    {
+                        <div class="question-container">
+                            <h6 class="fw-bold mb-3">@question.NoiDung</h6>
+                            @if (question.CauTraLois != null && question.CauTraLois.Any())
+                            {
+                                @foreach (var answer in question.CauTraLois)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="userAnswers[@question.Id]" value="@answer.Id" id="Answer_@answer.Id" />
+                                        <label class="form-check-label" for="Answer_@answer.Id">
+                                            @answer.NoiDung
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-danger">Không có câu trả lời nào cho câu hỏi này.</p>
+                            }
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-success submit-button">
+                        <i class="bi bi-check-circle me-2"></i>Nộp bài
+                    </button>
+                    @if (ViewBag.SoCauDung != null && ViewBag.TongSoCau != null)
+                    {
+                        <p class="text-danger fw-bold mt-3">
+                            Số câu đúng: @ViewBag.SoCauDung / @ViewBag.TongSoCau
+                        </p>
+                    }
+                </form>
+            </div>
+        </div> <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-primary">🔙 Quay lại Chọn Bài</a>
+    </div>
+   
+</div>
+
+<script src="~/js/ChamDiem.js"></script>
