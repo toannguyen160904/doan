@@ -14,6 +14,7 @@
                 </div>
                 <div class="card-body">
                     <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="BaihocId" />
                         <div class="mb-4">
@@ -111,18 +112,94 @@
                 questionBlock.querySelector('.answers-list').insertAdjacentHTML('beforeend', html);
             }
         });
-        // Remove answer
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-answer')) {
-                var answerBlock = e.target.closest('.answer-block');
-                answerBlock.remove();
-            }
-        });
-        // Remove question
+        // Handle question deletion
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('remove-question')) {
                 var questionBlock = e.target.closest('.question-block');
-                questionBlock.remove();
+                var questionIdInput = questionBlock.querySelector('input[name$=".Id"]');
+                var questionId = questionIdInput ? questionIdInput.value : null;
+
+                if (questionId && questionId !== "0") {
+                    if (confirm("Bạn có chắc chắn muốn xóa câu hỏi này?")) {
+                        fetch('/Admin/Quiz/DeleteQuestion', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify({ questionId: parseInt(questionId) })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                questionBlock.remove();
+                                // Update question numbers
+                                document.querySelectorAll('.question-block').forEach((block, index) => {
+                                    block.querySelector('.form-label').textContent = `Câu hỏi ${index + 1}:`;
+                                    block.setAttribute('data-question-index', index);
+                                    // Update all input names with new index
+                                    block.querySelectorAll('input[name^="CauHois["]').forEach(input => {
+                                        input.name = input.name.replace(/CauHois\[\d+\]/, `CauHois[${index}]`);
+                                    });
+                                });
+                            } else {
+                                alert(data.message || "Đã xảy ra lỗi khi xóa câu hỏi.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("Đã xảy ra lỗi khi xóa câu hỏi.");
+                        });
+                    }
+                } else {
+                    // If question hasn't been saved to database yet, just remove from UI
+                    questionBlock.remove();
+                    // Update question numbers
+                    document.querySelectorAll('.question-block').forEach((block, index) => {
+                        block.querySelector('.form-label').textContent = `Câu hỏi ${index + 1}:`;
+                        block.setAttribute('data-question-index', index);
+                        // Update all input names with new index
+                        block.querySelectorAll('input[name^="CauHois["]').forEach(input => {
+                            input.name = input.name.replace(/CauHois\[\d+\]/, `CauHois[${index}]`);
+                        });
+                    });
+                }
+            }
+        });
+        // Handle answer deletion
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-answer')) {
+                var answerBlock = e.target.closest('.answer-block');
+                var answerIdInput = answerBlock.querySelector('input[name$=".Id"]');
+                var answerId = answerIdInput ? answerIdInput.value : null;
+
+                if (answerId && answerId !== "0") {
+                    if (confirm("Bạn có chắc chắn muốn xóa câu trả lời này?")) {
+                        fetch('/Admin/Quiz/DeleteAnswer', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify({ answerId: parseInt(answerId) })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                answerBlock.remove();
+                            } else {
+                                alert(data.message || "Đã xảy ra lỗi khi xóa câu trả lời.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("Đã xảy ra lỗi khi xóa câu trả lời.");
+                        });
+                    }
+                } else {
+                    // If answer hasn't been saved to database yet, just remove from UI
+                    answerBlock.remove();
+                }
             }
         });
     </script>
