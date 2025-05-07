@@ -28,11 +28,11 @@ namespace doan.Models
 
         public ICollection<Vocabulary> tuvung { get; set; } = new List<Vocabulary>();
         public List<GrammarStructure> nguphap { get; set; } = new List<GrammarStructure>();
-<<<<<<< HEAD
+
         public ICollection<flashcards> Flashcards { get; set; }
         public ICollection<Diendanmodel> Diendan { get; set; } = new List<Diendanmodel>();
-=======
+
         public Quiz ? Quiz { get; set; }
->>>>>>> quang
+
     }
 }

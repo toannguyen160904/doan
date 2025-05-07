@@ -177,9 +177,13 @@ public class QuizController : Controller
                         }
                         else if (answer.Id == 0)
                         {
-                            // Add new answer
-                            answer.CauHoiId = existingQuestion.Id;
-                            _context.CauTraLois.Add(answer);
+                            var newAnswer = new CauTraLoi
+                            {
+                                NoiDung = answer.NoiDung,
+                                IsCorrect = answer.IsCorrect,
+                                CauHoiId = existingQuestion.Id
+                            };
+                            _context.CauTraLois.Add(newAnswer);
                         }
                     }
                 }

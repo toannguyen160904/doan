@@ -12,8 +12,8 @@ using doan.Models;
 namespace doan.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250410041700_AddLearningPlanTracking")]
-    partial class AddLearningPlanTracking
+    [Migration("20250507164632_cuoicung")]
+    partial class cuoicung
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -244,6 +244,9 @@ namespace doan.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LevelId")
                         .HasColumnType("int");
 
@@ -260,6 +263,9 @@ namespace doan.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LevelId");
+
+                    b.HasIndex("Name", "LevelId")
+                        .IsUnique();
 
                     b.ToTable("Baihoc");
                 });
@@ -280,6 +286,88 @@ namespace doan.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("doan.Models.CauHoi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("NoiDung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("CauHois");
+                });
+
+            modelBuilder.Entity("doan.Models.CauTraLoi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CauHoiId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NoiDung")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CauHoiId");
+
+                    b.ToTable("CauTraLois");
+                });
+
+            modelBuilder.Entity("doan.Models.Diendanmodel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BaiHocId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoiDung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TieuDe")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaiHocId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Diendan");
                 });
 
             modelBuilder.Entity("doan.Models.GrammarStructure", b =>
@@ -420,6 +508,129 @@ namespace doan.Migrations
                     b.ToTable("ProductImages");
                 });
 
+            modelBuilder.Entity("doan.Models.Quiz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BaihocId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaihocId")
+                        .IsUnique();
+
+                    b.ToTable("Quizzes");
+                });
+
+            modelBuilder.Entity("doan.Models.TestQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChoicesJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrectAnswer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Explanation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TestQuestions");
+                });
+
+            modelBuilder.Entity("doan.Models.TestResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CorrectAnswers")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SuggestedLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestResults");
+                });
+
+            modelBuilder.Entity("doan.Models.UserAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("SelectedAnswer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TestQuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TestResultId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestQuestionId");
+
+                    b.HasIndex("TestResultId");
+
+                    b.ToTable("UserAnswers");
+                });
+
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
                 {
                     b.Property<int>("Id")
@@ -462,6 +673,12 @@ namespace doan.Migrations
                     b.Property<DateTime?>("LearnedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("NextReviewDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReviewLevel")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -487,38 +704,73 @@ namespace doan.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AmHan")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("HanTu")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nghia")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhatAm")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tuvung")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserLearningPlanId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");
 
+                    b.HasIndex("UserLearningPlanId");
+
                     b.ToTable("tuvung");
+                });
+
+            modelBuilder.Entity("doan.Models.flashcards", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BaihocId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GrammarStructureId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VocabularyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaihocId");
+
+                    b.HasIndex("GrammarStructureId")
+                        .IsUnique()
+                        .HasFilter("[GrammarStructureId] IS NOT NULL");
+
+                    b.HasIndex("VocabularyId")
+                        .IsUnique()
+                        .HasFilter("[VocabularyId] IS NOT NULL");
+
+                    b.ToTable("Flashcards");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -583,6 +835,47 @@ namespace doan.Migrations
                     b.Navigation("Level");
                 });
 
+            modelBuilder.Entity("doan.Models.CauHoi", b =>
+                {
+                    b.HasOne("doan.Models.Quiz", "Quiz")
+                        .WithMany("CauHois")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("doan.Models.CauTraLoi", b =>
+                {
+                    b.HasOne("doan.Models.CauHoi", "CauHoi")
+                        .WithMany("CauTraLois")
+                        .HasForeignKey("CauHoiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CauHoi");
+                });
+
+            modelBuilder.Entity("doan.Models.Diendanmodel", b =>
+                {
+                    b.HasOne("doan.Models.Baihoc", "Baihoc")
+                        .WithMany("Diendan")
+                        .HasForeignKey("BaiHocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("doan.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Baihoc");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("doan.Models.GrammarStructure", b =>
                 {
                     b.HasOne("doan.Models.Baihoc", "Lesson")
@@ -616,6 +909,47 @@ namespace doan.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("doan.Models.Quiz", b =>
+                {
+                    b.HasOne("doan.Models.Baihoc", "Baihoc")
+                        .WithOne("Quiz")
+                        .HasForeignKey("doan.Models.Quiz", "BaihocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Baihoc");
+                });
+
+            modelBuilder.Entity("doan.Models.TestResult", b =>
+                {
+                    b.HasOne("doan.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("doan.Models.UserAnswer", b =>
+                {
+                    b.HasOne("doan.Models.TestQuestion", "Question")
+                        .WithMany()
+                        .HasForeignKey("TestQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("doan.Models.TestResult", "TestResult")
+                        .WithMany()
+                        .HasForeignKey("TestResultId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("TestResult");
+                });
+
             modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
                 {
                     b.HasOne("doan.Models.ApplicationUser", "User")
@@ -636,7 +970,7 @@ namespace doan.Migrations
                         .IsRequired();
 
                     b.HasOne("doan.Models.Vocabulary", "Vocabulary")
-                        .WithMany()
+                        .WithMany("UserVocabularyProgresses")
                         .HasForeignKey("VocabularyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -654,11 +988,46 @@ namespace doan.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("doan.Models.UserLearningPlan", null)
+                        .WithMany("VocabularyList")
+                        .HasForeignKey("UserLearningPlanId");
+
                     b.Navigation("Lesson");
+                });
+
+            modelBuilder.Entity("doan.Models.flashcards", b =>
+                {
+                    b.HasOne("doan.Models.Baihoc", "Baihoc")
+                        .WithMany("Flashcards")
+                        .HasForeignKey("BaihocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("doan.Models.GrammarStructure", "GrammarStructure")
+                        .WithOne()
+                        .HasForeignKey("doan.Models.flashcards", "GrammarStructureId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("doan.Models.Vocabulary", "Vocabulary")
+                        .WithOne()
+                        .HasForeignKey("doan.Models.flashcards", "VocabularyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Baihoc");
+
+                    b.Navigation("GrammarStructure");
+
+                    b.Navigation("Vocabulary");
                 });
 
             modelBuilder.Entity("doan.Models.Baihoc", b =>
                 {
+                    b.Navigation("Diendan");
+
+                    b.Navigation("Flashcards");
+
+                    b.Navigation("Quiz");
+
                     b.Navigation("nguphap");
 
                     b.Navigation("tuvung");
@@ -669,6 +1038,11 @@ namespace doan.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("doan.Models.CauHoi", b =>
+                {
+                    b.Navigation("CauTraLois");
+                });
+
             modelBuilder.Entity("doan.Models.Level", b =>
                 {
                     b.Navigation("Lessons");
@@ -677,6 +1051,21 @@ namespace doan.Migrations
             modelBuilder.Entity("doan.Models.Product", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("doan.Models.Quiz", b =>
+                {
+                    b.Navigation("CauHois");
+                });
+
+            modelBuilder.Entity("doan.Models.UserLearningPlan", b =>
+                {
+                    b.Navigation("VocabularyList");
+                });
+
+            modelBuilder.Entity("doan.Models.Vocabulary", b =>
+                {
+                    b.Navigation("UserVocabularyProgresses");
                 });
 #pragma warning restore 612, 618
         }

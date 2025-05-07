@@ -64,7 +64,7 @@
                             }
                         </td>
                         <td>
-                            @(item.NextReviewDate != null ? item.NextReviewDate.Value.ToString("dd/MM/yyyy") : "Chưa có lịch")
+                            @(item.CreatedAt != null ? item.CreatedAt.ToString("dd/MM/yyyy") : "Chưa có lịch")
                         </td>
                         <td>
                             @if (learnedIds.Contains(item.Id))

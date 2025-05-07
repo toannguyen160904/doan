@@ -40,9 +40,13 @@
                         </div>
                     }
 
-                    <button type="submit" class="btn btn-success submit-button">
-                        <i class="bi bi-check-circle me-2"></i>Nộp bài
-                    </button>
+                    @if (ViewBag.SoCauDung == null)
+                    {
+                        <button type="submit" class="btn btn-success submit-button">
+                            <i class="bi bi-check-circle me-2"></i>Nộp bài
+                        </button>
+                    }
+
                     @if (ViewBag.SoCauDung != null && ViewBag.TongSoCau != null)
                     {
                         <p class="text-danger fw-bold mt-3">

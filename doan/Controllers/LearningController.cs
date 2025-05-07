@@ -64,7 +64,7 @@ public class LearningController : Controller
 
             if (progress != null)
             {
-                vocab.NextReviewDate = progress.NextReviewDate;
+                vocab.CreatedAt = progress.Vocabulary.CreatedAt;
             }
         }
 

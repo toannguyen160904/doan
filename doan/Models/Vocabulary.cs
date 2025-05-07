@@ -26,7 +26,7 @@ namespace doan.Models
 
         public ICollection<UserVocabularyProgress> UserVocabularyProgresses { get; set; } = new List<UserVocabularyProgress>();
 
-        public DateTime? NextReviewDate { get; set; }
+        
 
  
        
