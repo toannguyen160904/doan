@@ -224,25 +224,80 @@ public class QuizController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult DeleteConfirmed(int id)
     {
-        var quiz = _context.Quizzes
-            .Include(q => q.CauHois)
-            .ThenInclude(ch => ch.CauTraLois)
-            .FirstOrDefault(q => q.Id == id);
-        if (quiz == null)
+        try
         {
-            return NotFound();
+            var quiz = _context.Quizzes
+                .Include(q => q.CauHois)
+                    .ThenInclude(ch => ch.CauTraLois)
+                .FirstOrDefault(q => q.Id == id);
+
+            if (quiz == null)
+            {
+                return NotFound();
+            }
+
+            // First delete all answers
+            foreach (var question in quiz.CauHois)
+            {
+                _context.CauTraLois.RemoveRange(question.CauTraLois);
+            }
+            _context.SaveChanges();
+
+            // Then delete all questions
+            _context.CauHois.RemoveRange(quiz.CauHois);
+            _context.SaveChanges();
+
+            // Finally delete the quiz
+            _context.Quizzes.Remove(quiz);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Quiz deleted successfully.";
+            return RedirectToAction(nameof(Index));
         }
-        // Remove answers
-        foreach (var question in quiz.CauHois)
+        catch (Exception ex)
         {
-            _context.CauTraLois.RemoveRange(question.CauTraLois);
+            // Log the error here if you have logging configured
+            TempData["ErrorMessage"] = "An error occurred while deleting the quiz.";
+            return RedirectToAction(nameof(Index));
         }
-        // Remove questions
-        _context.CauHois.RemoveRange(quiz.CauHois);
-        // Remove quiz
-        _context.Quizzes.Remove(quiz);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteQuestion([FromBody] DeleteIdModel model)
+    {
+        var question = _context.CauHois
+            .Include(q => q.CauTraLois)
+            .FirstOrDefault(q => q.Id == model.questionId);
+
+        if (question == null)
+            return Json(new { success = false, message = "Không tìm thấy câu hỏi." });
+
+        _context.CauTraLois.RemoveRange(question.CauTraLois);
+        _context.CauHois.Remove(question);
         _context.SaveChanges();
-        return RedirectToAction("Index");
+
+        return Json(new { success = true });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteAnswer([FromBody] DeleteIdModel model)
+    {
+        var answer = _context.CauTraLois.FirstOrDefault(a => a.Id == model.answerId);
+        if (answer == null)
+            return Json(new { success = false, message = "Không tìm thấy câu trả lời." });
+
+        _context.CauTraLois.Remove(answer);
+        _context.SaveChanges();
+
+        return Json(new { success = true });
+    }
+
+    public class DeleteIdModel
+    {
+        public int questionId { get; set; }
+        public int answerId { get; set; }
     }
 
 }

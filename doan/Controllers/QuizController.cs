@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using doan.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace doan.Controllers
 {
@@ -26,7 +28,7 @@ namespace doan.Controllers
             {
                 return NotFound("Quiz không tồn tại cho bài học này.");
             }
-             
+
             return View(quiz);
         }
 
@@ -63,7 +65,7 @@ namespace doan.Controllers
             return View("~/Views/Home/Quiz.cshtml", quiz);
         }
 
-       
+
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
