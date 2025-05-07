@@ -30,13 +30,12 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="LessonId" class="form-label fw-semibold">Bài học <span class="text-danger">*</span></label>
-                        <select id="lessonSelect" class="form-select">
+                    <div class="form-group">
+                        <label asp-for="LessonId">Bài học</label>
+                        <select asp-for="LessonId" class="form-control" id="lessonSelect">
                             <option value="">-- Chọn bài học --</option>
                         </select>
-                        <input type="hidden" asp-for="LessonId" />
-                        <span asp-validation-for="LessonId" class="text-danger small"></span>
+                        <span asp-validation-for="LessonId" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-12 mb-3">
@@ -70,7 +69,7 @@
                 </div>
 
             </form>
-
+            
         </div>
     </div>
 
@@ -78,23 +77,22 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
-        // Load bài học theo cấp độ
+        // Khi chọn cấp độ → gọi API lấy danh sách bài học
         $("#levelSelect").change(function () {
             var levelId = $(this).val();
-            $.get("/api/BaihocApi/GetByLevel/" + levelId, function (data) {
+            $.get("/Admin/Grammars/GetByLevel/" + levelId, function (data) {
                 var lessonSelect = $("#lessonSelect");
                 lessonSelect.empty();
                 lessonSelect.append('<option value="">-- Chọn bài học --</option>');
                 $.each(data, function (i, lesson) {
                     lessonSelect.append(`<option value="${lesson.id}">${lesson.name}</option>`);
                 });
-                $("#LessonId").val("");
             });
         });
-
-        $("#lessonSelect").change(function () {
-            $("#LessonId").val($(this).val());
-        });
     </script>
+
+    <script src="~/js/them-tu-vung.js"></script>
+
 }

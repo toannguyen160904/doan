@@ -26,13 +26,24 @@ namespace doan.Areas.Admin.Controllers
 
             return View(grammar);
         }
+        [HttpGet("/Admin/Grammars/GetByLevel/{levelId}")]
+        public IActionResult GetByLevel(int levelId)
+        {
+            var lessons = _context.Baihoc
+                .Where(b => b.LevelId == levelId)
+                .Select(b => new { id = b.Id, name = b.Title })
+                .ToList();
+
+            return Ok(lessons);
+        }
 
         public IActionResult Create()
         {
-            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name"); 
-            ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title"); 
+            ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
+            ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title");
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GrammarStructure model)

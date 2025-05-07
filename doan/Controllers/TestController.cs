@@ -1,8 +1,12 @@
 ﻿using doan.Models;
 using doan.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 namespace doan.Controllers
 {
     public class TestController : Controller
@@ -13,7 +17,7 @@ namespace doan.Controllers
         {
             _context = context;
         }
-
+        [Authorize]
         public IActionResult Start()
         {
             return View(); // Mặc định trả về Views/Test/Start.cshtml

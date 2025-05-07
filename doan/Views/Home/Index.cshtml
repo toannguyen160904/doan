@@ -52,13 +52,8 @@
                     <a href="/" class="text-xl font-bold text-blue-600 flex items-center">
                         <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
-                    <a href="/Home/ChonLevel" class="text-lg text-blue-500 hover:underline">Cấp độ</a>
-
-                    <a href="/Learning/Daily" class="text-lg text-blue-500 hover:underline">Lộ Trình Học</a>
-
-
-                </div>
-
+                </div> 
+                
                 <button class="text-gray-600 text-2xl focus:outline-none" onclick="toggleMenu()">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -66,17 +61,12 @@
 
 
             <!-- Menu dropdown -->
-            <div id="menuDropdown" class="hidden mt-4 bg-gray-100 p-3 rounded-lg shadow-lg">
-                <ul class="space-y-2 text-center">
-                    <li><a href="/" class="block text-lg text-blue-600 hover:underline">🏠 Trang chủ</a></li>
-                    <li><a href="/Home/ChonLevel" class="block text-lg text-blue-600 hover:underline">📚 Chọn cấp độ</a></li>
-                    <li><a href="/Learning/Daily" class="block text-lg text-blue-600 hover:underline">📈 Lộ Trình Học</a></li>
-                    <li><a href="/Home/Privacy" class="block text-lg text-blue-600 hover:underline">🔒 Chính sách</a></li>
-
             <div id="menuDropdown" class="hidden mt-4 bg-white border border-gray-300 p-4 rounded-lg shadow-lg">
+                <ul style="font-size :20px">Menu</ul>
                 <ul class="space-y-3 text-center">
                     <li><a href="/" class="block py-2 text-gray-700 hover:text-blue-600">🏠 Trang chủ</a></li>
                     <li><a href="/Home/ChonLevel" class="block py-2 text-gray-700 hover:text-blue-600">📚 Chọn cấp độ</a></li>
+                    <li><a href="/Learning/Daily" class="block py-2 text-gray-700 hover:text-blue-600">📈 Lộ Trình Học</a></li>
                     <li><a href="/Home/Privacy" class="block py-2 text-gray-700 hover:text-blue-600">🔒 Chính sách</a></li>
 
                     @if (User.IsInRole("Admin"))
@@ -88,12 +78,13 @@
 
                     <li>
                         <div class="text-gray-500 text-sm mb-1 uppercase tracking-widest text-center">Tài khoản</div>
-                        <div class="flex justify-center"><partial name="_LoginPartial" /></div>
+                        <div class="flex justify-center">
+                            <partial name="_LoginPartial" />
+                        </div>
                     </li>
-
                 </ul>
             </div>
-        </div>
+            <hr />
 
         <!-- Banner Giới thiệu Pro -->
         <div class="flex justify-center my-14">

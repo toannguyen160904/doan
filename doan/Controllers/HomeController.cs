@@ -14,7 +14,6 @@ using System.Linq;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace doan.Controllers
 {
     public class HomeController : Controller
@@ -49,22 +48,19 @@ namespace doan.Controllers
         [Authorize]
         public async Task<IActionResult> ChonLevel()
         {
-
-            var levels = await _context.Levels.Include(l => l.Lessons).ToListAsync();
-            if (levels == null || !levels.Any())
-                return View(new List<Level>());
-
+            // Khai báo và lấy danh sách levels cùng với Lessons
             var levels = await _context.Levels
-                .Include(l => l.Lessons)
-                .ToListAsync();
+                .Include(l => l.Lessons)  // Bao gồm các bài học (Lessons)
+                .ToListAsync();  // Chuyển đổi kết quả thành danh sách
 
+            // Kiểm tra nếu không có dữ liệu Levels
             if (levels == null || !levels.Any())
             {
                 _logger.LogWarning("Không có dữ liệu Level nào!");
                 return View(new List<Level>());
             }
 
-
+            // Trả về view với danh sách levels đã lấy từ cơ sở dữ liệu
             return View(levels);
         }
 
@@ -80,11 +76,7 @@ namespace doan.Controllers
                     return RedirectToAction("Index1");
             }
 
-
-            ViewBag.ErrorMessage = "Invalid username or password.";
-
             ViewBag.ErrorMessage = "Tên đăng nhập hoặc mật khẩu không đúng.";
-
             return View("Login");
         }
 
@@ -104,7 +96,6 @@ namespace doan.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
-
 
         // ✅ Xem từ vựng theo Level
         public async Task<IActionResult> TuVung(int? levelId)
@@ -150,7 +141,7 @@ namespace doan.Controllers
 
             return View(nguPhap);
         }
-
+        [Authorize]
         // ✅ Giao diện làm bài test đầu vào
         public async Task<IActionResult> Test()
         {
@@ -187,6 +178,7 @@ namespace doan.Controllers
             };
 
             return View("~/Views/Home/TestResult.cshtml", result);
+        }
 
         [Authorize]
         public IActionResult Flashcards(int baiHocId)
@@ -199,7 +191,7 @@ namespace doan.Controllers
             if (baiHoc == null)
                 return NotFound();
 
-            var flashcards = new List<flashcards>();
+            var flashcards = new List<flashcards>();  // Đổi tên thành Flashcard, viết hoa chữ cái đầu
 
             // Thêm flashcard từ từ vựng
             flashcards.AddRange(baiHoc.tuvung.Select(word => new flashcards
@@ -227,7 +219,6 @@ namespace doan.Controllers
 
             ViewData["BaiHocName"] = baiHoc.Name;
             return View(flashcards);
-
         }
     }
 }
