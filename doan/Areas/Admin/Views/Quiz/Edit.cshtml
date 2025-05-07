@@ -1,0 +1,129 @@
+@model doan.Models.Quiz
+
+@{
+    ViewData["Title"] = "Sửa Quiz";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Sửa Quiz: @ViewData["BaiHocName"]</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="BaihocId" />
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Ngày tạo:</label>
+                            <span>@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <h5>Các câu hỏi và đáp án</h5>
+                        <hr />
+                        <div id="dynamicQuestions">
+                            @for (int i = 0; i < Model.CauHois.Count; i++)
+                            {
+                                <div class="mb-4 p-3 border rounded bg-light question-block" data-question-index="@i">
+                                    <label class="form-label fw-semibold">Câu hỏi @(i + 1):</label>
+                                    <input type="hidden" name="CauHois[@i].Id" value="@Model.CauHois.ElementAt(i).Id" />
+                                    <input type="text" name="CauHois[@i].NoiDung" class="form-control mb-2" value="@Model.CauHois.ElementAt(i).NoiDung" />
+                                    <div class="ms-3">
+                                        <label class="form-label">Đáp án:</label>
+                                        <div class="answers-list">
+                                            @for (int j = 0; j < Model.CauHois.ElementAt(i).CauTraLois.Count; j++)
+                                            {
+                                                <div class="input-group mb-2 answer-block" data-answer-index="@j">
+                                                    <input type="hidden" name="CauHois[@i].CauTraLois[@j].Id" value="@Model.CauHois.ElementAt(i).CauTraLois.ElementAt(j).Id" />
+                                                    <input type="text" name="CauHois[@i].CauTraLois[@j].NoiDung" class="form-control" value="@Model.CauHois.ElementAt(i).CauTraLois.ElementAt(j).NoiDung" placeholder="Nội dung đáp án" />
+                                                    <span class="input-group-text">
+                                                        <input type="checkbox" name="CauHois[@i].CauTraLois[@j].IsCorrect" value="true" @(Model.CauHois.ElementAt(i).CauTraLois.ElementAt(j).IsCorrect ? "checked" : "") /> Đúng
+                                                    </span>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-answer">&times;</button>
+                                                </div>
+                                            }
+                                        </div>
+                                        <button type="button" class="btn btn-outline-success btn-sm add-answer">Thêm đáp án</button>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger btn-sm mt-2 remove-question">Xóa câu hỏi</button>
+                                </div>
+                            }
+                        </div>
+                        <button type="button" class="btn btn-success mt-3" id="addQuestionBtn">Thêm câu hỏi</button>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-secondary px-4">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-save me-1"></i> Lưu lại
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Helper to get next question index
+        function getNextQuestionIndex() {
+            return document.querySelectorAll('.question-block').length;
+        }
+        // Helper to get next answer index for a question
+        function getNextAnswerIndex(questionBlock) {
+            return questionBlock.querySelectorAll('.answer-block').length;
+        }
+        // Add new question
+        document.getElementById('addQuestionBtn').addEventListener('click', function() {
+            var qIdx = getNextQuestionIndex();
+            var html = `<div class=\"mb-4 p-3 border rounded bg-light question-block\" data-question-index=\"${qIdx}\">\n` +
+                `<label class=\"form-label fw-semibold\">Câu hỏi ${qIdx + 1}:</label>\n` +
+                `<input type=\"hidden\" name=\"CauHois[${qIdx}].Id\" value=\"0\" />\n` +
+                `<input type=\"text\" name=\"CauHois[${qIdx}].NoiDung\" class=\"form-control mb-2\" value=\"\" />\n` +
+                `<div class=\"ms-3\">\n` +
+                `<label class=\"form-label\">Đáp án:</label>\n` +
+                `<div class=\"answers-list\"></div>\n` +
+                `<button type=\"button\" class=\"btn btn-outline-success btn-sm add-answer\">Thêm đáp án</button>\n` +
+                `</div>\n` +
+                `<button type=\"button\" class=\"btn btn-outline-danger btn-sm mt-2 remove-question\">Xóa câu hỏi</button>\n` +
+                `</div>`;
+            var container = document.getElementById('dynamicQuestions');
+            container.insertAdjacentHTML('beforeend', html);
+        });
+        // Add answer to a question
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-answer')) {
+                var questionBlock = e.target.closest('.question-block');
+                var qIdx = questionBlock.getAttribute('data-question-index');
+                var aIdx = getNextAnswerIndex(questionBlock);
+                var html = `<div class=\"input-group mb-2 answer-block\" data-answer-index=\"${aIdx}\">\n` +
+                    `<input type=\"hidden\" name=\"CauHois[${qIdx}].CauTraLois[${aIdx}].Id\" value=\"0\" />\n` +
+                    `<input type=\"text\" name=\"CauHois[${qIdx}].CauTraLois[${aIdx}].NoiDung\" class=\"form-control\" value=\"\" placeholder=\"Nội dung đáp án\" />\n` +
+                    `<span class=\"input-group-text\">\n` +
+                    `<input type=\"checkbox\" name=\"CauHois[${qIdx}].CauTraLois[${aIdx}].IsCorrect\" value=\"true\" /> Đúng\n` +
+                    `</span>\n` +
+                    `<button type=\"button\" class=\"btn btn-outline-danger btn-sm remove-answer\">&times;</button>\n` +
+                    `</div>`;
+                questionBlock.querySelector('.answers-list').insertAdjacentHTML('beforeend', html);
+            }
+        });
+        // Remove answer
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-answer')) {
+                var answerBlock = e.target.closest('.answer-block');
+                answerBlock.remove();
+            }
+        });
+        // Remove question
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-question')) {
+                var questionBlock = e.target.closest('.question-block');
+                questionBlock.remove();
+            }
+        });
+    </script>
+} 
