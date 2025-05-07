@@ -123,4 +123,126 @@ public class QuizController : Controller
         return Ok(new { success = true });
     }
 
+    // GET: Admin/Quiz/Edit/5
+    public IActionResult Edit(int id)
+    {
+        var quiz = _context.Quizzes
+            .Include(q => q.CauHois)
+                .ThenInclude(ch => ch.CauTraLois)
+            .FirstOrDefault(q => q.Id == id);
+        if (quiz == null)
+        {
+            return NotFound();
+        }
+        ViewData["BaiHocName"] = _context.Baihoc.Where(b => b.Id == quiz.BaihocId).Select(b => b.Name).FirstOrDefault();
+        return View(quiz);
+    }
+
+    // POST: Admin/Quiz/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(int id, Quiz quiz)
+    {
+        if (id != quiz.Id)
+        {
+            return NotFound();
+        }
+        if (ModelState.IsValid)
+        {
+            var existingQuiz = _context.Quizzes
+                .Include(q => q.CauHois)
+                .ThenInclude(ch => ch.CauTraLois)
+                .FirstOrDefault(q => q.Id == id);
+            if (existingQuiz == null)
+            {
+                return NotFound();
+            }
+            // Update quiz properties if needed (add more fields as required)
+            existingQuiz.BaihocId = quiz.BaihocId;
+            // Update questions and answers (now supports adding new ones)
+            foreach (var question in quiz.CauHois)
+            {
+                var existingQuestion = existingQuiz.CauHois.FirstOrDefault(q => q.Id == question.Id);
+                if (existingQuestion != null)
+                {
+                    // Update existing question
+                    existingQuestion.NoiDung = question.NoiDung;
+                    foreach (var answer in question.CauTraLois)
+                    {
+                        var existingAnswer = existingQuestion.CauTraLois.FirstOrDefault(a => a.Id == answer.Id);
+                        if (existingAnswer != null)
+                        {
+                            existingAnswer.NoiDung = answer.NoiDung;
+                            existingAnswer.IsCorrect = answer.IsCorrect;
+                        }
+                        else if (answer.Id == 0)
+                        {
+                            // Add new answer
+                            answer.CauHoiId = existingQuestion.Id;
+                            _context.CauTraLois.Add(answer);
+                        }
+                    }
+                }
+                else if (question.Id == 0)
+                {
+                    // Add new question
+                    question.QuizId = existingQuiz.Id;
+                    _context.CauHois.Add(question);
+                    _context.SaveChanges(); // Save to get the new question Id
+                    // Add new answers for this new question
+                    foreach (var answer in question.CauTraLois)
+                    {
+                        answer.CauHoiId = question.Id;
+                        _context.CauTraLois.Add(answer);
+                    }
+                }
+            }
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        ViewData["BaiHocName"] = _context.Baihoc.Where(b => b.Id == quiz.BaihocId).Select(b => b.Name).FirstOrDefault();
+        return View(quiz);
+    }
+
+    // GET: Admin/Quiz/Delete/5
+    public IActionResult Delete(int id)
+    {
+        var quiz = _context.Quizzes
+            .Include(q => q.CauHois)
+            .ThenInclude(ch => ch.CauTraLois)
+            .FirstOrDefault(q => q.Id == id);
+        if (quiz == null)
+        {
+            return NotFound();
+        }
+        ViewData["BaiHocName"] = _context.Baihoc.Where(b => b.Id == quiz.BaihocId).Select(b => b.Name).FirstOrDefault();
+        return View(quiz);
+    }
+
+    // POST: Admin/Quiz/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteConfirmed(int id)
+    {
+        var quiz = _context.Quizzes
+            .Include(q => q.CauHois)
+            .ThenInclude(ch => ch.CauTraLois)
+            .FirstOrDefault(q => q.Id == id);
+        if (quiz == null)
+        {
+            return NotFound();
+        }
+        // Remove answers
+        foreach (var question in quiz.CauHois)
+        {
+            _context.CauTraLois.RemoveRange(question.CauTraLois);
+        }
+        // Remove questions
+        _context.CauHois.RemoveRange(quiz.CauHois);
+        // Remove quiz
+        _context.Quizzes.Remove(quiz);
+        _context.SaveChanges();
+        return RedirectToAction("Index");
+    }
+
 }

@@ -71,7 +71,7 @@
                                             <i class="bi bi-pencil-square"></i> Sửa Quiz
                                         </a>
                                          // Optional: Add delete button if needed
-                                        <a asp-action="Delete" asp-route-id="@item.Quiz.Id" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Xóa Quiz bài học này">
+                                        <a asp-action="Delete" asp-route-id="@item.Quiz.Id" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Xóa Quiz bài học này" onclick="return confirm('Bạn có muốn xóa bài Quiz?');">
                                             <i class="bi bi-trash"></i> Xóa Quiz
                                         </a>
                                     }
