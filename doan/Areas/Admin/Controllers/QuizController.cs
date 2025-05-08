@@ -147,36 +147,45 @@ public class QuizController : Controller
         {
             return NotFound();
         }
+
         if (ModelState.IsValid)
         {
             var existingQuiz = _context.Quizzes
                 .Include(q => q.CauHois)
                 .ThenInclude(ch => ch.CauTraLois)
                 .FirstOrDefault(q => q.Id == id);
+
             if (existingQuiz == null)
             {
                 return NotFound();
             }
-            // Update quiz properties if needed (add more fields as required)
+
+            // Update quiz properties if needed
             existingQuiz.BaihocId = quiz.BaihocId;
+
             // Update questions and answers (now supports adding new ones)
             foreach (var question in quiz.CauHois)
             {
                 var existingQuestion = existingQuiz.CauHois.FirstOrDefault(q => q.Id == question.Id);
+
                 if (existingQuestion != null)
                 {
                     // Update existing question
                     existingQuestion.NoiDung = question.NoiDung;
+
+                    // Update existing answers
                     foreach (var answer in question.CauTraLois)
                     {
                         var existingAnswer = existingQuestion.CauTraLois.FirstOrDefault(a => a.Id == answer.Id);
+
                         if (existingAnswer != null)
                         {
                             existingAnswer.NoiDung = answer.NoiDung;
                             existingAnswer.IsCorrect = answer.IsCorrect;
                         }
-                        else if (answer.Id == 0)
+                        else
                         {
+                            // Add new answer for existing question
                             var newAnswer = new CauTraLoi
                             {
                                 NoiDung = answer.NoiDung,
@@ -184,30 +193,47 @@ public class QuizController : Controller
                                 CauHoiId = existingQuestion.Id
                             };
                             _context.CauTraLois.Add(newAnswer);
-                            _context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT CauTraLois OFF");
                         }
                     }
                 }
-                else if (question.Id == 0)
+                else
                 {
                     // Add new question
-                    question.QuizId = existingQuiz.Id;
-                    _context.CauHois.Add(question);
+                    var newQuestion = new CauHoi
+                    {
+                        NoiDung = question.NoiDung,
+                        QuizId = existingQuiz.Id
+                    };
+
+                    _context.CauHois.Add(newQuestion);
                     _context.SaveChanges(); // Save to get the new question Id
+
                     // Add new answers for this new question
                     foreach (var answer in question.CauTraLois)
                     {
-                        answer.CauHoiId = question.Id;
-                        _context.CauTraLois.Add(answer);
+                        var newAnswer = new CauTraLoi
+                        {
+                            NoiDung = answer.NoiDung,
+                            IsCorrect = answer.IsCorrect,
+                            CauHoiId = newQuestion.Id
+                        };
+                        _context.CauTraLois.Add(newAnswer);
                     }
                 }
             }
+
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
-        ViewData["BaiHocName"] = _context.Baihoc.Where(b => b.Id == quiz.BaihocId).Select(b => b.Name).FirstOrDefault();
+
+        ViewData["BaiHocName"] = _context.Baihoc
+            .Where(b => b.Id == quiz.BaihocId)
+            .Select(b => b.Name)
+            .FirstOrDefault();
+
         return View(quiz);
     }
+
 
     // GET: Admin/Quiz/Delete/5
     public IActionResult Delete(int id)
