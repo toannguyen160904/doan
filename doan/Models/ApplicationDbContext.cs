@@ -70,6 +70,7 @@ namespace doan.Models
            
             // Quan hệ: Baihoc - Level (1 - nhiều)
 
+
             modelBuilder.Entity<Baihoc>()
                 .HasOne(b => b.Level)
                 .WithMany(l => l.Lessons)

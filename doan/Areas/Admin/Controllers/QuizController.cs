@@ -184,6 +184,7 @@ public class QuizController : Controller
                                 CauHoiId = existingQuestion.Id
                             };
                             _context.CauTraLois.Add(newAnswer);
+                            _context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT CauTraLois OFF");
                         }
                     }
                 }
