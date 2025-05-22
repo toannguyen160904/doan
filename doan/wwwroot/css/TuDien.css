@@ -1,114 +1,91 @@
-﻿/* Custom styles to mimic Mazii */
-.search-container {
-    background-color: #fff;
-    padding: 1rem 1.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 1.5rem;
+﻿/* Từ điển - Tối ưu giao diện tìm kiếm và từ vựng */
+.container {
+    max-width: 1280px;
 }
 
-.lang-dropdown {
-    background-color: #4a90e2; /* Blue background */
-    color: white;
+.search-container {
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .search-input-wrapper {
-    border: 1px solid #d1d5db; /* Gray border */
-    border-radius: 0.375rem;
-    display: flex;
-    align-items: center;
+    position: relative;
 }
 
 .search-input {
-    border: none;
-    outline: none;
-    flex-grow: 1;
-    padding: 0.75rem;
-    padding-left: 2.5rem; /* Space for icon */
-}
-
-.search-icon {
-    position: absolute;
-    left: 0.75rem;
-    color: #6b7280; /* Gray icon */
+    width: 100%;
+    padding: 10px 12px;
+    padding-left: 40px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    background-color: #fff;
 }
 
 .search-actions button {
     background: none;
     border: none;
-    color: #6b7280;
-    padding: 0.5rem;
+    color: #333;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 8px;
 }
 
-.filter-tabs button {
-    padding: 0.5rem 1rem;
-    border-radius: 9999px; /* Pill shape */
-    border: 1px solid transparent;
-    color: #6b7280;
-    transition: all 0.2s ease;
-}
-
-    .filter-tabs button.active,
-    .filter-tabs button:hover {
-        border-color: #4a90e2;
-        color: #4a90e2;
-        background-color: #ebf4ff;
-    }
-
+/* Vocabulary List */
 .vocabulary-list {
-    background-color: #fff;
-    padding: 1rem 1.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px 0;
 }
 
 .vocab-item {
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-    .vocab-item:last-child {
-        border-bottom: none;
-    }
-
-.vocab-japanese .word {
-    font-size: 1.125rem; /* text-lg */
-    font-weight: 500;
-    color: #111827;
+.vocab-left {
+    flex-grow: 1;
 }
 
-.vocab-japanese .reading {
-    font-size: 0.875rem; /* text-sm */
-    color: #6b7280;
+.word {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1d4ed8;
+}
+
+.reading {
+    font-size: 16px;
+    color: #777;
+}
+
+.vocab-japanese {
+    margin-left: 10px;
 }
 
 .vocab-meaning {
-    font-size: 1rem;
-    color: #374151;
-    text-align: right;
+    font-size: 16px;
+    color: #555;
 }
 
-.vocab-actions button {
-    background: none;
-    border: none;
-    color: #6b7280;
-    font-size: 1.25rem; /* text-xl */
-    margin-left: 0.75rem;
-}
-
+/* For No results */
 .no-results {
     text-align: center;
-    padding: 2rem;
-    color: #6b7280;
+    color: #e74c3c;
 }
 
-.page-header {
-    background-color: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .vocab-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-input {
+        padding-left: 20px;
+    }
 }

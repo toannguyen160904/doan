@@ -9,17 +9,17 @@
 
 <div class="quiz-wrapper">
     <div class="quiz-container">
-        <div class="quiz-card shadow">
-            <div class="quiz-header">
+        <div class="quiz-card shadow-lg">
+            <div class="quiz-header bg-primary text-white p-3 rounded-top">
                 <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>@ViewData["BaiHocName"]</h4>
             </div>
 
-            <div class="quiz-content">
+            <div class="quiz-content p-4">
                 <form asp-action="ChamDiem" asp-controller="Quiz" method="post">
                     <input type="hidden" name="quizId" value="@Model.Id" />
                     @foreach (var question in Model.CauHois)
                     {
-                        <div class="question-container">
+                        <div class="question-container mb-4">
                             <h6 class="fw-bold mb-3">@question.NoiDung</h6>
                             @if (question.CauTraLois != null && question.CauTraLois.Any())
                             {
@@ -42,7 +42,7 @@
 
                     @if (ViewBag.SoCauDung == null)
                     {
-                        <button type="submit" class="btn btn-success submit-button">
+                        <button type="submit" class="btn btn-success submit-button mt-4 w-100">
                             <i class="bi bi-check-circle me-2"></i>Nộp bài
                         </button>
                     }
@@ -55,9 +55,12 @@
                     }
                 </form>
             </div>
-        </div> <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-primary">🔙 Quay lại Chọn Bài</a>
+        </div>
+
+        <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-outline-primary mt-3 w-100">
+            🔙 Quay lại Chọn Bài
+        </a>
     </div>
-   
 </div>
 
 <script src="~/js/ChamDiem.js"></script>

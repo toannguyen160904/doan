@@ -1,56 +1,102 @@
-﻿.quiz-wrapper {
+﻿/* Tổng quan cho quiz */
+.quiz-wrapper {
     display: flex;
     justify-content: center;
-    padding: 2rem;
-    min-height: 100vh;
-    background-color: #f8f9fa;
+    margin-top: 30px;
 }
 
 .quiz-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 700px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .quiz-card {
-    background: white;
-    border: none;
-    border-radius: 8px;
-    overflow: hidden;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Định dạng cho header quiz */
 .quiz-header {
-    background: #0d6efd !important;
-    padding: 1rem;
-    color: white;
+    background-color: #1d4ed8; /* Xanh dương đậm */
+    color: #fff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 15px;
+    font-size: 18px;
 }
 
+    .quiz-header i {
+        font-size: 20px;
+    }
+
+/* Nội dung câu hỏi */
 .quiz-content {
-    padding: 2rem;
+    padding: 20px;
+    font-size: 16px;
 }
 
-.question-container {
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+/* Câu hỏi */
+.question-container h6 {
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
+/* Câu trả lời */
 .form-check {
-    margin: 0.8rem 0;
-    padding-left: 2rem;
+    margin-bottom: 10px;
 }
 
-.form-check-input {
-    margin-top: 0.3rem;
-}
-
-.form-check-label {
-    color: #202124;
-    font-size: 0.95rem;
-}
-
+/* Nút "Nộp bài" */
 .submit-button {
-    margin-top: 1rem;
-    padding: 0.5rem 1.5rem;
+    font-size: 18px;
+    padding: 12px;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .submit-button:hover {
+        background-color: #45a049;
+    }
+
+/* Nút "Quay lại" */
+.btn-outline-primary {
+    font-size: 16px;
+    padding: 12px;
+    background-color: transparent;
+    color: #1d4ed8;
+    border: 2px solid #1d4ed8;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #1d4ed8;
+        color: white;
+    }
+
+/* Định dạng cho các thông báo lỗi và điểm */
+.text-danger {
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+/* Đảm bảo các form checkboxes và radio buttons đẹp mắt */
+.form-check-input {
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .quiz-container {
+        padding: 10px;
+    }
 }
