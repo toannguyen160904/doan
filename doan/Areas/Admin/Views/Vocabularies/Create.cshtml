@@ -6,71 +6,88 @@
 
 <div class="container mt-4">
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-success text-white">
-            <h4 class="mb-0"><i class="bi bi-plus-circle-fill"></i> Thêm từ vựng mới</h4>
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-plus-circle-fill me-2"></i> Thêm từ vựng mới</h4>
+            <a asp-action="Index" class="text-white text-decoration-none">
+                <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
+            </a>
         </div>
 
-<form asp-action="Create" method="post">
-    <!-- Chọn cấp độ -->
-    <div class="form-group">
-        <label>Cấp độ</label>
-        <select id="levelSelect" class="form-control">
-            <option value="">-- Chọn cấp độ --</option>
-            @if (ViewBag.Levels != null)
-            {
-                foreach (var level in (SelectList)ViewBag.Levels)
-                {
-                    <option value="@level.Value">@level.Text</option>
-                }
-            }
-            else
-            {
-                <option disabled>⚠ Không tải được danh sách cấp độ</option>
-            }
-        </select>
-    </div>
+        <div class="card-body">
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
-    <!-- Chọn bài học (đã fix) -->
-    <div class="form-group">
-        <label asp-for="LessonId">Bài học</label>
-        <select asp-for="LessonId" class="form-control" id="lessonSelect">
-            <option value="">-- Chọn bài học --</option>
-        </select>
-        <span asp-validation-for="LessonId" class="text-danger"></span>
-    </div>
+            <form asp-action="Create" method="post" id="createForm">
+                <div class="row g-3">
+                    <!-- Chọn cấp độ -->
+                    <div class="col-md-6">
+                        <label class="form-label">Cấp độ *</label>
+                        <select id="levelSelect" class="form-select">
+                            <option value="">-- Chọn cấp độ --</option>
+                            @if (ViewBag.Levels != null)
+                            {
+                                foreach (var level in (SelectList)ViewBag.Levels)
+                                {
+                                    <option value="@level.Value">@level.Text</option>
+                                }
+                            }
+                            else
+                            {
+                                <option disabled>⚠ Không tải được danh sách cấp độ</option>
+                            }
+                        </select>
+                    </div>
 
-    <!-- Các trường thông tin từ vựng -->
-    <div class="form-group">
-        <label asp-for="Tuvung"> Từ Vựng </label>
-        <input asp-for="Tuvung" class="form-control" />
-        <span asp-validation-for="Tuvung" class="text-danger"></span>
-    </div>
+                    <!-- Chọn bài học -->
+                    <div class="col-md-6">
+                        <label asp-for="LessonId" class="form-label">Bài học *</label>
+                        <select asp-for="LessonId" class="form-select" id="lessonSelect">
+                            <option value="">-- Chọn bài học --</option>
+                        </select>
+                        <span asp-validation-for="LessonId" class="text-danger small"></span>
+                    </div>
 
-    <div class="form-group">
-        <label asp-for="PhatAm"> Phát Âm</label>
-        <input asp-for="PhatAm" class="form-control" />
-    </div>
+                    <!-- Các trường từ vựng -->
+                    <div class="col-md-6">
+                        <label asp-for="Tuvung" class="form-label">Từ Vựng *</label>
+                        <input asp-for="Tuvung" class="form-control" />
+                        <span asp-validation-for="Tuvung" class="text-danger small"></span>
+                    </div>
 
-    <div class="form-group">
-        <label asp-for="AmHan">Âm Hán</label>
-        <input asp-for="AmHan" class="form-control" />
-    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PhatAm" class="form-label">Phát Âm</label>
+                        <input asp-for="PhatAm" class="form-control" />
+                    </div>
 
-    <div class="form-group">
-        <label asp-for="HanTu">Hán Tự</label>
-        <input asp-for="HanTu" class="form-control" />
-    </div>
+                    <div class="col-md-6">
+                        <label asp-for="AmHan" class="form-label">Âm Hán</label>
+                        <input asp-for="AmHan" class="form-control" />
+                    </div>
 
-    <div class="form-group">
-        <label asp-for="Nghia">Nghĩa</label>
-        <textarea asp-for="Nghia" class="form-control"></textarea>
-        <span asp-validation-for="Nghia" class="text-danger"></span>
-    </div>
+                    <div class="col-md-6">
+                        <label asp-for="HanTu" class="form-label">Hán Tự</label>
+                        <input asp-for="HanTu" class="form-control" />
+                    </div>
 
-    <!-- Nút hành động -->
-    <button type="submit" class="btn btn-success">Lưu từ vựng</button>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-</form>
+                    <div class="col-12">
+                        <label asp-for="Nghia" class="form-label">Nghĩa *</label>
+                        <textarea asp-for="Nghia" rows="3" class="form-control"></textarea>
+                        <span asp-validation-for="Nghia" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Nút hành động -->
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-check-circle me-1"></i> Lưu từ vựng
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

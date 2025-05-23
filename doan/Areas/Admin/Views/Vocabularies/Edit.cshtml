@@ -4,70 +4,62 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="max-w-xl mx-auto mt-10">
-    <div class="bg-white shadow-md border border-gray-200 rounded-lg overflow-hidden">
-        <div class="bg-orange-500 text-white px-5 py-3 rounded-t-lg">
-            <h2 class="text-xl font-semibold flex items-center gap-2">
-                <i class="bi bi-pencil-square"></i> Sửa từ vựng
-            </h2>
+<div class="container mt-5">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Chỉnh sửa từ vựng</h5>
+            <a asp-action="Index" class="text-white text-decoration-none">
+                <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
+            </a>
         </div>
 
-        <div class="p-6 space-y-5">
+        <div class="card-body">
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger text-sm text-center" })
 
-            @Html.ValidationSummary(true, "", new { @class = "bg-red-50 border border-red-300 text-red-600 px-4 py-2 rounded text-sm text-center" })
-
-            <form asp-action="Edit" id="editForm">
+            <form asp-action="Edit" id="editForm" novalidate>
                 <input type="hidden" asp-for="Id" />
 
-                <div class="grid grid-cols-1 gap-4">
-
-                    <div>
-                        <label asp-for="LessonId" class="block text-sm font-medium text-gray-600 mb-1">Bài học *</label>
-                        <select asp-for="LessonId" asp-items="ViewBag.LessonId" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400"></select>
-                        <span asp-validation-for="LessonId" class="text-red-500 text-xs"></span>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="LessonId" class="form-label">Bài học *</label>
+                        <select asp-for="LessonId" asp-items="ViewBag.LessonId" class="form-select"></select>
+                        <span asp-validation-for="LessonId" class="text-danger small"></span>
                     </div>
 
-                    <div>
-                        <label asp-for="Tuvung" class="block text-sm font-medium text-gray-600 mb-1">Từ vựng *</label>
-                        <input asp-for="Tuvung" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập từ vựng" />
-                        <span asp-validation-for="Tuvung" class="text-red-500 text-xs"></span>
+                    <div class="col-md-6">
+                        <label asp-for="Tuvung" class="form-label">Từ vựng *</label>
+                        <input asp-for="Tuvung" class="form-control" placeholder="Nhập từ vựng" />
+                        <span asp-validation-for="Tuvung" class="text-danger small"></span>
                     </div>
 
-                    <div>
-                        <label asp-for="PhatAm" class="block text-sm font-medium text-gray-600 mb-1">Phát âm</label>
-                        <input asp-for="PhatAm" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập phát âm" />
+                    <div class="col-md-6">
+                        <label asp-for="PhatAm" class="form-label">Phát âm</label>
+                        <input asp-for="PhatAm" class="form-control" placeholder="Nhập phát âm" />
                     </div>
 
-                    <div>
-                        <label asp-for="AmHan" class="block text-sm font-medium text-gray-600 mb-1">Âm Hán</label>
-                        <input asp-for="AmHan" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập âm Hán" />
+                    <div class="col-md-6">
+                        <label asp-for="AmHan" class="form-label">Âm Hán</label>
+                        <input asp-for="AmHan" class="form-control" placeholder="Nhập âm Hán" />
                     </div>
 
-                    <div>
-                        <label asp-for="HanTu" class="block text-sm font-medium text-gray-600 mb-1">Hán Tự</label>
-                        <input asp-for="HanTu" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400" placeholder="Nhập Hán Tự" />
+                    <div class="col-md-6">
+                        <label asp-for="HanTu" class="form-label">Hán Tự</label>
+                        <input asp-for="HanTu" class="form-control" placeholder="Nhập Hán Tự" />
                     </div>
 
-                    <div>
-                        <label asp-for="Nghia" class="block text-sm font-medium text-gray-600 mb-1">Nghĩa *</label>
-                        <textarea asp-for="Nghia" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-orange-400 focus:border-orange-400 resize-y" placeholder="Nhập nghĩa chi tiết"></textarea>
-                        <span asp-validation-for="Nghia" class="text-red-500 text-xs"></span>
+                    <div class="col-12">
+                        <label asp-for="Nghia" class="form-label">Nghĩa *</label>
+                        <textarea asp-for="Nghia" rows="3" class="form-control" placeholder="Nhập nghĩa chi tiết"></textarea>
+                        <span asp-validation-for="Nghia" class="text-danger small"></span>
                     </div>
-
                 </div>
 
-                <div class="flex justify-end gap-3 mt-6">
-                    <a asp-action="Index" class="inline-flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md transition">
-                        <i class="bi bi-arrow-left-circle"></i> Quay lại
-                    </a>
-
-                    <button type="submit" class="inline-flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">
-                        <i class="bi bi-save"></i> Lưu lại
+                <div class="d-flex justify-end mt-4">
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-save2 me-1"></i> Lưu thay đổi
                     </button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
@@ -78,8 +70,8 @@
         const form = document.getElementById('editForm');
         form.addEventListener('submit', function () {
             const btn = form.querySelector('button[type="submit"]');
-            btn.innerHTML = '<span class="animate-pulse">Đang lưu...</span>';
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang lưu...';
             btn.disabled = true;
-        })
+        });
     </script>
 }
