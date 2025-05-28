@@ -7,28 +7,77 @@
 
 <link rel="stylesheet" href="~/css/Quiz.css" />
 
-<div class="quiz-wrapper">
-    <div class="quiz-container">
-        <div class="quiz-card shadow-lg">
-            <div class="quiz-header bg-primary text-white p-3 rounded-top">
-                <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>@ViewData["BaiHocName"]</h4>
-            </div>
+<div class="container py-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-pencil-square me-2"></i>@ViewData["BaiHocName"]
+            </h4>
+        </div>
 
-            <div class="quiz-content p-4">
-                <form asp-action="ChamDiem" asp-controller="Quiz" method="post">
-                    <input type="hidden" name="quizId" value="@Model.Id" />
-                    @foreach (var question in Model.CauHois)
-                    {
-                        <div class="question-container mb-4">
-                            <h6 class="fw-bold mb-3">@question.NoiDung</h6>
+        <div class="card-body bg-light">
+            <form asp-action="ChamDiem" asp-controller="Quiz" method="post">
+                <input type="hidden" name="quizId" value="@Model.Id" />
+
+                @foreach (var question in Model.CauHois)
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0 text-dark">
+                                <i class="bi bi-question-circle me-2 text-primary"></i>@question.NoiDung
+                            </h5>
+                        </div>
+                        <div class="card-body">
                             @if (question.CauTraLois != null && question.CauTraLois.Any())
                             {
-                                @foreach (var answer in question.CauTraLois)
+                                var correctAnswerId = ViewBag.CorrectAnswers != null && ViewBag.CorrectAnswers.ContainsKey(question.Id)
+                                ? (int?)ViewBag.CorrectAnswers[question.Id]
+                                : null;
+
+                                var userAnswerId = ViewBag.UserAnswers != null && ViewBag.UserAnswers.ContainsKey(question.Id)
+                                ? (int?)ViewBag.UserAnswers[question.Id]
+                                : null;
+
+                                foreach (var answer in question.CauTraLois)
                                 {
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="userAnswers[@question.Id]" value="@answer.Id" id="Answer_@answer.Id" />
-                                        <label class="form-check-label" for="Answer_@answer.Id">
+                                    var isCorrect = correctAnswerId == answer.Id;
+                                    var isSelected = userAnswerId == answer.Id;
+                                    string labelClass = "form-check-label";
+                                    string wrapperClass = "form-check mb-2";
+
+                                    if (ViewBag.SoCauDung != null)
+                                    {
+                                        if (isCorrect)
+                                        {
+                                            labelClass += " text-success fw-bold";
+                                        }
+                                        else if (isSelected && !isCorrect)
+                                        {
+                                            labelClass += " text-danger";
+                                        }
+                                    }
+
+                                    <div class="@wrapperClass">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="userAnswers[@question.Id]"
+                                               value="@answer.Id"
+                                               id="Answer_@answer.Id"
+                                        @(isSelected ? "checked" : "")
+                                        @(ViewBag.SoCauDung != null ? "disabled" : "") />
+                                        <label class="@labelClass" for="Answer_@answer.Id">
                                             @answer.NoiDung
+                                            @if (ViewBag.SoCauDung != null)
+                                            {
+                                                if (isCorrect)
+                                                {
+                                                    <span class="badge bg-success ms-2">✔ Đáp án đúng</span>
+                                                }
+                                                else if (isSelected && !isCorrect)
+                                                {
+                                                    <span class="badge bg-danger ms-2">✘ Bạn chọn</span>
+                                                }
+                                            }
                                         </label>
                                     </div>
                                 }
@@ -38,28 +87,31 @@
                                 <p class="text-danger">Không có câu trả lời nào cho câu hỏi này.</p>
                             }
                         </div>
-                    }
+                    </div>
+                }
 
-                    @if (ViewBag.SoCauDung == null)
-                    {
-                        <button type="submit" class="btn btn-success submit-button mt-4 w-100">
-                            <i class="bi bi-check-circle me-2"></i>Nộp bài
-                        </button>
-                    }
+                @if (ViewBag.SoCauDung == null)
+                {
+                    <button type="submit" class="btn btn-success btn-sm mt-4">
+                        <i class="bi bi-send-check-fill me-2"></i>Nộp bài
+                    </button>
 
-                    @if (ViewBag.SoCauDung != null && ViewBag.TongSoCau != null)
-                    {
-                        <p class="text-danger fw-bold mt-3">
-                            Số câu đúng: @ViewBag.SoCauDung / @ViewBag.TongSoCau
-                        </p>
-                    }
-                </form>
-            </div>
+                }
+
+                @if (ViewBag.SoCauDung != null && ViewBag.TongSoCau != null)
+                {
+                    <div class="alert alert-info mt-4 text-center">
+                        ✅ Số câu đúng: <strong>@ViewBag.SoCauDung</strong> / @ViewBag.TongSoCau
+                    </div>
+                }
+            </form>
         </div>
 
-        <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-outline-primary mt-3 w-100">
-            🔙 Quay lại Chọn Bài
-        </a>
+        <div class="card-footer text-center bg-white">
+            <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-outline-primary w-100">
+                <i class="bi bi-arrow-left-circle me-2"></i>Quay lại Chọn Bài
+            </a>
+        </div>
     </div>
 </div>
 
