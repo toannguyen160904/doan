@@ -47,9 +47,13 @@
         </form>
     </div>
 
+    @{
+        var random = new Random();
+        var randomWords = Model.OrderBy(x => random.Next()).Take(5).ToList();
+    }
     <!-- Vocabulary List -->
     <div class="vocabulary-list">
-        <h2 class="text-2xl font-semibold mb-4">Từ vựng</h2>
+        <h2 class="text-2xl font-semibold mb-4">Từ vựng </h2>
         @if (!Model.Any())
         {
             <div class="no-results">
@@ -65,7 +69,8 @@
         }
         else
         {
-            @foreach (var word in Model)
+            
+            @foreach (var word in randomWords)
             {
                 <div class="vocab-item bg-white shadow-md rounded-lg p-4 mb-4">
                     <div class="vocab-left flex items-center mb-3">

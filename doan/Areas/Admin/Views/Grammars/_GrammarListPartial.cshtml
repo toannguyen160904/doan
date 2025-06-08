@@ -1,0 +1,41 @@
+﻿@model IEnumerable<doan.Models.GrammarStructure>
+
+@if (Model.Any())
+{
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var item in Model)
+        {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title text-primary fw-bold">@item.CongThuc</h5>
+                                    <p class="mb-1"><strong>Giải thích:</strong> @item.GiaiThich</p>
+                                    <p class="mb-1"><strong>Ví dụ:</strong> <em>@item.CauViDu</em></p>
+                                    <p class="mb-1 text-muted"><strong>Bài học:</strong> @item.Lesson?.Name</p>
+                                    <p class="mb-0 text-muted"><strong>Cấp độ:</strong> @item.Lesson?.Level?.Name</p>
+                                </div>
+                                <div class="mt-3 d-flex justify-content-end gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                        <i class="bi bi-info-circle"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xoá"
+                                       onclick="return confirm('Xác nhận xoá?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        }
+        </div>
+}
+else
+{
+        <div class="alert alert-warning text-center mt-4">
+            <i class="bi bi-exclamation-circle fs-5"></i> Không tìm thấy ngữ pháp nào phù hợp.
+        </div>
+}

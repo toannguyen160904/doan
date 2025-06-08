@@ -39,31 +39,41 @@ namespace doan.Controllers
         {
             var quiz = _context.Quizzes
                 .Include(q => q.CauHois)
-                .ThenInclude(ch => ch.CauTraLois)
+                    .ThenInclude(ch => ch.CauTraLois)
                 .FirstOrDefault(q => q.Id == quizId);
 
             if (quiz == null)
                 return Json(new { error = "Quiz không tồn tại." });
 
             int soCauDung = 0;
+            var dapanDungDict = new Dictionary<int, int>();
             int tongSoCau = quiz.CauHois.Count;
 
             foreach (var cauHoi in quiz.CauHois)
             {
-                if (userAnswers.TryGetValue(cauHoi.Id, out int selectedAnswerId))
+                var dapAnDung = cauHoi.CauTraLois.FirstOrDefault(ct => ct.IsCorrect);
+                if (dapAnDung != null)
                 {
-                    var dapAn = cauHoi.CauTraLois.FirstOrDefault(ct => ct.Id == selectedAnswerId);
-                    if (dapAn != null && dapAn.IsCorrect)
+                    dapanDungDict[cauHoi.Id] = dapAnDung.Id;
+
+                    if (userAnswers.TryGetValue(cauHoi.Id, out int selectedAnswerId))
                     {
-                        soCauDung++;
+                        if (selectedAnswerId == dapAnDung.Id)
+                        {
+                            soCauDung++;
+                        }
                     }
                 }
-                ViewBag.SoCauDung = soCauDung;
-                ViewBag.TongSoCau = tongSoCau;
             }
+
+            ViewBag.SoCauDung = soCauDung;
+            ViewBag.TongSoCau = tongSoCau;
+            ViewBag.CorrectAnswers = dapanDungDict;
+            ViewBag.UserAnswers = userAnswers;
 
             return View("~/Views/Home/Quiz.cshtml", quiz);
         }
+
 
 
 

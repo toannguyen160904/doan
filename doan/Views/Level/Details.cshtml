@@ -1,12 +1,14 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Http
 @using doan.Models
+
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext Context
 @inject IHttpContextAccessor HttpContextAccessor
 @model doan.Models.Baihoc
 
 @{
+    var Diendanmodel = new Dictionary<string, string>();
     var user = await UserManager.GetUserAsync(User);
     var learnedIds = Context.UserVocabularyProgresses
         .Where(p => p.UserId == user.Id && p.IsLearned)
@@ -19,6 +21,12 @@
     int page = Convert.ToInt32(HttpContextAccessor.HttpContext?.Request.Query["page"].FirstOrDefault() ?? "1");
     var pagedWords = Model.tuvung.Skip((page - 1) * pageSize).Take(pageSize).ToList();
     int totalPages = (int)Math.Ceiling((double)totalWords / pageSize);
+
+    int totalComments = Model.Diendan.Count();
+    int commentPageSize = 4;
+    int commentPage = Convert.ToInt32(HttpContextAccessor.HttpContext?.Request.Query["commentPage"].FirstOrDefault() ?? "1");
+    var pagedComments = Model.Diendan.Skip((commentPage - 1) * commentPageSize).Take(commentPageSize).ToList();
+    int totalCommentPages = (int)Math.Ceiling((double)totalComments / commentPageSize);
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
@@ -69,13 +77,13 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
+            <!-- Pagination for vocabulary -->
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     @for (int i = 1; i <= totalPages; i++)
                     {
                         <li class="page-item @(i == page ? "active" : "")">
-                            <a class="page-link" href="?page=@i">@i</a>
+                            <a class="page-link" href="?page=@i&commentPage=@commentPage">@i</a>
                         </li>
                     }
                 </ul>
@@ -129,10 +137,10 @@
     <section class="mb-5">
         <h2 class="text-success fw-bold">🗣️ Diễn đàn</h2>
 
-        @if (Model.Diendan.Any())
+        @if (pagedComments.Any())
         {
             <div class="row row-cols-1 row-cols-md-2 g-4 mt-3 animate__fadeInUp">
-                @foreach (var post in Model.Diendan)
+                @foreach (var post in pagedComments)
                 {
                     <div class="col">
                         <div class="card border shadow-sm rounded-4 hover-shadow h-100">
@@ -147,6 +155,21 @@
                     </div>
                 }
             </div>
+
+         <!-- Pagination for comments -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @for (int cmtPage = 1; cmtPage <= totalCommentPages; cmtPage++)
+                    {
+                        var href = $"?page={page}&commentPage={cmtPage}";
+                        <li class="page-item @(cmtPage == commentPage ? "active" : "")">
+                            <a class="page-link" href="@href">@cmtPage</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
+
         }
         else
         {

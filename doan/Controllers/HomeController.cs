@@ -73,7 +73,7 @@ namespace doan.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
                 if (result.Succeeded)
-                    return RedirectToAction("Index1");
+                    return RedirectToAction("~/Lessons/Index");
             }
 
             ViewBag.ErrorMessage = "Tên đăng nhập hoặc mật khẩu không đúng.";

@@ -18,12 +18,15 @@
         <div class="card-body bg-light">
             <form asp-action="ChamDiem" asp-controller="Quiz" method="post">
                 <input type="hidden" name="quizId" value="@Model.Id" />
-
+                @{
+                    int index = 1;
+                }
                 @foreach (var question in Model.CauHois)
                 {
                     <div class="card mb-4">
                         <div class="card-header bg-white">
                             <h5 class="mb-0 text-dark">
+                                <span class="badge bg-primary me-2">Câu @index</span>
                                 <i class="bi bi-question-circle me-2 text-primary"></i>@question.NoiDung
                             </h5>
                         </div>
@@ -88,6 +91,7 @@
                             }
                         </div>
                     </div>
+                    index++;
                 }
 
                 @if (ViewBag.SoCauDung == null)

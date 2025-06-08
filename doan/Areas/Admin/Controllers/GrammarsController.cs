@@ -20,22 +20,59 @@ namespace doan.Areas.Admin.Controllers
         {
             var grammar = await _context.nguphap
                 .Include(v => v.Lesson)
-                .ThenInclude(l => l.Level) 
-                .OrderBy(x => x.Lesson.LevelId) 
+                .ThenInclude(l => l.Level)
+                .OrderBy(x => x.Lesson.LevelId)
                 .ToListAsync();
 
+            ViewBag.Levels = new SelectList(await _context.Levels.ToListAsync(), "Id", "Name");
             return View(grammar);
+        }
+        [HttpGet]
+        public async Task<IActionResult> _GrammarListPartial(int? levelId, int? lessonId)
+        {
+            // Bắt đầu với một query có thể lọc được
+            var query = _context.nguphap
+                                .Include(g => g.Lesson)
+                                .ThenInclude(l => l.Level)
+                                .AsQueryable();
+
+            // Lọc theo Bài học (ưu tiên cao nhất)
+            if (lessonId.HasValue && lessonId > 0)
+            {
+                query = query.Where(g => g.LessonId == lessonId.Value);
+            }
+            // Nếu không có bài học, lọc theo Cấp độ
+            else if (levelId.HasValue && levelId > 0)
+            {
+                query = query.Where(g => g.Lesson.LevelId == levelId.Value);
+            }
+
+            // Thực thi query và sắp xếp
+            var filteredGrammar = await query.OrderBy(g => g.Lesson.LevelId).ThenBy(g => g.LessonId).ToListAsync();
+
+            // Trả về Partial View với dữ liệu đã được lọc
+            return PartialView("_GrammarListPartial", filteredGrammar);
         }
         [HttpGet("/Admin/Grammars/GetByLevel/{levelId}")]
         public IActionResult GetByLevel(int levelId)
         {
             var lessons = _context.Baihoc
-                .Where(b => b.LevelId == levelId)
+                .Where(b => b.LevelId == levelId && !b.IsDeleted)
                 .Select(b => new { id = b.Id, name = b.Title })
                 .ToList();
 
             return Ok(lessons);
         }
+        //[HttpGet("/Admin/Grammars/GetByLevel/{levelId}")]
+        //public IActionResult GetByLevel(int levelId)
+        //{
+        //    var lessons = _context.Baihoc
+        //        .Where(b => b.LevelId == levelId)
+        //        .Select(b => new { id = b.Id, name = b.Title })
+        //        .ToList();
+
+        //    return Ok(lessons);
+        //}
 
         public IActionResult Create()
         {
@@ -70,7 +107,7 @@ namespace doan.Areas.Admin.Controllers
 
             ViewBag.Levels = new SelectList(_context.Levels, "Id", "Name");
             ViewBag.LessonId = new SelectList(_context.Baihoc, "Id", "Title", grammar.LessonId);
-          
+
             return View(grammar);
         }
 

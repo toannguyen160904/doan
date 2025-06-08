@@ -27,7 +27,7 @@ namespace doan.Areas.Admin.Controllers
                 .OrderBy(l => l.LevelId)
                 .ToListAsync();
 
-            return View(lessons);
+              return View(await _context.Baihoc.ToListAsync());
         }
 
         // GET: Admin/Lessons/Create
