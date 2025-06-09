@@ -79,23 +79,39 @@ namespace doan.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-
-                    // 🔐 Phân quyền theo Role
                     var user = await _userManager.FindByEmailAsync(Input.Email);
                     if (user != null)
                     {
                         var roles = await _userManager.GetRolesAsync(user);
                         if (roles.Contains("Admin"))
                         {
-                            return RedirectToAction("Index", "Categories", new { area = "Admin" });
-
+                            return RedirectToAction("Index", "Lessons", new { area = "Admin" });
                         }
-                        // Thêm các vai trò khác nếu muốn
                     }
 
-                    // Mặc định chuyển về trang chủ
-                    return LocalRedirect("~/");
+                    // Kiểm tra đã làm bài test đầu vào chưa?
+                    var dbContext = HttpContext.RequestServices.GetService(typeof(doan.Models.ApplicationDbContext)) as doan.Models.ApplicationDbContext;
+                    var userId = user?.Id;
+                    var daLamTest = dbContext.TestResults.Any(tr => tr.UserId == userId);
+
+                    _logger.LogInformation("UserId: " + userId);
+                    _logger.LogInformation("Da lam test: " + daLamTest);
+
+
+                    if (!daLamTest)
+                    {
+                        // Chưa làm bài test → chuyển đến Test/Start
+                        return RedirectToAction("Start", "Test", new { area = "" });
+                    }
+                    else
+                    {
+                        // Đã làm test → chuyển tới ChonLevel với level=N5
+                        return RedirectToAction("ChonLevel", "Home", new { level = "N5", area = "" });
+                        // Hoặc dùng LocalRedirect nếu muốn chính xác đường dẫn
+                        // return LocalRedirect("/Home/ChonLevel?level=N5");
+                    }
                 }
+
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
