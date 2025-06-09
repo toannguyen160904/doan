@@ -41,6 +41,17 @@ builder.Services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    // Đặt thời gian timeout cho session, ví dụ 30 phút.
+    // Sau 30 phút không có request nào, session sẽ hết hạn.
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Đánh dấu cookie session là cần thiết
+});
 // 📄 Razor Pages + Controllers
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -79,6 +90,7 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseSession();
 
 // ✅ Razor Pages cho Identity UI
 app.MapRazorPages();

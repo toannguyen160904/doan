@@ -2,51 +2,65 @@
 
 @{
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa từ vựng";
 }
 
 <div class="container mt-5">
     <div class="card shadow border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Chỉnh sửa từ vựng</h5>
-            <a asp-action="Index" class="text-white text-decoration-none">
+            <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i> @ViewData["Title"]</h5>
+            <a asp-action="Index" class="btn btn-sm btn-outline-light">
                 <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
             </a>
         </div>
 
-        <div class="card-body">
-            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger text-sm text-center" })
+        <div class="card-body p-4">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <form asp-action="Edit" id="editForm" novalidate>
+            @* THÊM THUỘC TÍNH `data-lessons-url` VÀO ĐÂY *@
+            <form asp-action="Edit"
+                  id="editForm"
+                  novalidate
+                  data-lessons-url="@Url.Action("GetLessonsByLevel", "Vocabularies", new { levelId = 0 })">
+
                 <input type="hidden" asp-for="Id" />
+                @Html.AntiForgeryToken()
 
                 <div class="row g-3">
                     <div class="col-md-6">
+                        <label for="LevelId" class="form-label">Trình độ *</label>
+                        <select id="LevelId" name="LevelId" class="form-select" asp-items="ViewBag.Levels">
+                            <option value="">-- Chọn trình độ --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
                         <label asp-for="LessonId" class="form-label">Bài học *</label>
-                        <select asp-for="LessonId" asp-items="ViewBag.LessonId" class="form-select"></select>
+                        <select asp-for="LessonId" class="form-select" asp-items="ViewBag.Lessons">
+                            <option value="">-- Chọn bài học --</option>
+                        </select>
                         <span asp-validation-for="LessonId" class="text-danger small"></span>
                     </div>
 
+                    @* ... Các trường input khác không thay đổi ... *@
                     <div class="col-md-6">
                         <label asp-for="Tuvung" class="form-label">Từ vựng *</label>
                         <input asp-for="Tuvung" class="form-control" placeholder="Nhập từ vựng" />
                         <span asp-validation-for="Tuvung" class="text-danger small"></span>
                     </div>
-
                     <div class="col-md-6">
                         <label asp-for="PhatAm" class="form-label">Phát âm</label>
                         <input asp-for="PhatAm" class="form-control" placeholder="Nhập phát âm" />
                     </div>
-
                     <div class="col-md-6">
                         <label asp-for="AmHan" class="form-label">Âm Hán</label>
                         <input asp-for="AmHan" class="form-control" placeholder="Nhập âm Hán" />
                     </div>
-
                     <div class="col-md-6">
                         <label asp-for="HanTu" class="form-label">Hán Tự</label>
                         <input asp-for="HanTu" class="form-control" placeholder="Nhập Hán Tự" />
+                        <span asp-validation-for="HanTu" class="text-danger small"></span>
                     </div>
-
                     <div class="col-12">
                         <label asp-for="Nghia" class="form-label">Nghĩa *</label>
                         <textarea asp-for="Nghia" rows="3" class="form-control" placeholder="Nhập nghĩa chi tiết"></textarea>
@@ -54,7 +68,7 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-end mt-4">
+                <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-success px-4">
                         <i class="bi bi-save2 me-1"></i> Lưu thay đổi
                     </button>
@@ -66,12 +80,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        const form = document.getElementById('editForm');
-        form.addEventListener('submit', function () {
-            const btn = form.querySelector('button[type="submit"]');
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang lưu...';
-            btn.disabled = true;
-        });
-    </script>
+
+    @* THAY THẾ TOÀN BỘ KHỐI SCRIPT CŨ BẰNG DÒNG NÀY *@
+    <script src="~/js/vocabulary-edit.js" defer></script>
 }

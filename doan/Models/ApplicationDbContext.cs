@@ -86,6 +86,10 @@ namespace doan.Models
             // Quan hệ: Baihoc - Vocabulary (1 - nhiều)
 
             modelBuilder.Entity<Vocabulary>()
+                .HasIndex(v => new { v.HanTu, v.LessonId })
+                .IsUnique();
+
+            modelBuilder.Entity<Vocabulary>()
                 .HasOne(v => v.Lesson)
                 .WithMany(l => l.tuvung)
                 .HasForeignKey(v => v.LessonId);
