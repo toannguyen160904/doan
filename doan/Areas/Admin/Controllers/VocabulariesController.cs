@@ -162,7 +162,7 @@ namespace doan.Areas.Admin.Controllers
         {
             var lessons = await _context.Baihoc
                 .Where(b => b.LevelId == levelId && !b.IsDeleted)
-                .Select(b => new { id = b.Id, name = b.Title })
+                .Select(b => new { id = b.Id, name = b.Name })
                 .ToListAsync();
 
             return Ok(lessons);
@@ -232,7 +232,7 @@ namespace doan.Areas.Admin.Controllers
             {
                 ViewBag.Lessons = new SelectList(
                     await _context.Baihoc.Where(b => b.LevelId == levelId.Value && !b.IsDeleted).ToListAsync(),
-                    "Id", "Title", selectedLesson);
+                    "Id", "Name", selectedLesson);
             }
             else
             {

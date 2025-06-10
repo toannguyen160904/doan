@@ -41,7 +41,7 @@
                     .then(data => {
                         lessonSelect.innerHTML = '<option value="">-- Chọn bài học --</option>'; // Reset
                         data.forEach(lesson => {
-                            const option = new Option(lesson.name, lesson.id);
+                            const option = new Option(lesso.title, lesson.id);
                             lessonSelect.add(option);
                         });
                         lessonSelect.disabled = false; // Kích hoạt lại
