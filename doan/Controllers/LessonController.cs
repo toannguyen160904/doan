@@ -52,36 +52,47 @@ public class LessonController : Controller
 
     // Đăng bài viết lên diễn đàn của bài học
     [HttpPost]
-    public IActionResult DangBai(int BaiHocId, string TieuDe, string NoiDung)
+    public async Task<IActionResult> DangBai(int BaiHocId, string TieuDe, string NoiDung)
     {
-        if (!ModelState.IsValid)
+        // Kiểm tra dữ liệu đầu vào
+        if (string.IsNullOrWhiteSpace(NoiDung))
         {
-            return RedirectToAction("Details", new { id = BaiHocId });
-        }
-
-        var baiHoc = _context.Baihoc
-            .Include(b => b.Diendan)
-            .FirstOrDefault(b => b.Id == BaiHocId);
-
-        if (baiHoc == null)
-        {
-            return NotFound();
+            return BadRequest(new { success = false, message = "Nội dung bình luận không được để trống." });
         }
 
         var userId = _userManager.GetUserId(User);
+        if (userId == null)
+        {
+            return Unauthorized(new { success = false, message = "Bạn cần đăng nhập để thực hiện hành động này." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
 
         var newPost = new Diendanmodel
         {
             BaiHocId = BaiHocId,
             UserId = userId,
-            TieuDe = TieuDe,
+            TieuDe = TieuDe, // Dù ẩn nhưng vẫn cần
             NoiDung = NoiDung,
             CreatedAt = DateTime.Now
         };
 
-        baiHoc.Diendan.Add(newPost);
-        _context.SaveChanges();
+        _context.Diendan.Add(newPost);
+        await _context.SaveChangesAsync();
 
-        return RedirectToAction("Details", new { id = BaiHocId });
+        // Trả về dữ liệu của bài viết mới dưới dạng JSON
+        // Đây là bước quan trọng nhất
+        return Ok(new
+        {
+            success = true,
+            post = new
+            {
+                id = newPost.Id,
+                tieuDe = newPost.TieuDe,
+                noiDung = newPost.NoiDung,
+                userName = user.Name, // Lấy tên người dùng
+                createdAt = newPost.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+            }
+        });
     }
 }

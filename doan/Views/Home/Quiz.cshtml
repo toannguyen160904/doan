@@ -1,86 +1,78 @@
 ﻿@model doan.Models.Quiz
 
 @{
-    ViewData["Title"] = "Làm bài Quiz";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var totalQuestions = Model.CauHois.Count();
 }
 
 <link rel="stylesheet" href="~/css/Quiz.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
 
-<div class="container py-5">
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">
-                <i class="bi bi-pencil-square me-2"></i>@ViewData["BaiHocName"]
-            </h4>
+
+<div class="container py-5 quiz-container">
+    <div class="quiz-header text-center mb-4">
+        <h2 class="fw-bold">@ViewData["BaiHocName"]</h2>
+        <p class="text-muted">Hãy chọn đáp án đúng nhất cho các câu hỏi dưới đây.</p>
+    </div>
+
+    <!-- Thanh tiến trình -->
+    <div class="progress mb-4" style="height: 10px;">
+        <div id="quiz-progress-bar"
+             class="progress-bar bg-success"
+             role="progressbar"
+             style="width: 0%"
+             aria-valuenow="0"
+             aria-valuemin="0"
+             aria-valuemax="@totalQuestions"
+             data-total-questions="@totalQuestions">
         </div>
+    </div>
 
-        <div class="card-body bg-light">
-            <form asp-action="ChamDiem" asp-controller="Quiz" method="post">
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-lg-5">
+            <form id="quizForm" asp-action="ChamDiem" asp-controller="Quiz" method="post">
                 <input type="hidden" name="quizId" value="@Model.Id" />
+                <input type="hidden" id="quizIdForJs" value="@Model.Id" /> <!-- Giữ lại cho quiz-handler.js -->
                 @{
-                    int index = 1;
+                    int index = 0;
                 }
                 @foreach (var question in Model.CauHois)
                 {
-                    <div class="card mb-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0 text-dark">
-                                <span class="badge bg-primary me-2">Câu @index</span>
-                                <i class="bi bi-question-circle me-2 text-primary"></i>@question.NoiDung
-                            </h5>
-                        </div>
-                        <div class="card-body">
+                    <div class="quiz-question-card mb-5">
+                        <h5 class="question-title fw-bold mb-3">
+                            Câu @(index + 1): @question.NoiDung
+                        </h5>
+
+                        <div class="answer-options row g-3">
                             @if (question.CauTraLois != null && question.CauTraLois.Any())
                             {
-                                var correctAnswerId = ViewBag.CorrectAnswers != null && ViewBag.CorrectAnswers.ContainsKey(question.Id)
-                                ? (int?)ViewBag.CorrectAnswers[question.Id]
-                                : null;
-
-                                var userAnswerId = ViewBag.UserAnswers != null && ViewBag.UserAnswers.ContainsKey(question.Id)
-                                ? (int?)ViewBag.UserAnswers[question.Id]
-                                : null;
+                                var correctAnswerId = ViewBag.CorrectAnswers?.ContainsKey(question.Id) == true ? (int?)ViewBag.CorrectAnswers[question.Id] : null;
+                                var userAnswerId = ViewBag.UserAnswers?.ContainsKey(question.Id) == true ? (int?)ViewBag.UserAnswers[question.Id] : null;
 
                                 foreach (var answer in question.CauTraLois)
                                 {
                                     var isCorrect = correctAnswerId == answer.Id;
                                     var isSelected = userAnswerId == answer.Id;
-                                    string labelClass = "form-check-label";
-                                    string wrapperClass = "form-check mb-2";
+                                    string wrapperClass = "quiz-option";
 
                                     if (ViewBag.SoCauDung != null)
                                     {
-                                        if (isCorrect)
-                                        {
-                                            labelClass += " text-success fw-bold";
-                                        }
-                                        else if (isSelected && !isCorrect)
-                                        {
-                                            labelClass += " text-danger";
-                                        }
+                                        if (isCorrect) { wrapperClass += " option-correct"; }
+                                        else if (isSelected && !isCorrect) { wrapperClass += " option-incorrect"; }
                                     }
 
-                                    <div class="@wrapperClass">
+                                    <div class="form-check-wrapper col-md-6">
                                         <input class="form-check-input"
                                                type="radio"
                                                name="userAnswers[@question.Id]"
                                                value="@answer.Id"
                                                id="Answer_@answer.Id"
                                         @(isSelected ? "checked" : "")
-                                        @(ViewBag.SoCauDung != null ? "disabled" : "") />
-                                        <label class="@labelClass" for="Answer_@answer.Id">
+                                        @(ViewBag.SoCauDung != null ? "disabled" : "") required />
+                                        <label class="@wrapperClass" for="Answer_@answer.Id">
                                             @answer.NoiDung
-                                            @if (ViewBag.SoCauDung != null)
-                                            {
-                                                if (isCorrect)
-                                                {
-                                                    <span class="badge bg-success ms-2">✔ Đáp án đúng</span>
-                                                }
-                                                else if (isSelected && !isCorrect)
-                                                {
-                                                    <span class="badge bg-danger ms-2">✘ Bạn chọn</span>
-                                                }
-                                            }
                                         </label>
                                     </div>
                                 }
@@ -96,27 +88,103 @@
 
                 @if (ViewBag.SoCauDung == null)
                 {
-                    <button type="submit" class="btn btn-success btn-sm mt-4">
-                        <i class="bi bi-send-check-fill me-2"></i>Nộp bài
-                    </button>
-
+                    <div class="text-center mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow px-5">
+                            <i class="bi bi-send-check-fill me-2"></i>Nộp bài & Xem kết quả
+                        </button>
+                    </div>
                 }
 
                 @if (ViewBag.SoCauDung != null && ViewBag.TongSoCau != null)
                 {
-                    <div class="alert alert-info mt-4 text-center">
-                        ✅ Số câu đúng: <strong>@ViewBag.SoCauDung</strong> / @ViewBag.TongSoCau
+                    <div class="alert alert-success mt-5 text-center fs-5 shadow-sm">
+                        🎉 Chúc mừng! Bạn đã trả lời đúng <strong>@ViewBag.SoCauDung / @ViewBag.TongSoCau</strong> câu.
                     </div>
                 }
             </form>
         </div>
-
-        <div class="card-footer text-center bg-white">
-            <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-outline-primary w-100">
-                <i class="bi bi-arrow-left-circle me-2"></i>Quay lại Chọn Bài
-            </a>
-        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a asp-controller="Home" asp-action="DanhSachQuiz" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left-circle me-2"></i>Quay lại danh sách Quiz
+        </a>
     </div>
 </div>
 
-<script src="~/js/ChamDiem.js"></script>
+<style>
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Be Vietnam Pro', sans-serif;
+    }
+
+    .quiz-container {
+        max-width: 800px;
+    }
+
+    .question-title {
+        color: #343a40;
+    }
+
+    .quiz-option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        padding: 1rem;
+        background-color: #fff;
+        border: 2px solid #e9ecef;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+    }
+
+        .quiz-option:hover {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+
+    .form-check-wrapper .form-check-input {
+        display: none;
+    }
+
+        .form-check-wrapper .form-check-input:checked + .quiz-option {
+            border-color: #0d6efd;
+            background-color: #0d6efd;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+    .quiz-option.option-correct {
+        border-color: #198754;
+        background-color: #d1e7dd;
+        color: #0a3622;
+    }
+
+    .quiz-option.option-incorrect {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+        color: #58151c;
+    }
+
+    .form-check-wrapper .form-check-input:disabled + .quiz-option.option-correct::after {
+        content: '✔';
+        font-weight: bold;
+        margin-left: 0.5rem;
+        color: #198754;
+    }
+
+    .form-check-wrapper .form-check-input:disabled + .quiz-option.option-incorrect::after {
+        content: '✘';
+        font-weight: bold;
+        margin-left: 0.5rem;
+        color: #dc3545;
+    }
+</style>
+
+@section Scripts {
+    <script src="~/js/quiz-handler.js" defer></script>
+    <script src="~/js/quiz-ui.js" defer></script>
+}
