@@ -1,17 +1,18 @@
-using doan.Models;
+using SharedModels;
 using doan.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SharedModels.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 🔌 Kết nối cơ sở dữ liệu
-var connectionString = builder.Configuration.GetConnectionString("doan")
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("❌ Connection string 'doan' is missing.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
+    options.UseNpgsql(connectionString, x =>
+        x.MigrationsAssembly("doan")));
 // 🔐 Cấu hình Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

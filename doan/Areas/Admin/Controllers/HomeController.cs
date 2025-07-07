@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using doan.Models;
+using SharedModels;
 using Microsoft.AspNetCore.Authorization;
+using SharedModels.Models;
 
 namespace doan.Areas.Admin.Controllers
 {

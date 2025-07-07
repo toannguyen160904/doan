@@ -1,11 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Http
-@using doan.Models
+@using SharedModels.Models
 
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext Context
 @inject IHttpContextAccessor HttpContextAccessor
-@model doan.Models.Baihoc
+@model SharedModels.Models.Baihoc
 
 @{
     var Diendanmodel = new Dictionary<string, string>();

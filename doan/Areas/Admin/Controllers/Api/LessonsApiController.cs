@@ -1,5 +1,6 @@
-﻿using doan.Models;
+﻿using SharedModels;
 using Microsoft.AspNetCore.Mvc;
+using SharedModels.Models;
 
 namespace doan.Controllers
 {

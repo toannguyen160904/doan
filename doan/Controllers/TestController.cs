@@ -1,7 +1,8 @@
-﻿using doan.Models;
+﻿using SharedModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedModels.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

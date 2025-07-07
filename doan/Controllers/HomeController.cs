@@ -1,4 +1,4 @@
-﻿using doan.Models;
+﻿using SharedModels;
 using doan.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,12 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
-using doan.Models.ViewModels;
+using SharedModels.Models.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 
 using System.Linq;
 using System.Threading.Tasks;
+using SharedModels.Models;
 
 namespace doan.Controllers
 {

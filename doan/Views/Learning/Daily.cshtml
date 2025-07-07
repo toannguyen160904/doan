@@ -1,5 +1,5 @@
-﻿@using doan.Models
-@model doan.Models.UserLearningPlan
+﻿@using SharedModels.Models
+@model SharedModels.Models.UserLearningPlan
 
 @{
     ViewData["Title"] = "Lộ Trình Học Hôm Nay";
@@ -7,7 +7,7 @@
     var completed = ViewData["CompletedToday"] as int? ?? 0;
     var target = ViewData["DailyTarget"] as int? ?? 10;
     var percent = target > 0 ? (int)((double)completed / target * 100) : 0;
-    var reviewList = ViewBag.ReviewList as List<doan.Models.UserVocabularyProgress> ?? new List<doan.Models.UserVocabularyProgress>();
+    var reviewList = ViewBag.ReviewList as List<SharedModels.Models.UserVocabularyProgress> ?? new List<SharedModels.Models.UserVocabularyProgress>();
 }
 
 <div class="container py-5">

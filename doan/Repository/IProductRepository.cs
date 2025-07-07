@@ -1,4 +1,4 @@
-﻿using doan.Models;
+﻿using SharedModels.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace doan.Repository

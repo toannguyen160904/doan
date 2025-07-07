@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using doan.Models;
+using SharedModels.Models;
 
 public interface IVocabularyRepository
 {

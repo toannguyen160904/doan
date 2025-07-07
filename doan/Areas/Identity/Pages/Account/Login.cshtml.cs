@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using doan.Models;
+using SharedModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using SharedModels.Models;
 
 namespace doan.Areas.Identity.Pages.Account
 {
@@ -90,7 +91,7 @@ namespace doan.Areas.Identity.Pages.Account
                     }
 
                     // Kiểm tra đã làm bài test đầu vào chưa?
-                    var dbContext = HttpContext.RequestServices.GetService(typeof(doan.Models.ApplicationDbContext)) as doan.Models.ApplicationDbContext;
+                    var dbContext = HttpContext.RequestServices.GetService(typeof(SharedModels.Models.ApplicationDbContext)) as SharedModels.Models.ApplicationDbContext;
                     var userId = user?.Id;
                     var daLamTest = dbContext.TestResults.Any(tr => tr.UserId == userId);
 

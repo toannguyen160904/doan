@@ -1,6 +1,7 @@
-﻿using doan.Models;
+﻿using SharedModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedModels.Models;
 
 [Route("api/[controller]")]
 [ApiController]

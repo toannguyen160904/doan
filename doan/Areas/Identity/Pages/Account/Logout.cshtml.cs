@@ -5,11 +5,12 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using doan.Models;
+using SharedModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using SharedModels.Models;
 
 namespace doan.Areas.Identity.Pages.Account
 {

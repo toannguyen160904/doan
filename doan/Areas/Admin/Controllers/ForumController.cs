@@ -1,11 +1,12 @@
 ﻿// File: Areas/Admin/Controllers/ForumController.cs
 
-using doan.Models;
+using SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using SharedModels.Models;
 
 [Area("Admin")] // Quan trọng: Khai báo Controller này thuộc Area "Admin"
 [Authorize(Roles = "Admin")] // Chỉ người dùng có vai trò "Admin" mới được truy cập

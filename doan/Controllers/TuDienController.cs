@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using doan.Models;
+using SharedModels;
+using SharedModels.Models;
 using System.Linq;
 using System.Threading.Tasks;
 

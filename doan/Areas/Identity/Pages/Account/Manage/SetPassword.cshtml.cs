@@ -5,10 +5,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using doan.Models;
+using SharedModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SharedModels.Models;
 
 namespace doan.Areas.Identity.Pages.Account.Manage
 {

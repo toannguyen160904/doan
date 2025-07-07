@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using doan.Models;
+using SharedModels;
 using System;
 using System.Linq;
+using SharedModels.Models;
 
 public class LessonController : Controller
 {

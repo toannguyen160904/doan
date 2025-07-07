@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using doan.Models;
+using  SharedModels;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
 using doan.Controllers;
+using SharedModels.Models;
 
 [Authorize]
 public class LearningController : Controller

@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
-using doan.Models;
+using SharedModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SharedModels.Models;
 
 namespace doan.Controllers
 {
