@@ -10,7 +10,7 @@ namespace SharedModels.Models
 
         public int DailyTarget { get; set; } = 10;
         public int CompletedToday { get; set; }
-        public DateTime LastUpdated { get; set; } = DateTime.Now;
+        public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
         public List<Vocabulary> VocabularyList { get; set; } = new List<Vocabulary>(); // Danh sách từ vựng cần học
     }
 }

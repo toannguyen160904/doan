@@ -13,7 +13,7 @@ namespace SharedModels.Models
 
         public int CorrectAnswers { get; set; }
 
-        public DateTime SubmittedAt { get; set; } = DateTime.Now;
+        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
         public string SuggestedLevel { get; set; } // Gợi ý N5, N4...
     }

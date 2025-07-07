@@ -22,7 +22,7 @@ namespace SharedModels.Models
 
         public Baihoc? Lesson { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now; // ✅ Gán giá trị mặc định
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // ✅ Gán giá trị mặc định
 
         public ICollection<UserVocabularyProgress> UserVocabularyProgresses { get; set; } = new List<UserVocabularyProgress>();
 
