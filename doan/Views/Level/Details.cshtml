@@ -1,308 +1,282 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.Http
-@using SharedModels.Models
+﻿    @model SharedModels.Models.ViewModels.LessonDetailsViewModel
 
-@inject UserManager<ApplicationUser> UserManager
-@inject ApplicationDbContext Context
-@inject IHttpContextAccessor HttpContextAccessor
-@model SharedModels.Models.Baihoc
+    @{
+        ViewData["Title"] = Model?.Lesson?.Name ?? "Chi tiết bài học";
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    }
 
-@{
-    var Diendanmodel = new Dictionary<string, string>();
-    var user = await UserManager.GetUserAsync(User);
-    var learnedIds = Context.UserVocabularyProgresses
-        .Where(p => p.UserId == user.Id && p.IsLearned)
-        .Select(p => p.VocabularyId)
-        .ToHashSet();
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
 
-    int totalWords = Model.tuvung.Count();
-    int totalLearned = Model.tuvung.Count(w => learnedIds.Contains(w.Id));
-    int pageSize = 5;
-    int page = Convert.ToInt32(HttpContextAccessor.HttpContext?.Request.Query["page"].FirstOrDefault() ?? "1");
-    var pagedWords = Model.tuvung.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-    int totalPages = (int)Math.Ceiling((double)totalWords / pageSize);
+    <input type="hidden" id="currentUserId" value="@userId" />
+    @Html.AntiForgeryToken()
 
-    var sortedComments = Model.Diendan.OrderByDescending(c => c.CreatedAt).ToList();
-    int totalComments = sortedComments.Count();
-    int commentPageSize = 4;
-    int commentPage = Convert.ToInt32(HttpContextAccessor.HttpContext?.Request.Query["commentPage"].FirstOrDefault() ?? "1");
-    var pagedComments = sortedComments.Skip((commentPage - 1) * commentPageSize).Take(commentPageSize).ToList();
-    int totalCommentPages = (int)Math.Ceiling((double)totalComments / commentPageSize);
-}
+    <div class="container my-5 animate__animated animate__fadeIn">
+        @if (Model != null && Model.Lesson != null)
+        {
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-2">
+                    Bài học: <span class="text-primary">@Model.Lesson.Name</span>
+                </h1>
+            </div>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+            <!-- Từ vựng -->
+            <section class="mb-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <h2 class="card-title h5 mb-0 fw-bold">
+                            <i class="fas fa-book-open me-2 text-success"></i>Từ vựng
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.PagedVocabularies != null && Model.PagedVocabularies.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Từ</th>
+                                            <th>Phát âm</th>
+                                            <th>Âm Hán</th>
+                                            <th>Hán tự</th>
+                                            <th>Nghĩa</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var word in Model.PagedVocabularies)
+                                        {
+                                            <tr>
+                                                <td class="fw-semibold">@word?.Tuvung</td>
+                                                <td>@(word?.PhatAm ?? "-")</td>
+                                                <td>@(word?.AmHan ?? "-")</td>
+                                                <td>@(word?.HanTu ?? "-")</td>
+                                                <td>@(word?.Nghia ?? "-")</td>
+                                                <td>
+                                                    <button class="btn btn-sm rounded-pill btn-mark-learned" data-vocab-id="@word.Id">
+                                                        ✅ Đã học
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
 
+                            <!-- Phân trang từ vựng -->
+                            <nav aria-label="Vocabulary pagination" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    @for (int i = 1; i <= Model.TotalVocabularyPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.CurrentVocabularyPage ? "active" : "")">
+                                            <a class="page-link"
+                                               asp-controller="Lesson"
+                                               asp-action="Details"
+                                               asp-route-id="@Model.Lesson.Id"
+                                               asp-route-page="@i"
+                                               asp-route-commentPage="@Model.CurrentCommentPage">@i</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                        else
+                        {
+                            <div class="alert alert-light text-center">❌ Chưa có từ vựng cho bài học này.</div>
+                        }
+                    </div>
+                </div>
+            </section>
 
-<div class="container my-5 animate__animated animate__fadeIn">
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold mb-2">
-            Bài học: <span class="text-primary">@Model.Name</span>
-        </h1>
-        <p class="text-muted fs-5">Cùng khám phá kiến thức mới và thảo luận nhé!</p>
+            <!-- Ngữ pháp -->
+            <section class="mb-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <h2 class="card-title h5 mb-0 fw-bold">
+                            <i class="fas fa-pencil-ruler me-2 text-info"></i>Ngữ pháp
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Lesson.nguphap != null && Model.Lesson.nguphap.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Công thức</th>
+                                            <th>Giải thích</th>
+                                            <th>Ví dụ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var g in Model.Lesson.nguphap)
+                                        {
+                                            <tr>
+                                                <td class="fw-semibold">@g.CongThuc</td>
+                                                <td>@g.GiaiThich</td>
+                                                <td>@g.CauViDu</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-light text-center">⚠️ Chưa có dữ liệu ngữ pháp cho bài học này.</div>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diễn đàn -->
+            <section class="mb-4">
+                <div class="card section-card">
+                    <div class="card-header">
+                        <h2 class="card-title h5 mb-0 fw-bold">
+                            <i class="fas fa-comments me-2 text-primary"></i>Diễn đàn
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="discussion-container">
+                            <div class="row row-cols-1 row-cols-lg-2 g-3" id="discussion-list">
+                                @if (Model.PagedComments != null && Model.PagedComments.Any())
+                                {
+                                    @foreach (var post in Model.PagedComments)
+                                    {
+                                        <div class="col discussion-item-@post.Id">
+                                            <div class="card h-100 discussion-card">
+                                                <div class="card-body">
+                                                    <h5 class="card-title h6 fw-bold text-primary mb-1">@post.TieuDe</h5>
+                                                    <p class="card-text small">@post.NoiDung</p>
+                                                </div>
+                                                <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
+                                                    <small class="text-muted">
+                                                        <strong>@(post.User?.Name ?? "Ẩn danh")</strong> - @post.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="alert alert-light text-center" id="no-comments-alert">💬 Chưa có bài viết nào được đăng.</div>
+                                }
+                            </div>
+
+                            <!-- Phân trang bình luận -->
+                            <nav aria-label="Comment pagination" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    @for (int i = 1; i <= Model.TotalCommentPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.CurrentCommentPage ? "active" : "")">
+                                            <a class="page-link"
+                                               asp-controller="Lesson"
+                                               asp-action="Details"
+                                               asp-route-id="@Model.Lesson.Id"
+                                               asp-route-page="@Model.CurrentVocabularyPage"
+                                               asp-route-commentPage="@i">@i</a>
+
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Form bình luận -->
+                        <div class="mt-4 pt-4 border-top">
+                            <form id="comment-form" action="/Lesson/DangBai" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="BaiHocId" value="@Model.Lesson.Id" />
+                                <div class="input-group">
+                                    <textarea id="comment-content" name="NoiDung" class="form-control" rows="1" placeholder="Thêm bình luận..." required style="resize: none;"></textarea>
+                                    <button id="submit-comment-btn" class="btn btn-primary" type="submit">
+                                        <i class="fas fa-paper-plane"></i> Gửi
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Nút điều hướng -->
+            <section class="text-center my-4">
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-outline-secondary">🔙 Quay lại</a>
+                    <a asp-controller="Home" asp-action="Flashcards" asp-route-baiHocId="@Model.Lesson.Id" class="btn btn-success">🎴 Flashcards</a>
+                    <a asp-controller="Learning" asp-action="Daily" class="btn btn-info">📘 Lộ Trình Hôm Nay</a>
+                    <a asp-controller="Learning" asp-action="LearnedWords" class="btn btn-dark">📖 Từ đã học</a>
+                </div>
+            </section>
+        }
+        else
+        {
+            <div class="text-center">
+                <h1 class="display-4">Lỗi</h1>
+                <p class="lead">Không thể tải dữ liệu bài học.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Trang chủ</a>
+            </div>
+        }
     </div>
 
-    <!-- Từ vựng -->
-    <section class="mb-4">
-        <div class="card section-card">
-            <div class="card-header">
-                <h2 class="card-title h5 mb-0 fw-bold"><i class="fas fa-book-open me-2 text-success"></i>Từ vựng</h2>
-            </div>
-            <div class="card-body">
-                @if (pagedWords.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Từ</th>
-                                    <th>Phát âm</th>
-                                    <th>Âm Hán</th>
-                                    <th>Hán tự</th>
-                                    <th>Nghĩa</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var word in pagedWords)
-                                {
-                                    <tr>
-                                        <td class="fw-semibold">@word.Tuvung</td>
-                                        <td>@(word.PhatAm ?? "-")</td>
-                                        <td>@(word.AmHan ?? "-")</td>
-                                        <td>@(word.HanTu ?? "-")</td>
-                                        <td>@word.Nghia</td>
-                                        <td>
-                                            <form asp-controller="Learning" asp-action="@(learnedIds.Contains(word.Id) ? "MarkUnlearned" : "MarkLearned")" method="post">
-                                                <input type="hidden" name="VocabId" value="@word.Id" />
-                                                <button type="submit" class="btn btn-sm rounded-pill @(learnedIds.Contains(word.Id) ? "btn-warning" : "btn-outline-success")">
-                                                    @(learnedIds.Contains(word.Id) ? "🔁 Chưa học" : "✅ Đã học")
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <nav>
-                            <ul class="pagination mb-0">
-                                @for (int i = 1; i <= totalPages; i++)
-                                {
-                                    <li class="page-item @(i == page ? "active" : "")">
-                                        <a class="page-link" href="?page=@i&commentPage=@commentPage">@i</a>
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
-                        <div class="text-muted">
-                            📈 Đã học: <strong class="text-success">@totalLearned</strong> / <strong>@totalWords</strong> từ vựng.
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-light text-center">❌ Chưa có từ vựng cho bài học này.</div>
-                }
-            </div>
-        </div>
-    </section>
-
-    <!-- Ngữ pháp -->
-    <section class="mb-4">
-        <div class="card section-card">
-            <div class="card-header">
-                <h2 class="card-title h5 mb-0 fw-bold"><i class="fas fa-pencil-ruler me-2 text-info"></i>Ngữ pháp</h2>
-            </div>
-            <div class="card-body">
-                @if (Model.nguphap.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Công thức</th>
-                                    <th>Giải thích</th>
-                                    <th>Ví dụ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var g in Model.nguphap)
-                                {
-                                    <tr>
-                                        <td class="fw-semibold">@g.CongThuc</td>
-                                        <td>@g.GiaiThich</td>
-                                        <td>@g.CauViDu</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-light text-center">⚠️ Chưa có dữ liệu ngữ pháp cho bài học này.</div>
-                }
-            </div>
-        </div>
-    </section>
-
-    <!-- Diễn đàn -->
-    <section class="mb-4">
-        <div class="card section-card">
-            <div class="card-header">
-                <h2 class="card-title h5 mb-0 fw-bold"><i class="fas fa-comments me-2 text-primary"></i>Diễn đàn</h2>
-            </div>
-            <div class="card-body">
-                <div id="discussion-container">
-                    @if (pagedComments.Any())
-                    {
-                        <div class="row row-cols-1 row-cols-lg-2 g-3" id="discussion-list">
-                            @foreach (var post in pagedComments)
-                            {
-                                <div class="col">
-                                    <div class="card h-100 discussion-card">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title h6 fw-bold text-primary mb-1">@post.TieuDe</h5>
-                                                @if (User.IsInRole("Admin"))
-                                                {
-                                                    <form asp-action="DeletePost" asp-controller="Forum" asp-area="Admin" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
-                                                        <input type="hidden" name="id" value="@post.Id" />
-                                                        <input type="hidden" name="returnUrl" value="@HttpContextAccessor.HttpContext.Request.Path@HttpContextAccessor.HttpContext.Request.QueryString" />
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Xóa bài viết">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                        @Html.AntiForgeryToken()
-                                                    </form>
-                                                }
-                                            </div>
-                                            <p class="card-text small">@post.NoiDung</p>
-                                        </div>
-                                        <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
-                                            <small class="text-muted">
-                                                <strong>@(post.User?.Name ?? "Ẩn danh")</strong> - @post.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                        <nav class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                @for (int cmtPage = 1; cmtPage <= totalCommentPages; cmtPage++)
-                                {
-                                    var href = $"?page={page}&commentPage={cmtPage}";
-                                    <li class="page-item @(cmtPage == commentPage ? "active" : "")">
-                                        <a class="page-link" href="@href">@cmtPage</a>
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
-                    }
-                    else
-                    {
-                        <div class="alert alert-light text-center" id="no-comments-alert">💬 Chưa có bài viết nào được đăng. Hãy là người đầu tiên!</div>
-                    }
-                </div>
-                <!-- Form đăng bài mới -->
-                <div class="mt-4 pt-4 border-top">
-                    <form id="comment-form" asp-action="DangBai" asp-controller="Lesson" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="BaiHocId" value="@Model.Id" />
-                        <input type="hidden" name="TieuDe" value="Bình luận bài học" />
-                        <div class="input-group">
-                            <textarea id="comment-content" name="NoiDung" class="form-control" rows="1" placeholder="Thêm bình luận..." required style="resize: none;"></textarea>
-                            <button id="submit-comment-btn" class="btn btn-primary" type="submit">
-                                <i class="fas fa-paper-plane"></i> Gửi
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Điều hướng -->
-    <section class="text-center">
-        <div class="d-flex flex-wrap justify-content-center gap-2">
-            <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-outline-secondary">🔙 Quay lại</a>
-            <a asp-controller="Home" asp-action="Flashcards" asp-route-baiHocId="@Model.Id" class="btn btn-success">🎴 Flashcards</a>
-            <a asp-controller="Learning" asp-action="Daily" class="btn btn-info">📘 Lộ Trình Hôm Nay</a>
-            <a asp-controller="Learning" asp-action="LearnedWords" class="btn btn-dark">📖 Từ đã học</a>
-        </div>
-    </section>
-</div>
-
-<style>
-    body {
-        background-color: #f8f9fa;
-        font-family: 'Be Vietnam Pro', sans-serif;
-    }
-
-    .section-card {
-        border: none;
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-
-        .section-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Be Vietnam Pro', sans-serif;
         }
 
-    .card-header {
-        background-color: #ffffff;
-        border-bottom: 1px solid #dee2e6;
-        padding: 1rem 1.25rem;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .pagination .page-link {
-        border-radius: 0.375rem;
-        margin: 0 0.25rem;
-        border: none;
-    }
-
-    .pagination .page-item.active .page-link {
-        box-shadow: 0 4px 8px rgba(var(--bs-primary-rgb), 0.3);
-    }
-
-    .discussion-card {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 0.5rem;
-        transition: all 0.2s ease-in-out;
-    }
-
-        .discussion-card:hover {
-            border-color: rgba(var(--bs-primary-rgb), 0.5);
-            background-color: #fff;
+        .section-card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
-    .input-group textarea.form-control {
-        border-right: 0;
-    }
+            .section-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            }
 
-        .input-group textarea.form-control:focus {
-            box-shadow: none;
-            border-color: #ced4da;
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
         }
 
-    .input-group .btn {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-</style>
+        .table {
+            margin-bottom: 0;
+        }
 
-@section Scripts {
-    <script src="~/js/lesson-details.js" asp-append-version="true"></script>
-}
+        .discussion-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .discussion-card:hover {
+                border-color: rgba(var(--bs-primary-rgb), 0.5);
+                background-color: #fff;
+            }
+
+        .input-group textarea.form-control {
+            border-right: 0;
+        }
+
+            .input-group textarea.form-control:focus {
+                box-shadow: none;
+                border-color: #ced4da;
+            }
+
+        .input-group .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+
+    @section Scripts {
+        <script src="~/js/lesson-details.js" asp-append-version="true"></script>
+    }

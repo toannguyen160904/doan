@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
-
+using System.Text.Json.Serialization;
 namespace SharedModels.Models
 {
     public class Vocabulary
@@ -18,11 +18,12 @@ namespace SharedModels.Models
         public string? Nghia { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn bài học.")]
-        public int LessonId { get; set; } 
-
+        public int LessonId { get; set; }
+        [JsonIgnore]
         public Baihoc? Lesson { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // ✅ Gán giá trị mặc định
+        [JsonIgnore]
 
         public ICollection<UserVocabularyProgress> UserVocabularyProgresses { get; set; } = new List<UserVocabularyProgress>();
 

@@ -1,201 +1,121 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using  SharedModels;
-using Microsoft.AspNetCore.Authorization;
-using System.Linq;
-using System.Threading.Tasks;
-using System;
-using doan.Controllers;
-using SharedModels.Models;
+﻿// File: doan/Controllers/LearningController.cs (FRONTEND CONTROLLER)
 
-[Authorize]
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SharedModels.Models.DTO;
+using SharedModels.Models.ViewModels;
+using System.Net.Http;
+using System.Net.Http.Json; // Cần thêm using này để dùng PostAsJsonAsync
+using System.Security.Claims;
+using System.Text.Json;
+using System.Threading.Tasks;
+using SharedModels.Models;
+[Authorize] // Yêu cầu người dùng phải đăng nhập để vào các trang học tập
 public class LearningController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IHttpClientFactory _httpClientFactory;
+    // Thay thế port 7xxx bằng port của doanapi của bạn
+    private readonly string _apiBaseUrl = "https://localhost:7191"; // ✅ sửa lại
 
-    public LearningController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+
+    public LearningController(IHttpClientFactory httpClientFactory)
     {
-        _context = context;
-        _userManager = userManager;
+        _httpClientFactory = httpClientFactory;
     }
 
+    // Action này xử lý trang học hàng ngày (/Learning/Daily)
     public async Task<IActionResult> Daily()
     {
-        var user = await _userManager.GetUserAsync(User);
-        var plan = await _context.UserLearningPlans.FirstOrDefaultAsync(p => p.UserId == user.Id);
+        // Tạo một HTTP client đã được xác thực (nếu cần)
+        // Cách làm này đơn giản, nhưng để an toàn hơn nên dùng token
+        var client = _httpClientFactory.CreateClient();
+        var apiUrl = $"{_apiBaseUrl}/api/learning/daily";
 
-        if (plan == null)
+        // Gửi request GET đến API
+        var response = await client.GetAsync(apiUrl);
+
+        if (response.IsSuccessStatusCode)
         {
-            plan = new UserLearningPlan
-            {
-                UserId = user.Id,
-                DailyTarget = 10,
-                CompletedToday = 0,
-                LastUpdated = DateTime.Now
-            };
-            _context.UserLearningPlans.Add(plan);
-            await _context.SaveChangesAsync();
+            var responseStream = await response.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var viewModel = await JsonSerializer.DeserializeAsync<DailyLearningViewModel>(responseStream, options);
+
+            return View(viewModel); // Truyền ViewModel vào View Daily.cshtml
         }
 
-        if (plan.LastUpdated.Date != DateTime.Today)
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
-            plan.CompletedToday = 0;
-            plan.LastUpdated = DateTime.Now;
-            _context.UserLearningPlans.Update(plan);
-            await _context.SaveChangesAsync();
+            return Challenge(); // Chuyển hướng đến trang đăng nhập nếu chưa xác thực
         }
 
-        var learnedIds = await _context.UserVocabularyProgresses
-            .Where(p => p.UserId == user.Id && p.IsLearned)
-            .Select(p => p.VocabularyId)
-            .ToListAsync();
-
-        var vocabList = await _context.tuvung
-            .Where(v => !learnedIds.Contains(v.Id))
-            .OrderBy(v => Guid.NewGuid())
-            .Take(10)
-            .ToListAsync();
-
-        foreach (var vocab in vocabList)
-        {
-            var progress = await _context.UserVocabularyProgresses
-                .FirstOrDefaultAsync(p => p.UserId == user.Id && p.VocabularyId == vocab.Id);
-
-            if (progress != null)
-            {
-                vocab.CreatedAt = progress.Vocabulary.CreatedAt;
-            }
-        }
-
-        // Từ cần ôn lại hôm nay
-        var reviewList = await _context.UserVocabularyProgresses
-            .Where(p => p.UserId == user.Id && p.IsLearned && p.NextReviewDate <= DateTime.Today)
-            .Include(p => p.Vocabulary)
-            .Select(p => p.Vocabulary)
-            .ToListAsync();
-
-        plan.VocabularyList = vocabList;
-
-        ViewData["CompletedToday"] = plan.CompletedToday;
-        ViewData["DailyTarget"] = plan.DailyTarget;
-        ViewBag.LearnedIds = learnedIds;
-        ViewBag.ReviewList = reviewList;
-
-        return View(plan);
+        ViewBag.ErrorMessage = "Không thể tải kế hoạch học tập.";
+        return View("Error");
     }
 
+    // Action này xử lý khi người dùng click "Đã học"
+    // Nó sẽ được gọi bằng AJAX/Fetch từ phía client (JavaScript)
     [HttpPost]
-    public async Task<IActionResult> MarkLearned(int VocabId)
+    public async Task<IActionResult> MarkLearned([FromBody] VocabularyMarkRequest request)
     {
-        var user = await _userManager.GetUserAsync(User);
-        var progress = await _context.UserVocabularyProgresses
-            .FirstOrDefaultAsync(p => p.UserId == user.Id && p.VocabularyId == VocabId);
+        var client = _httpClientFactory.CreateClient();
+        var apiUrl = $"{_apiBaseUrl}/api/learning/mark-learned";
 
-        var plan = await _context.UserLearningPlans.FirstOrDefaultAsync(p => p.UserId == user.Id);
+        // Gửi request POST với dữ liệu JSON đến API
+        var response = await client.PostAsJsonAsync(apiUrl, request);
 
-        if (progress == null)
+        if (response.IsSuccessStatusCode)
         {
-            progress = new UserVocabularyProgress
-            {
-                UserId = user.Id,
-                VocabularyId = VocabId,
-                IsLearned = true,
-                LearnedDate = DateTime.Now,
-                ReviewLevel = 1,
-                NextReviewDate = DateTime.Now.AddDays(1)
-            };
-            _context.UserVocabularyProgresses.Add(progress);
-
-            if (plan != null && plan.CompletedToday < plan.DailyTarget)
-            {
-                plan.CompletedToday++;
-                _context.UserLearningPlans.Update(plan);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Daily");
+            // Trả về 200 OK để JavaScript biết là đã thành công
+            return Ok();
         }
 
-        if (!progress.IsLearned)
-        {
-            progress.IsLearned = true;
-            progress.LearnedDate = DateTime.Now;
-
-            switch (progress.ReviewLevel)
-            {
-                case 0: progress.NextReviewDate = DateTime.Now.AddDays(1); break;
-                case 1: progress.NextReviewDate = DateTime.Now.AddDays(3); break;
-                case 2: progress.NextReviewDate = DateTime.Now.AddDays(7); break;
-                default: progress.NextReviewDate = DateTime.Now.AddDays(14); break;
-            }
-            progress.ReviewLevel++;
-
-            if (plan != null && plan.CompletedToday < plan.DailyTarget)
-            {
-                plan.CompletedToday++;
-                _context.UserLearningPlans.Update(plan);
-            }
-
-            _context.UserVocabularyProgresses.Update(progress);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Daily");
-        }
-
-        return RedirectToAction("Daily");
+        // Trả về mã lỗi để JavaScript có thể xử lý
+        return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
+    // Action này xử lý khi người dùng click "Chưa học"
     [HttpPost]
-    public async Task<IActionResult> MarkUnlearned(int VocabId)
+    public async Task<IActionResult> MarkUnlearned([FromBody] VocabularyMarkRequest request)
     {
-        var user = await _userManager.GetUserAsync(User);
-        var progress = await _context.UserVocabularyProgresses
-            .FirstOrDefaultAsync(p => p.UserId == user.Id && p.VocabularyId == VocabId);
 
-        if (progress == null)
+        var client = _httpClientFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Cookie", Request.Headers["Cookie"].ToString());
+        var apiUrl = $"{_apiBaseUrl}/api/learning/mark-unlearned";
+
+        var response = await client.PostAsJsonAsync(apiUrl, request);
+
+        if (response.IsSuccessStatusCode)
         {
-            return RedirectToAction("Daily");
+            return Ok();
         }
 
-        if (progress.IsLearned)
-        {
-            progress.IsLearned = false;
-            progress.LearnedDate = null;
-            progress.ReviewLevel = 0;
-            progress.NextReviewDate = null;
-
-            var plan = await _context.UserLearningPlans.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (plan != null && plan.CompletedToday > 0)
-            {
-                plan.CompletedToday--;
-                _context.UserLearningPlans.Update(plan);
-            }
-
-            _context.UserVocabularyProgresses.Update(progress);
-            await _context.SaveChangesAsync();
-        }
-
-        return RedirectToAction("Daily");
+        return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    [HttpGet]
+    // Action này để hiển thị trang danh sách các từ đã học (/Learning/LearnedWords)
     public async Task<IActionResult> LearnedWords()
     {
-        var user = await _userManager.GetUserAsync(User);
+        var client = _httpClientFactory.CreateClient();
+        var apiUrl = $"{_apiBaseUrl}/api/learning/learned-words";
 
-        var learnedWords = await _context.UserVocabularyProgresses
-            .Where(p => p.UserId == user.Id && p.IsLearned)
-            .Include(p => p.Vocabulary)
-            .Select(p => p.Vocabulary)
-            .ToListAsync();
+        var response = await client.GetAsync(apiUrl);
 
-        return View(learnedWords);
-    }
+        if (response.IsSuccessStatusCode)
+        {
+            var responseStream = await response.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            // API trả về IEnumerable<Vocabulary>, chúng ta deserialize nó thành List
+            var learnedWords = await JsonSerializer.DeserializeAsync<List<Vocabulary>>(responseStream, options);
 
-    public class VocabularyMarkRequest
-    {
-        public int VocabId { get; set; }
+            return View(learnedWords); // Truyền danh sách từ đã học vào View LearnedWords.cshtml
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            return Challenge();
+        }
+
+        ViewBag.ErrorMessage = "Không thể tải danh sách từ đã học.";
+        return View("Error");
     }
 }

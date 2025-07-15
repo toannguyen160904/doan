@@ -1,4 +1,4 @@
-﻿
+﻿using System.Text.Json.Serialization;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +19,7 @@ namespace SharedModels.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [ValidateNever]
+        [JsonIgnore]
         public Baihoc Baihoc { get; set; }
         [Required]
         public string UserId { get; set; }   

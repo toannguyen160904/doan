@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Text.Json.Serialization;
 namespace SharedModels.Models
 {
     public class GrammarStructure
@@ -21,6 +21,7 @@ namespace SharedModels.Models
         public int LessonId { get; set; }
 
         [ForeignKey("LessonId")]
+        [JsonIgnore]
         public Baihoc? Lesson { get; set; } // DẤU HỎI: Cho phép null để tránh lỗi binding
 
 

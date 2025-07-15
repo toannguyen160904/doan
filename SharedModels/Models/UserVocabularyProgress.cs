@@ -1,5 +1,8 @@
 ﻿using SharedModels.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SharedModels.Models
 {
@@ -7,6 +10,7 @@ namespace SharedModels.Models
     {
         public int Id { get; set; }
         public string UserId { get; set; }
+        [JsonIgnore]
         public ApplicationUser User { get; set; }
 
         public int VocabularyId { get; set; }

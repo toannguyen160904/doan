@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using System.Text.Json.Serialization;
 namespace SharedModels.Models
 {
     public class Level
@@ -16,6 +16,7 @@ namespace SharedModels.Models
         public string Description { get; set; } = "";  // Mô tả cấp độ
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
         public ICollection<Baihoc> Lessons { get; set; } = new List<Baihoc>();
 
     }

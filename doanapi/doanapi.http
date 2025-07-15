@@ -1,0 +1,6 @@
+@doanapi_HostAddress = http://localhost:5015
+
+GET {{doanapi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

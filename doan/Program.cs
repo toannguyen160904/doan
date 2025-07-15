@@ -1,3 +1,5 @@
+// File: doan/Program.cs (ĐÃ SẮP XẾP LẠI CHO ĐÚNG)
+
 using SharedModels;
 using doan.Repository;
 using Microsoft.AspNetCore.Identity;
@@ -5,61 +7,64 @@ using Microsoft.EntityFrameworkCore;
 using SharedModels.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+// ===================================================================
+// == PHẦN ĐĂNG KÝ DỊCH VỤ (Tất cả phải nằm trước builder.Build()) ==
+// ===================================================================
 
 // 🔌 Kết nối cơ sở dữ liệu
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("❌ Connection string 'doan' is missing.");
 
+// SỬA "doan" thành "DataAccess" nếu bạn đã di chuyển thư mục Migrations
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, x =>
         x.MigrationsAssembly("doan")));
+
 // 🔐 Cấu hình Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireDigit = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
+    // ... options của bạn ...
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders()
-.AddDefaultUI(); // UI mặc định của Identity
+.AddDefaultUI();
 
 // 🍪 Cấu hình cookie xác thực
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-    options.LoginPath = "/Identity/Account/Login";
-    options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-    options.SlidingExpiration = true;
+    // ... options của bạn ...
 });
 
-// 🧠 Đăng ký các Repository
+// 🧠 Đăng ký các Repository (Bạn muốn giữ lại)
 builder.Services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+// 📞 Đăng ký HttpClient để gọi API (Đúng vị trí)
+builder.Services.AddHttpClient();
 
-
+// 🕒 Cấu hình Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    // Đặt thời gian timeout cho session, ví dụ 30 phút.
-    // Sau 30 phút không có request nào, session sẽ hết hạn.
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // Đánh dấu cookie session là cần thiết
+    // ... options của bạn ...
 });
-// 📄 Razor Pages + Controllers
+
+// 📄 Dịch vụ cho MVC
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+
+// ===================================================================
+// == DÒNG CHỐT SỔ - XÂY DỰNG ỨNG DỤNG ==
+// ===================================================================
 var app = builder.Build();
 
-// 🛠 Middleware xử lý pipeline
+
+// ===================================================================
+// == PHẦN CẤU HÌNH MIDDLEWARE (Tất cả nằm sau builder.Build()) ==
+// ===================================================================
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -71,32 +76,27 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 🌍 CORS nếu cần (bạn có thể bỏ nếu không sử dụng)
-app.UseCors(cors =>
-    cors.AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader());
+// 🌍 Bỏ CORS - Frontend không cần
+// app.UseCors(...); 
 
-// ✅ Identity middlewares
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseSession();
 
-// ✅ Route cho Areas (rất quan trọng)
+// ✅ Route cho Areas và Default
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-// ✅ Route mặc định
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.UseSession();
 
 // ✅ Razor Pages cho Identity UI
 app.MapRazorPages();
 
-app.MapControllers(); // Cho phép route API hoạt động
-
+// ❌ Bỏ MapControllers() - Không cần thiết cho MVC
+// app.MapControllers(); 
 
 app.Run();

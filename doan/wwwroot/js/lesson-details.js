@@ -1,81 +1,129 @@
-﻿// File: wwwroot/js/lesson-details.js
+﻿document.addEventListener('DOMContentLoaded', async function () {
+    const userId = document.getElementById('currentUserId')?.value;
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
 
-// Đảm bảo code chỉ chạy sau khi toàn bộ trang đã được tải xong
-$(document).ready(function () {
+    // ========== PHẦN 1: Trạng thái học từ vựng ==========
+    let learnedIds = [];
+    try {
+        const res = await fetch(`/api/LearningApi/LearnedVocabIds/${userId}`);
+        if (res.ok) {
+            learnedIds = await res.json();
+        }
+    } catch (error) {
+        console.error("Không thể tải danh sách từ đã học:", error);
+    }
 
-    // Bắt sự kiện submit của form có id là 'comment-form'
+    document.querySelectorAll('.btn-mark-learned').forEach(btn => {
+        const vocabId = parseInt(btn.dataset.vocabId);
+        const isLearned = learnedIds.includes(vocabId);
+        updateButtonStyle(btn, isLearned);
+
+        btn.addEventListener('click', async function () {
+            const isCurrentlyLearned = btn.textContent.includes('Chưa học');
+            const apiUrl = isCurrentlyLearned ? '/api/LearningApi/MarkUnlearned' : '/api/LearningApi/MarkLearned';
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({
+                    VocabId: vocabId,
+                    UserId: userId
+                })
+            });
+
+            if (response.ok) {
+                updateButtonStyle(btn, !isCurrentlyLearned);
+            } else {
+                alert("Có lỗi khi cập nhật trạng thái.");
+            }
+        });
+    });
+
+    function updateButtonStyle(button, isLearned) {
+        if (isLearned) {
+            button.textContent = '🔁 Chưa học';
+            button.classList.remove('btn-outline-success');
+            button.classList.add('btn-warning');
+        } else {
+            button.textContent = '✅ Đã học';
+            button.classList.remove('btn-warning');
+            button.classList.add('btn-outline-success');
+        }
+    }
+
+    // ========== PHẦN 2: Bình luận ==========
     $('#comment-form').on('submit', function (e) {
-
-        // Ngăn chặn hành vi mặc định của form là tải lại trang
         e.preventDefault();
 
-        var form = $(this);
-        var url = form.attr('action');
-        var formData = form.serialize(); // Thu thập dữ liệu từ các input trong form
-        var submitButton = $('#submit-comment-btn');
+        const baiHocId = parseInt($('input[name="BaiHocId"]').val());
+        const noiDung = $('#comment-content').val().trim();
+        const submitButton = $('#submit-comment-btn');
 
-        // Vô hiệu hóa nút gửi và hiển thị spinner để người dùng biết đang xử lý
+        if (!noiDung) {
+            alert("Vui lòng nhập nội dung bình luận.");
+            return;
+        }
+
         submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Gửi...');
 
-        // Gửi yêu cầu AJAX đến server
         $.ajax({
             type: 'POST',
-            url: url,
-            data: formData,
+            url: '/Lesson/DangBai',
+            contentType: 'application/json',
+            headers: {
+                'RequestVerificationToken': token
+            },
+            data: JSON.stringify({
+                BaiHocId: baiHocId,
+                TieuDe: "Bình luận bài học",
+                NoiDung: noiDung,
+                UserId: userId
+            }),
             success: function (response) {
-                // Hàm này sẽ chạy khi server trả về kết quả thành công (status 200 OK)
                 if (response.success) {
-                    // Tạo một chuỗi HTML cho bình luận mới dựa trên dữ liệu server trả về
-                    var newCommentHtml = `
-                        <div class="col">
-                            <div class="card h-100 discussion-card animate__animated animate__fadeIn">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <h5 class="card-title h6 fw-bold text-primary mb-1">${response.post.tieuDe}</h5>
-                                    </div>
-                                    <p class="card-text small">${response.post.noiDung}</p>
-                                </div>
-                                <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
-                                    <small class="text-muted">
-                                        <strong>${response.post.userName}</strong> - ${response.post.createdAt}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    const post = response.post; // Lấy thông tin bình luận mới từ server
 
-                    // Ẩn thông báo "Chưa có bài viết" nếu nó đang hiển thị
+                    // Tạo HTML cho bình luận mới (SỬ DỤNG THÔNG TIN TỪ SERVER)
+                    const newCommentHtml = `
+            <div class="col discussion-item-${post.id}">
+                <div class="card h-100 discussion-card animate__animated animate__fadeIn">
+                    <div class="card-body">
+                        <h5 class="card-title h6 fw-bold text-primary mb-1">${post.tieuDe}</h5>
+                        <p class="card-text small">${post.noiDung}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
+                        <small class="text-muted">
+                            <strong>${post.userName}</strong> - ${new Date(post.createdAt).toLocaleString()}
+                        </small>
+                    </div>
+                </div>
+            </div>`;
+
+                    // Ẩn thông báo "Chưa có bình luận nào"
                     $('#no-comments-alert').hide();
 
-                    // Nếu danh sách bình luận chưa tồn tại, tạo nó trước
-                    if ($('#discussion-list').length === 0) {
-                        $('#discussion-container').prepend('<div class="row row-cols-1 row-cols-lg-2 g-3" id="discussion-list"></div>');
-                    }
-
-                    // Thêm bình luận mới vào đầu danh sách
+                    // Thêm bình luận mới vào danh sách (SAU KHI NHẬN PHẢN HỒI TỪ SERVER)
                     $('#discussion-list').prepend(newCommentHtml);
 
-                    // Xóa nội dung trong ô textarea để người dùng có thể viết tiếp
+                    // Xóa nội dung textarea
                     $('#comment-content').val('');
+
                 } else {
-                    // Hiển thị lỗi từ server nếu có
                     alert(response.message || 'Đã xảy ra lỗi, vui lòng thử lại.');
                 }
             },
-            error: function (xhr, status, error) {
-                // Hàm này sẽ chạy khi có lỗi kết nối hoặc server trả về lỗi (4xx, 5xx)
+            error: function (xhr) {
                 if (xhr.status === 401) {
-                    alert('Bạn cần đăng nhập để bình luận.');
-                } else if (xhr.status === 400) {
-                    alert('Nội dung bình luận không hợp lệ.');
-                }
-                else {
-                    alert('Không thể gửi bình luận. Vui lòng kiểm tra lại kết nối mạng.');
+                    alert('⚠️ Bạn cần đăng nhập để bình luận.');
+                } else {
+                    console.error("Lỗi chi tiết:", xhr.responseText);
+                    alert('Không thể gửi bình luận. Kiểm tra kết nối mạng hoặc thử lại.');
                 }
             },
             complete: function () {
-                // Hàm này luôn chạy sau khi success hoặc error kết thúc
-                // Kích hoạt lại nút gửi để người dùng có thể tiếp tục thao tác
                 submitButton.prop('disabled', false).html('<i class="fas fa-paper-plane"></i> Gửi');
             }
         });
