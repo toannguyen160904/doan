@@ -1,41 +1,49 @@
-﻿// File: wwwroot/js/test-ui.js
-
-// Script này chỉ chạy sau khi toàn bộ cấu trúc HTML của trang đã được tải
-document.addEventListener('DOMContentLoaded', function () {
-    // Tìm form và thanh tiến trình bằng ID
+﻿document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('testForm');
-    const progressBar = document.getElementById('test-progress-bar');
+    if (!form) return;
 
-    // Nếu không tìm thấy các thành phần cần thiết, dừng lại để tránh lỗi
-    if (!form || !progressBar) {
-        return;
+    // Lấy token từ hidden input của AntiForgeryToken
+    function getAntiForgeryToken() {
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        return tokenInput ? tokenInput.value : '';
     }
 
-    // Lấy tổng số câu hỏi từ data attribute trên thẻ HTML
-    const totalQuestions = parseInt(progressBar.dataset.totalQuestions, 10);
+    // Ví dụ nếu bạn muốn submit bằng fetch
+    form.addEventListener('submit', function (e) {
+        e.preventDefault(); // chặn submit mặc định nếu bạn muốn AJAX
+        const token = getAntiForgeryToken();
 
-    // Nếu không có câu hỏi nào, cũng dừng lại
-    if (isNaN(totalQuestions) || totalQuestions === 0) {
-        return;
-    }
+        const formData = new FormData(form);
+        const answers = [];
 
-    // Hàm để tính toán và cập nhật thanh tiến trình
-    function updateProgress() {
-        // Đếm số câu hỏi đã được trả lời (số radio button đã được check)
-        const answeredQuestions = form.querySelectorAll('input[type="radio"]:checked').length;
+        // Gom dữ liệu từ form vào object
+        for (let [key, value] of formData.entries()) {
+            if (key.includes("QuestionId")) {
+                const index = key.match(/\[(\d+)\]/)[1];
+                answers[index] = answers[index] || {};
+                answers[index].QuestionId = parseInt(value);
+            } else if (key.includes("SelectedAnswer")) {
+                const index = key.match(/\[(\d+)\]/)[1];
+                answers[index] = answers[index] || {};
+                answers[index].SelectedAnswer = value;
+            }
+        }
 
-        // Tính toán phần trăm hoàn thành
-        const percentage = (answeredQuestions / totalQuestions) * 100;
-
-        // Cập nhật lại chiều rộng và các thuộc tính aria của thanh tiến trình
-        progressBar.style.width = percentage + '%';
-        progressBar.setAttribute('aria-valuenow', answeredQuestions);
-    }
-
-    // Gắn sự kiện: mỗi khi người dùng thay đổi lựa chọn trong form, gọi hàm updateProgress
-    form.addEventListener('change', updateProgress);
-
-    // Gọi hàm một lần ngay khi tải trang để hiển thị tiến trình ban đầu
-    // (rất hữu ích khi kết hợp với việc lưu câu trả lời từ test-handler.js)
-    updateProgress();
+        fetch('/Test/Submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify(answers)
+        })
+            .then(res => {
+                if (res.ok) return res.text();
+                throw new Error('Lỗi gửi bài kiểm tra');
+            })
+            .then(html => {
+                document.body.innerHTML = html; // load trang kết quả
+            })
+            .catch(err => console.error(err));
+    });
 });

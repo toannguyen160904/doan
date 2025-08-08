@@ -1,121 +1,101 @@
-﻿// File: doan/Controllers/LearningController.cs (FRONTEND CONTROLLER)
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SharedModels.Models;
 using SharedModels.Models.DTO;
 using SharedModels.Models.ViewModels;
-using System.Net.Http;
-using System.Net.Http.Json; // Cần thêm using này để dùng PostAsJsonAsync
-using System.Security.Claims;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
-using SharedModels.Models;
-[Authorize] // Yêu cầu người dùng phải đăng nhập để vào các trang học tập
-public class LearningController : Controller
+
+namespace doan.Controllers
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    // Thay thế port 7xxx bằng port của doanapi của bạn
-    private readonly string _apiBaseUrl = "https://localhost:7191"; // ✅ sửa lại
-
-
-    public LearningController(IHttpClientFactory httpClientFactory)
+    [Authorize]
+    public class LearningController : Controller
     {
-        _httpClientFactory = httpClientFactory;
-    }
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string _apiBaseUrl;
 
-    // Action này xử lý trang học hàng ngày (/Learning/Daily)
-    public async Task<IActionResult> Daily()
-    {
-        // Tạo một HTTP client đã được xác thực (nếu cần)
-        // Cách làm này đơn giản, nhưng để an toàn hơn nên dùng token
-        var client = _httpClientFactory.CreateClient();
-        var apiUrl = $"{_apiBaseUrl}/api/learning/daily";
-
-        // Gửi request GET đến API
-        var response = await client.GetAsync(apiUrl);
-
-        if (response.IsSuccessStatusCode)
+        public LearningController(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
-            var responseStream = await response.Content.ReadAsStreamAsync();
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var viewModel = await JsonSerializer.DeserializeAsync<DailyLearningViewModel>(responseStream, options);
-
-            return View(viewModel); // Truyền ViewModel vào View Daily.cshtml
+            _httpClientFactory = httpClientFactory;
+            _apiBaseUrl = config["ApiSettings:BaseUrl"] ?? "https://localhost:7191";
         }
 
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        private HttpClient CreateApiClient()
         {
-            return Challenge(); // Chuyển hướng đến trang đăng nhập nếu chưa xác thực
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_apiBaseUrl);
+
+            // Forward cookie từ MVC sang API
+            var cookie = Request.Headers["Cookie"].ToString();
+            if (!string.IsNullOrWhiteSpace(cookie))
+            {
+                client.DefaultRequestHeaders.Remove("Cookie");
+                client.DefaultRequestHeaders.Add("Cookie", cookie);
+            }
+
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return client;
         }
 
-        ViewBag.ErrorMessage = "Không thể tải kế hoạch học tập.";
-        return View("Error");
-    }
-
-    // Action này xử lý khi người dùng click "Đã học"
-    // Nó sẽ được gọi bằng AJAX/Fetch từ phía client (JavaScript)
-    [HttpPost]
-    public async Task<IActionResult> MarkLearned([FromBody] VocabularyMarkRequest request)
-    {
-        var client = _httpClientFactory.CreateClient();
-        var apiUrl = $"{_apiBaseUrl}/api/learning/mark-learned";
-
-        // Gửi request POST với dữ liệu JSON đến API
-        var response = await client.PostAsJsonAsync(apiUrl, request);
-
-        if (response.IsSuccessStatusCode)
+        // GET /Learning/Daily
+        public async Task<IActionResult> Daily(CancellationToken ct)
         {
-            // Trả về 200 OK để JavaScript biết là đã thành công
-            return Ok();
+            var client = CreateApiClient();
+            var response = await client.GetAsync("/api/learning/daily", ct);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var vm = await response.Content.ReadFromJsonAsync<DailyLearningViewModel>(cancellationToken: ct);
+                return View(vm ?? new DailyLearningViewModel());
+            }
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                var returnUrl = Url.Action(nameof(Daily), "Learning");
+                return RedirectToPage("/Account/Login", new { area = "Identity", ReturnUrl = returnUrl });
+            }
+
+            ViewBag.ErrorMessage = "Không thể tải kế hoạch học tập.";
+            return View("Error");
         }
 
-        // Trả về mã lỗi để JavaScript có thể xử lý
-        return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    // Action này xử lý khi người dùng click "Chưa học"
-    [HttpPost]
-    public async Task<IActionResult> MarkUnlearned([FromBody] VocabularyMarkRequest request)
-    {
-
-        var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("Cookie", Request.Headers["Cookie"].ToString());
-        var apiUrl = $"{_apiBaseUrl}/api/learning/mark-unlearned";
-
-        var response = await client.PostAsJsonAsync(apiUrl, request);
-
-        if (response.IsSuccessStatusCode)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkLearned([FromBody] VocabularyMarkRequest request, CancellationToken ct)
         {
-            return Ok();
+            var client = CreateApiClient();
+            var response = await client.PostAsJsonAsync("/api/learning/mark-learned", request, ct);
+
+            if (response.IsSuccessStatusCode) return Ok();
+            if (response.StatusCode == HttpStatusCode.Unauthorized) return Unauthorized();
+
+            var body = await response.Content.ReadAsStringAsync(ct);
+            return StatusCode((int)response.StatusCode, body);
         }
 
-        return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    // Action này để hiển thị trang danh sách các từ đã học (/Learning/LearnedWords)
-    public async Task<IActionResult> LearnedWords()
-    {
-        var client = _httpClientFactory.CreateClient();
-        var apiUrl = $"{_apiBaseUrl}/api/learning/learned-words";
-
-        var response = await client.GetAsync(apiUrl);
-
-        if (response.IsSuccessStatusCode)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkUnlearned(int VocabId)
         {
-            var responseStream = await response.Content.ReadAsStreamAsync();
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            // API trả về IEnumerable<Vocabulary>, chúng ta deserialize nó thành List
-            var learnedWords = await JsonSerializer.DeserializeAsync<List<Vocabulary>>(responseStream, options);
+            var client = CreateApiClient();
+            var response = await client.PostAsJsonAsync("/api/learning/mark-unlearned", new { VocabId });
 
-            return View(learnedWords); // Truyền danh sách từ đã học vào View LearnedWords.cshtml
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(LearnedWords));
+
+            TempData["Error"] = "Không thể cập nhật trạng thái.";
+            return RedirectToAction(nameof(LearnedWords));
         }
-
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        public async Task<IActionResult> LearnedWords()
         {
-            return Challenge();
+            var client = CreateApiClient();
+            var words = await client.GetFromJsonAsync<List<Vocabulary>>("/api/learning/learned-words");
+            return View(words);
         }
-
-        ViewBag.ErrorMessage = "Không thể tải danh sách từ đã học.";
-        return View("Error");
     }
 }

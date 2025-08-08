@@ -1,42 +1,61 @@
-﻿using SharedModels;
-using doan.Repository;
+﻿using SharedModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-
 using SharedModels.Models.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
-
-using System.Linq;
-using System.Threading.Tasks;
-using SharedModels.Models;
+using System.Net.Http;
 
 namespace doan.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpClient _httpClient;
         private readonly ApplicationDbContext _context;
-        private readonly IVocabularyRepository _vocabularyRepository;
         private readonly ILogger<HomeController> _logger;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly string _apiBaseUrl;
 
         public HomeController(
+            IConfiguration configuration,
             ApplicationDbContext context,
-            IVocabularyRepository vocabularyRepository,
             ILogger<HomeController> logger,
             SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IHttpContextAccessor httpContextAccessor)
         {
+            _httpContextAccessor = httpContextAccessor;
             _context = context;
-            _vocabularyRepository = vocabularyRepository;
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
+            _apiBaseUrl = configuration["ApiSettings:BaseUrl"];
+
+            var handler = new HttpClientHandler
+            {
+                UseCookies = true,
+                CookieContainer = new System.Net.CookieContainer()
+            };
+
+            var httpContext = _httpContextAccessor.HttpContext
+                ?? throw new Exception("HttpContext chưa được khởi tạo.");
+
+            var uri = new Uri(_apiBaseUrl);
+            foreach (var cookie in httpContext.Request.Cookies)
+            {
+                handler.CookieContainer.Add(uri, new System.Net.Cookie(cookie.Key, cookie.Value));
+            }
+
+            _httpClient = new HttpClient(handler)
+            {
+                BaseAddress = uri
+            };
         }
 
         [AllowAnonymous]
@@ -49,21 +68,19 @@ namespace doan.Controllers
         [Authorize]
         public async Task<IActionResult> ChonLevel()
         {
-            // Khai báo và lấy danh sách levels cùng với Lessons
             var levels = await _context.Levels
-                .Include(l => l.Lessons)  // Bao gồm các bài học (Lessons)
-                .ToListAsync();  // Chuyển đổi kết quả thành danh sách
+                .Include(l => l.Lessons)
+                .ToListAsync();
 
-            // Kiểm tra nếu không có dữ liệu Levels
             if (levels == null || !levels.Any())
             {
                 _logger.LogWarning("Không có dữ liệu Level nào!");
                 return View(new List<Level>());
             }
 
-            // Trả về view với danh sách levels đã lấy từ cơ sở dữ liệu
             return View(levels);
         }
+
 
         [HttpPost]
         [AllowAnonymous]
@@ -80,6 +97,8 @@ namespace doan.Controllers
             ViewBag.ErrorMessage = "Tên đăng nhập hoặc mật khẩu không đúng.";
             return View("Login");
         }
+
+
 
         public IActionResult MiniTest()
         {
@@ -98,7 +117,6 @@ namespace doan.Controllers
             });
         }
 
-        // ✅ Xem từ vựng theo Level
         public async Task<IActionResult> TuVung(int? levelId)
         {
             if (levelId == null) return NotFound();
@@ -130,7 +148,6 @@ namespace doan.Controllers
             return View("~/Views/Home/TuVung.cshtml", tuVung);
         }
 
-        // ✅ Xem ngữ pháp theo Level
         public async Task<IActionResult> NguPhap(int? levelId)
         {
             if (levelId == null) return NotFound();
@@ -142,8 +159,8 @@ namespace doan.Controllers
 
             return View(nguPhap);
         }
+
         [Authorize]
-        // ✅ Giao diện làm bài test đầu vào
         public async Task<IActionResult> Test()
         {
             var questions = await _context.TestQuestions
@@ -155,7 +172,6 @@ namespace doan.Controllers
             return View("~/Views/Home/Test.cshtml", questions);
         }
 
-        // ✅ Xử lý nộp bài test đầu vào
         [HttpPost]
         public async Task<IActionResult> Submit(List<TestAnswerInput> answers)
         {
@@ -192,9 +208,8 @@ namespace doan.Controllers
             if (baiHoc == null)
                 return NotFound();
 
-            var flashcards = new List<flashcards>();  // Đổi tên thành Flashcard, viết hoa chữ cái đầu
+            var flashcards = new List<flashcards>();
 
-            // Thêm flashcard từ từ vựng
             flashcards.AddRange(baiHoc.tuvung.Select(word => new flashcards
             {
                 Vocabulary = new Vocabulary
@@ -207,7 +222,6 @@ namespace doan.Controllers
                 }
             }));
 
-            // Thêm flashcard từ ngữ pháp
             flashcards.AddRange(baiHoc.nguphap.Select(grammar => new flashcards
             {
                 GrammarStructure = new GrammarStructure
@@ -221,19 +235,24 @@ namespace doan.Controllers
             ViewData["BaiHocName"] = baiHoc.Name;
             return View(flashcards);
         }
-        // Action để hiển thị trang làm bài Quiz
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
         public IActionResult Quiz(int baiHocId)
         {
-            // Lấy Quiz dựa trên bài học
             var quiz = _context.Quizzes
                 .Include(q => q.CauHois)
                 .ThenInclude(ch => ch.CauTraLois)
                 .FirstOrDefault(q => q.BaihocId == baiHocId);
 
             if (quiz == null)
-            {
                 return NotFound("Quiz không tồn tại cho bài học này.");
-            }
 
             var baiHoc = _context.Baihoc.FirstOrDefault(b => b.Id == baiHocId);
             ViewData["BaiHocName"] = baiHoc.Name;
@@ -258,7 +277,5 @@ namespace doan.Controllers
 
             return View(levels);
         }
-
-
     }
 }

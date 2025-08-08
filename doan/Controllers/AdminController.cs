@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
-using SharedModels;
+using SharedModels.Models.DTO;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SharedModels.Models.ViewModels;
 using SharedModels.Models;
 
 namespace doan.Controllers

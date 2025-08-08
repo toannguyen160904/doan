@@ -25,9 +25,10 @@
                         <td class="fw-bold text-muted">@word.Id</td>
                         <td class="fw-semibold text-dark">@word.Tuvung</td>
                         <td class="text-secondary">@word.Nghia</td>
-                        <td class="text-secondary">@word.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td class="text-secondary">@(word.CreatedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "-")</td>
                         <td>
                             <form asp-action="MarkUnlearned" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
                                 <input type="hidden" name="VocabId" value="@word.Id" />
                                 <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-3">🔄 Chưa học</button>
                             </form>

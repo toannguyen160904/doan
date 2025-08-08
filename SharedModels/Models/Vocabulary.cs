@@ -22,14 +22,10 @@ namespace SharedModels.Models
         [JsonIgnore]
         public Baihoc? Lesson { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // ✅ Gán giá trị mặc định
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow; // ✅ Gán giá trị mặc định
         [JsonIgnore]
 
-        public ICollection<UserVocabularyProgress> UserVocabularyProgresses { get; set; } = new List<UserVocabularyProgress>();
-
-        
-
- 
+        public ICollection<UserVocabularyProgress> UserVocabularyProgresses { get; set; } = new List<UserVocabularyProgress>();   
        
 
     }

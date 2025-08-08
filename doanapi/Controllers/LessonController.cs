@@ -19,6 +19,7 @@ public class LessonController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
+
     public LessonController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;

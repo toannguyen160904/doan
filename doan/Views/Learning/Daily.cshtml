@@ -1,117 +1,233 @@
 ﻿@using SharedModels.Models
 @using SharedModels.Models.ViewModels
 @model DailyLearningViewModel
-
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+@{
+    var apiBase = (Config["ApiSettings:BaseUrl"] ?? "").TrimEnd('/') + "/api/learning";
+}
 @{
     ViewData["Title"] = "Lộ Trình Học Hôm Nay";
 
-    var percent = Model.DailyTarget > 0
-        ? (int)((double)Model.CompletedToday / Model.DailyTarget * 100)
-        : 0;
+    var dailyTarget = Model?.DailyTarget ?? 0;
+    var completed = Model?.CompletedToday ?? 0;
+    var percent = dailyTarget > 0 ? (int)Math.Round((double)completed / dailyTarget * 100) : 0;
 }
 
 <div class="container py-5">
     <h2 class="fw-bold mb-4 text-primary">📘 Lộ Trình Học Hôm Nay</h2>
 
-    @if (Model.CompletedToday >= Model.DailyTarget)
+    @if (Model == null)
     {
-        <div class="alert alert-success">🎉 Chúc mừng bạn đã hoàn thành lộ trình hôm nay!</div>
+        <div class="alert alert-info">Đang tải dữ liệu lộ trình...</div>
     }
     else
     {
-        <div class="alert alert-warning">⏳ Bạn còn <strong>@(Model.DailyTarget - Model.CompletedToday)</strong> từ để hoàn thành hôm nay!</div>
-    }
+        if (completed >= dailyTarget && dailyTarget > 0)
+        {
+            <div class="alert alert-success">🎉 Chúc mừng bạn đã hoàn thành lộ trình hôm nay!</div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                ⏳ Bạn còn <strong>@(dailyTarget - completed)</strong> từ để hoàn thành hôm nay!
+            </div>
+        }
 
-    <div class="mb-4">
-        <div class="d-flex justify-content-between">
-            <span><strong>🎯 Tiến độ hôm nay:</strong> @Model.CompletedToday / @Model.DailyTarget từ</span>
-            <span class="text-muted">@percent%</span>
-        </div>
-        <div class="progress" style="height: 20px;">
-            <div class="progress-bar bg-success" role="progressbar"
-                 style="width: @percent%" aria-valuenow="@percent"
-                 aria-valuemin="0" aria-valuemax="100">
-                @percent%
+        <div class="mb-4">
+            <div class="d-flex justify-content-between">
+                <span><strong>🎯 Tiến độ hôm nay:</strong> <span id="completed-today">@completed</span> / <span id="daily-target">@dailyTarget</span> từ</span>
+                <span class="text-muted" id="progress-percent">@percent%</span>
+            </div>
+            <div class="progress" style="height: 20px;">
+                <div id="progress-bar" class="progress-bar bg-success" role="progressbar"
+                     style="width: @percent%" aria-valuenow="@percent"
+                     aria-valuemin="0" aria-valuemax="100">
+                    @percent%
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover shadow-sm">
-            <thead class="table-light text-center">
-                <tr>
-                    <th>#</th>
-                    <th>Từ</th>
-                    <th>Nghĩa</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày ôn tập</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.NewWords)
-                {
-                    var isLearned = Model.LearnedIds.Contains(item.Id);
-                    <tr class="text-center">
-                        <td>@item.Id</td>
-                        <td>@item.Tuvung</td>
-                        <td>@item.Nghia</td>
-                        <td>
-                            @if (isLearned)
-                            {
-                                <span class="badge bg-success">✅ Đã học</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">❌ Chưa học</span>
-                            }
-                        </td>
-                        <td>@(item.CreatedAt.ToString("dd/MM/yyyy") ?? "Chưa có lịch")</td>
-                        <td>
-                            <form asp-action="@(isLearned ? "MarkUnlearned" : "MarkLearned")" method="post">
-                                <input type="hidden" name="VocabId" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm @(isLearned ? "btn-warning" : "btn-success")">
-                                    @(isLearned ? "Đánh dấu chưa học" : "Đánh dấu đã học")
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    @if (Model.ReviewWords.Any())
-    {
-        <div class="mt-5">
-            <h3 class="text-warning">🔁 Từ cần ôn lại hôm nay (Spaced Repetition)</h3>
-            <table class="table table-bordered">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover shadow-sm" id="new-words-table">
                 <thead class="table-light text-center">
                     <tr>
+                        <th>#</th>
                         <th>Từ</th>
                         <th>Nghĩa</th>
-                        <th>Hán tự</th>
-                        <th>Âm Hán</th>
-                        <th>Ngày học</th>
-                        <th>Ngày ôn</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày ôn tập</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.ReviewWords)
+                    @if (Model.NewWords != null && Model.NewWords.Any())
                     {
-                        <tr class="table-warning text-center">
-                            <td>@item.Vocabulary.Tuvung</td>
-                            <td>@item.Vocabulary.Nghia</td>
-                            <td>@item.Vocabulary.HanTu</td>
-                            <td>@item.Vocabulary.AmHan</td>
-                            <td>@item.LearnedDate?.ToString("dd/MM/yyyy")</td>
-                            <td>@item.NextReviewDate?.ToString("dd/MM/yyyy")</td>
-                        </tr>
+                        foreach (var item in Model.NewWords)
+                        {
+                            // NewWords đã được lọc không chứa từ đã học → mặc định chưa học
+                            var isLearned = false;
+                            <tr class="text-center" data-row-vocab-id="@item.Id">
+                                <td>@item.Id</td>
+                                <td>@item.Tuvung</td>
+                                <td>@item.Nghia</td>
+                                <td>
+                                    <span class="badge bg-secondary status-badge">❌ Chưa học</span>
+                                </td>
+                                <td>@(item.CreatedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "Chưa có lịch")</td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-mark-learned @(isLearned ? "btn-warning" : "btn-success")"
+                                            data-vocab-id="@item.Id"
+                                            data-learned="false">
+                                        Đánh dấu đã học
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center text-muted">Không còn từ mới hôm nay 🎉</td></tr>
                     }
                 </tbody>
             </table>
         </div>
-    }
 
-    <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-outline-primary rounded-pill mt-4">🔙 Chọn Level</a>
+        @if (Model.ReviewWords != null && Model.ReviewWords.Any())
+        {
+            <div class="mt-5">
+                <h3 class="text-warning">🔁 Từ cần ôn lại hôm nay (Spaced Repetition)</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>Từ</th>
+                                <th>Nghĩa</th>
+                                <th>Hán tự</th>
+                                <th>Âm Hán</th>
+                                <th>Ngày học</th>
+                                <th>Ngày ôn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ReviewWords)
+                            {
+                                <tr class="table-warning text-center">
+                                    <td>@item.Vocabulary?.Tuvung</td>
+                                    <td>@item.Vocabulary?.Nghia</td>
+                                    <td>@item.Vocabulary?.HanTu</td>
+                                    <td>@item.Vocabulary?.AmHan</td>
+                                    <td>@item.LearnedDate?.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                    <td>@item.NextReviewDate?.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-outline-primary rounded-pill mt-4">🔙 Chọn Level</a>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+          // LẤY base URL từ appsettings của MVC → https://localhost:7191/api/learning
+          const apiBase = '@apiBase';
+
+          const table = document.getElementById('new-words-table');
+          if (!table) return;
+
+          const progressBar = document.getElementById('progress-bar');
+          const progressPercent = document.getElementById('progress-percent');
+          const completedSpan = document.getElementById('completed-today');
+          const targetSpan = document.getElementById('daily-target');
+
+          function getNumbers() {
+            const completed = parseInt((completedSpan?.textContent || '0').trim(), 10) || 0;
+            const target = parseInt((targetSpan?.textContent || '0').trim(), 10) || 0;
+            return { completed, target };
+          }
+
+          function setNumbers(completed, target) {
+            if (completedSpan) completedSpan.textContent = completed;
+            if (targetSpan) targetSpan.textContent = target;
+            const pct = target > 0 ? Math.round((completed / target) * 100) : 0;
+            if (progressBar) {
+              progressBar.style.width = pct + '%';
+              progressBar.setAttribute('aria-valuenow', pct.toString());
+              progressBar.textContent = pct + '%';
+            }
+            if (progressPercent) progressPercent.textContent = pct + '%';
+          }
+
+          async function postJson(url, body) {
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              credentials: 'include', // gửi cookie sang API
+              mode: 'cors'
+            });
+            return res;
+          }
+
+          function updateRowUI(row, learned) {
+            const btn = row.querySelector('.btn-mark-learned');
+            const badge = row.querySelector('.status-badge');
+            if (!btn || !badge) return;
+
+            btn.dataset.learned = learned ? 'true' : 'false';
+            if (learned) {
+              btn.classList.remove('btn-success');
+              btn.classList.add('btn-warning');
+              btn.textContent = 'Đánh dấu chưa học';
+              badge.className = 'badge bg-success status-badge';
+              badge.textContent = '✅ Đã học';
+            } else {
+              btn.classList.remove('btn-warning');
+              btn.classList.add('btn-success');
+              btn.textContent = 'Đánh dấu đã học';
+              badge.className = 'badge bg-secondary status-badge';
+              badge.textContent = '❌ Chưa học';
+            }
+          }
+
+          table.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-mark-learned');
+            if (!btn) return;
+
+            const vocabId = Number(btn.dataset.vocabId);
+            const learned = btn.dataset.learned === 'true'; // <-- dùng biến này
+            const url = learned
+              ? `${apiBase}/mark-unlearned`
+              : `${apiBase}/mark-learned`;
+
+            try {
+              const res = await postJson(url, { vocabId });
+              if (res.ok) {
+                const row = btn.closest('tr');
+                updateRowUI(row, !learned);
+
+                const { completed, target } = getNumbers();
+                const newCompleted = learned ? Math.max(0, completed - 1) : completed + 1;
+                setNumbers(newCompleted, target);
+              } else if (res.status === 401) {
+                alert('⚠️ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                window.location.href = '/Account/Login';
+              } else {
+                const msg = await res.text().catch(()=> '');
+                console.error('API error:', res.status, msg);
+                alert('Có lỗi khi cập nhật trạng thái.');
+              }
+            } catch (err) {
+              console.error(err);
+              alert('Không thể kết nối máy chủ.');
+            }
+          });
+        })();
+    </script>
+}
+

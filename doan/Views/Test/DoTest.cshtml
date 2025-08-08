@@ -33,6 +33,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-body p-lg-5">
             <form id="testForm" asp-controller="Test" asp-action="Submit" method="post">
+                @Html.AntiForgeryToken()
                 @for (int i = 0; i < Model.Count; i++)
                 {
                     var question = Model[i];
@@ -121,4 +122,5 @@
 @section Scripts {
     <script src="~/js/test-handler.js" defer></script>
     <script src="~/js/test-ui.js" defer></script>
+    <script src="~/js/test-submit.js" defer></script>
 }

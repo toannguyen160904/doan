@@ -1,19 +1,15 @@
-﻿using SharedModels.Models;
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SharedModels.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SharedModels;                 // ApplicationDbContext
+using SharedModels.Models;          // TestQuestion, TestResult
+using DTO = SharedModels.Models.DTO; // <-- alias cho DTO
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace doan.Controllers
 {
-    /// <summary>
-    /// Xử lý logic cho việc làm bài kiểm tra đầu vào của người dùng.
-    /// </summary>
+    [Authorize]
     public class TestController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,146 +21,143 @@ namespace doan.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// Hiển thị trang bắt đầu, xóa session bài test cũ nếu có.
-        /// </summary>
-        [Authorize]
+        // GET /Test/Start
         public IActionResult Start()
         {
             HttpContext.Session.Remove(TestSessionKey);
             return View();
         }
 
-        /// <summary>
-        /// Hiển thị trang làm bài test với một bộ câu hỏi cố định cho phiên làm bài.
-        /// </summary>
+        // GET /Test/DoTest
         public async Task<IActionResult> DoTest()
         {
-            // Lấy danh sách ID câu hỏi từ session hoặc tạo mới nếu chưa có.
-            var questionIds = await GetOrCreateTestQuestionIdsAsync();
+            var ids = await GetOrCreateTestQuestionIdsAsync();
 
-            if (!questionIds.Any())
+            if (ids.Count == 0)
             {
-                // Xử lý trường hợp không có câu hỏi nào để hiển thị.
                 TempData["ErrorMessage"] = "Không có câu hỏi nào trong hệ thống.";
                 return RedirectToAction("Start");
             }
 
-            // Dùng danh sách ID để lấy đầy đủ thông tin các câu hỏi.
             var questions = await _context.TestQuestions
-                                        .Where(q => questionIds.Contains(q.Id))
-                                        .ToListAsync();
+                .Where(q => ids.Contains(q.Id))
+                .ToListAsync();
 
-            // Sắp xếp lại danh sách câu hỏi theo đúng thứ tự đã lưu trong session.
-            var orderedQuestions = questionIds
+            var ordered = ids
                 .Select(id => questions.FirstOrDefault(q => q.Id == id))
-                .Where(q => q != null) // Lọc bỏ câu hỏi có thể đã bị xóa khỏi DB.
+                .Where(q => q != null)
                 .ToList();
 
-            return View(orderedQuestions);
+            return View(ordered);
         }
 
-        /// <summary>
-        /// Nhận và xử lý bài làm của người dùng, sau đó hiển thị kết quả.
-        /// </summary>
+        // POST /Test/Submit
         [HttpPost]
-        public async Task<IActionResult> Submit(List<TestAnswerInput> answers)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Submit(List<DTO.TestAnswerInput> answers) // <-- dùng alias DTO
         {
-            // Xóa session khi nộp bài.
             HttpContext.Session.Remove(TestSessionKey);
 
-            // Tách logic chấm điểm ra một phương thức riêng.
-            int correctAnswersCount = await CalculateScoreAsync(answers);
-
-            // Tách logic xác định trình độ.
-            string suggestedLevel = DetermineLevel(correctAnswersCount);
+            var correct = await CalculateScoreAsync(answers);
+            var level = DetermineLevel(correct);
 
             var result = new TestResult
             {
-                CorrectAnswers = correctAnswersCount,
-                TotalScore = correctAnswersCount, // Giả sử mỗi câu 1 điểm
-                SuggestedLevel = suggestedLevel
+                CorrectAnswers = correct,
+                TotalScore = correct,
+                SuggestedLevel = level
             };
 
             return View("Result", result);
         }
 
-        #region Private Helper Methods
-
-        /// <summary>
-        /// Lấy danh sách ID câu hỏi từ Session. Nếu không có, tạo mới và lưu vào Session.
-        /// </summary>
+        // ===== Helpers =====
         private async Task<List<int>> GetOrCreateTestQuestionIdsAsync()
         {
-            var questionIdsJson = HttpContext.Session.GetString(TestSessionKey);
+            var json = HttpContext.Session.GetString(TestSessionKey);
+            if (!string.IsNullOrEmpty(json))
+                return JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
 
-            if (!string.IsNullOrEmpty(questionIdsJson))
-            {
-                // Đọc từ session nếu đã có.
-                return JsonSerializer.Deserialize<List<int>>(questionIdsJson);
-            }
-
-            // Tạo mới nếu chưa có trong session.
-            var newQuestionIds = await _context.TestQuestions
+            var newIds = await _context.TestQuestions
                 .Where(q => q.IsActive)
-                .OrderBy(q => Guid.NewGuid())
+                .OrderBy(_ => EF.Functions.Random())
                 .Take(NumberOfTestQuestions)
                 .Select(q => q.Id)
                 .ToListAsync();
 
-            // Lưu vào session để sử dụng cho các lần reload sau.
-            HttpContext.Session.SetString(TestSessionKey, JsonSerializer.Serialize(newQuestionIds));
-
-            return newQuestionIds;
+            HttpContext.Session.SetString(TestSessionKey, JsonSerializer.Serialize(newIds));
+            return newIds;
         }
 
-        /// <summary>
-        /// Tính toán số câu trả lời đúng từ danh sách câu trả lời của người dùng.
-        /// </summary>
-        private async Task<int> CalculateScoreAsync(List<TestAnswerInput> answers)
+        private async Task<int> CalculateScoreAsync(List<DTO.TestAnswerInput> answers)
         {
-            if (answers == null || !answers.Any()) return 0;
+            if (answers == null || answers.Count == 0) return 0;
 
-            int correctCount = 0;
-            var questionIds = answers.Select(a => a.QuestionId).ToList();
+            int correct = 0;
+            var ids = answers.Select(a => a.QuestionId).ToList();
 
-            // Lấy tất cả câu hỏi liên quan trong một lần truy vấn DB.
-            var questionsInTest = await _context.TestQuestions
-                                                .Where(q => questionIds.Contains(q.Id))
-                                                .ToDictionaryAsync(q => q.Id);
+            var map = await _context.TestQuestions
+                .Where(q => ids.Contains(q.Id))
+                .ToDictionaryAsync(q => q.Id);
 
             foreach (var ans in answers)
             {
-                if (questionsInTest.TryGetValue(ans.QuestionId, out var question)
-                    && int.TryParse(ans.SelectedAnswer, out int choiceIndex))
+                if (!map.TryGetValue(ans.QuestionId, out var q)) continue;
+
+                // 1) Selected từ client (index hoặc text)
+                string? selectedText = null;
+                int? selectedIndex = null;
+
+                if (int.TryParse(ans.SelectedAnswer, out var selIdx) &&
+                    selIdx >= 0 && selIdx < q.Choices.Count)
                 {
-                    if (choiceIndex >= 0 && choiceIndex < question.Choices.Count)
+                    selectedIndex = selIdx;
+                    selectedText = q.Choices[selIdx];
+                }
+                else
+                {
+                    selectedText = ans.SelectedAnswer?.Trim();
+                }
+
+                // 2) Đáp án đúng trong DB (index hoặc text)
+                bool isCorrect = false;
+
+                // a) DB lưu index (ví dụ "2")
+                if (int.TryParse(q.CorrectAnswer, out var correctIdx))
+                {
+                    if (selectedIndex.HasValue && selectedIndex.Value == correctIdx)
+                        isCorrect = true;
+                }
+                else
+                {
+                    // b) DB lưu text
+                    var correctText = q.CorrectAnswer?.Trim();
+                    if (!string.IsNullOrEmpty(correctText) && !string.IsNullOrEmpty(selectedText) &&
+                        string.Equals(correctText, selectedText, StringComparison.OrdinalIgnoreCase))
                     {
-                        string selectedChoiceText = question.Choices[choiceIndex];
-                        if (question.CorrectAnswer == selectedChoiceText)
-                        {
-                            correctCount++;
-                        }
+                        isCorrect = true;
+                    }
+                    else if (selectedIndex.HasValue)
+                    {
+                        // fallback: so sánh theo index tính từ text đúng
+                        var idxFromText = q.Choices.FindIndex(c =>
+                            string.Equals(c?.Trim(), correctText, StringComparison.OrdinalIgnoreCase));
+                        if (idxFromText >= 0 && idxFromText == selectedIndex.Value)
+                            isCorrect = true;
                     }
                 }
+
+                if (isCorrect) correct++;
             }
 
-            return correctCount;
+            return correct;
         }
 
-        /// <summary>
-        /// Xác định trình độ gợi ý dựa trên số câu đúng.
-        /// </summary>
-        private string DetermineLevel(int correctCount)
+        private string DetermineLevel(int correctCount) => correctCount switch
         {
-            return correctCount switch
-            {
-                >= 15 => "N3",
-                >= 8 => "N4",
-                _ => "N5"
-            };
-        }
-
-        #endregion
+            >= 15 => "N3",
+            >= 8 => "N4",
+            _ => "N5"
+        };
     }
 }
