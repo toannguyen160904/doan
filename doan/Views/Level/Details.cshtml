@@ -9,33 +9,58 @@
 <input type="hidden" id="currentUserId" value="@userId" />
 @Html.AntiForgeryToken()
 
+<!-- Fonts & Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
 
-<div class="container my-5 animate__animated animate__fadeIn">
+<div class="lesson-hero">
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+            <div class="flex-grow-1">
+                <h1 class="display-6 fw-bold mb-2 text-white">
+                    Bài học: <span class="lesson-title">@Model?.Lesson?.Name</span>
+                </h1>
+                <p class="text-white-50 mb-0">Tăng tốc hành trình học với từ vựng và ngữ pháp được trình bày mạch lạc.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-light btn-modern">
+                    <i class="fa-solid fa-arrow-left-long me-1"></i> Quay lại
+                </a>
+                <a asp-controller="Home" asp-action="Flashcards" asp-route-baiHocId="@Model?.Lesson?.Id" class="btn btn-outline-light btn-modern">
+                    <i class="fa-solid fa-clone me-1"></i> Flashcards
+                </a>
+                <a asp-controller="Learning" asp-action="Daily" class="btn btn-info btn-modern btn-compact">
+                    📘 Lộ Trình Hôm Nay
+                </a>
+                <a asp-controller="Learning" asp-action="LearnedWords" class="btn btn-dark btn-modern btn-compact">
+                    📖 Từ đã học
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+
     @if (Model != null && Model.Lesson != null)
     {
-        <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold mb-2">
-                Bài học: <span class="text-primary">@Model.Lesson.Name</span>
-            </h1>
-        </div>
-
         <!-- Từ vựng -->
         <section class="mb-4">
-            <div class="card section-card shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h2 class="card-title h5 mb-0 fw-bold">
-                        <i class="fas fa-book-open me-2 text-success"></i>Từ vựng
-                    </h2>
+            <div class="smart-card">
+                <div class="smart-card__header">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-wrap icon-green"><i class="fa-solid fa-book-open"></i></div>
+                        <h2 class="h5 fw-bold mb-0">Từ vựng</h2>
+                    </div>
                 </div>
-                <div class="card-body p-3">
+
+                <div class="smart-card__body">
                     @if (Model.PagedVocabularies != null && Model.PagedVocabularies.Any())
                     {
                         <div class="table-responsive">
                             <table id="new-words-table" class="table table-hover align-middle mb-0">
-                                <thead class="table-light text-center">
+                                <thead>
                                     <tr>
                                         <th class="text-start">Từ</th>
                                         <th>Phát âm</th>
@@ -49,10 +74,10 @@
                                     {
                                         <tr>
                                             <td class="fw-semibold text-primary text-start">@word?.Tuvung</td>
-                                            <td class="text-center">@word?.PhatAm</td>
-                                            <td class="text-center">@word?.AmHan</td>
-                                            <td class="text-center">@word?.HanTu</td>
-                                            <td class="text-start ps-3">@word?.Nghia</td>
+                                            <td>@word?.PhatAm</td>
+                                            <td>@word?.AmHan</td>
+                                            <td>@word?.HanTu</td>
+                                            <td class="text-start">@word?.Nghia</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -61,7 +86,7 @@
 
                         <!-- Phân trang từ vựng -->
                         <nav aria-label="Vocabulary pagination" class="mt-3">
-                            <ul class="pagination justify-content-center mb-0">
+                            <ul class="pagination pagination-modern justify-content-center mb-0">
                                 @for (int i = 1; i <= Model.TotalVocabularyPages; i++)
                                 {
                                     <li class="page-item @(i == Model.CurrentVocabularyPage ? "active" : "")">
@@ -78,7 +103,10 @@
                     }
                     else
                     {
-                        <div class="alert alert-light text-center mb-0">❌ Chưa có từ vựng cho bài học này.</div>
+                        <div class="empty-block">
+                            <i class="fa-regular fa-circle-xmark"></i>
+                            <span>Chưa có từ vựng cho bài học này.</span>
+                        </div>
                     }
                 </div>
             </div>
@@ -86,22 +114,24 @@
 
         <!-- Ngữ pháp -->
         <section class="mb-4">
-            <div class="card section-card shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h2 class="card-title h5 mb-0 fw-bold">
-                        <i class="fas fa-pencil-ruler me-2 text-info"></i>Ngữ pháp
-                    </h2>
+            <div class="smart-card">
+                <div class="smart-card__header">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-wrap icon-blue"><i class="fa-solid fa-pencil-ruler"></i></div>
+                        <h2 class="h5 fw-bold mb-0">Ngữ pháp</h2>
+                    </div>
                 </div>
-                <div class="card-body p-3">
+
+                <div class="smart-card__body">
                     @if (Model.Lesson.nguphap != null && Model.Lesson.nguphap.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light text-center">
+                                <thead>
                                     <tr>
-                                        <th class="text-start">Công thức</th>
-                                        <th class="text-start">Giải thích</th>
-                                        <th class="text-start">Ví dụ</th>
+                                        <th class="text-start" style="width: 25%;">Công thức</th>
+                                        <th class="text-start" style="width: 45%;">Giải thích</th>
+                                        <th class="text-start" style="width: 30%;">Ví dụ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,8 +139,8 @@
                                     {
                                         <tr>
                                             <td class="fw-semibold text-primary text-start">@g.CongThuc</td>
-                                            <td class="text-start ps-3">@g.GiaiThich</td>
-                                            <td class="text-start ps-3">@g.CauViDu</td>
+                                            <td class="text-start">@g.GiaiThich</td>
+                                            <td class="text-start">@g.CauViDu</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -119,21 +149,26 @@
                     }
                     else
                     {
-                        <div class="alert alert-light text-center mb-0">⚠️ Chưa có dữ liệu ngữ pháp cho bài học này.</div>
+                        <div class="empty-block">
+                            <i class="fa-regular fa-circle-question"></i>
+                            <span>Chưa có dữ liệu ngữ pháp cho bài học này.</span>
+                        </div>
                     }
                 </div>
             </div>
         </section>
 
         <!-- Diễn đàn -->
-        <section class="mb-4">
-            <div class="card section-card shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h2 class="card-title h5 mb-0 fw-bold">
-                        <i class="fas fa-comments me-2 text-primary"></i>Diễn đàn
-                    </h2>
+        <section class="mb-5">
+            <div class="smart-card">
+                <div class="smart-card__header">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-wrap icon-violet"><i class="fa-solid fa-comments"></i></div>
+                        <h2 class="h5 fw-bold mb-0">Diễn đàn</h2>
+                    </div>
                 </div>
-                <div class="card-body p-3">
+
+                <div class="smart-card__body">
                     <div id="discussion-container">
                         <div class="row row-cols-1 row-cols-lg-2 g-3" id="discussion-list">
                             @if (Model.PagedComments != null && Model.PagedComments.Any())
@@ -141,14 +176,16 @@
                                 @foreach (var post in Model.PagedComments)
                                 {
                                     <div class="col discussion-item-@post.Id">
-                                        <div class="card h-100 discussion-card border rounded-3 shadow-sm">
-                                            <div class="card-body">
-                                                <h5 class="card-title h6 fw-bold text-primary mb-1">@post.TieuDe</h5>
-                                                <p class="card-text small">@post.NoiDung</p>
+                                        <div class="comment-card h-100">
+                                            <div class="comment-card__body">
+                                                <h5 class="h6 fw-bold text-primary mb-1">@post.TieuDe</h5>
+                                                <p class="mb-0 small text-body-secondary">@post.NoiDung</p>
                                             </div>
-                                            <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
+                                            <div class="comment-card__footer">
                                                 <small class="text-muted">
-                                                    <strong>@(post.User?.Name ?? "Ẩn danh")</strong> - @post.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                    <i class="fa-regular fa-user me-1"></i><strong>@(post.User?.Name ?? "Ẩn danh")</strong>
+                                                    <span class="mx-2">•</span>
+                                                    <i class="fa-regular fa-clock me-1"></i>@post.CreatedAt.ToString("dd/MM/yyyy HH:mm")
                                                 </small>
                                             </div>
                                         </div>
@@ -157,13 +194,16 @@
                             }
                             else
                             {
-                                <div class="alert alert-light text-center" id="no-comments-alert">💬 Chưa có bài viết nào được đăng.</div>
+                                <div class="empty-block w-100">
+                                    <i class="fa-regular fa-message"></i>
+                                    <span>Chưa có bài viết nào được đăng.</span>
+                                </div>
                             }
                         </div>
 
                         <!-- Phân trang bình luận -->
                         <nav aria-label="Comment pagination" class="mt-3">
-                            <ul class="pagination justify-content-center mb-0">
+                            <ul class="pagination pagination-modern justify-content-center mb-0">
                                 @for (int i = 1; i <= Model.TotalCommentPages; i++)
                                 {
                                     <li class="page-item @(i == Model.CurrentCommentPage ? "active" : "")">
@@ -181,12 +221,16 @@
 
                     <!-- Form bình luận -->
                     <div class="mt-4 pt-4 border-top">
-                        <form id="comment-form" action="/Lesson/DangBai" method="post">
+                        <form id="comment-form" action="/Lesson/DangBai" method="post" class="comment-form">
                             <input type="hidden" name="BaiHocId" value="@Model.Lesson.Id" />
-                            <div class="input-group">
-                                <textarea id="comment-content" name="NoiDung" class="form-control" rows="1" placeholder="Thêm bình luận..." required style="resize: none;"></textarea>
-                                <button id="submit-comment-btn" class="btn btn-primary" type="submit">
-                                    <i class="fas fa-paper-plane"></i> Gửi
+                            <div class="comment-form__wrap">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                                <textarea id="comment-content" name="NoiDung" class="form-control" rows="1"
+                                          placeholder="Viết bình luận của bạn..." required></textarea>
+                                <button id="submit-comment-btn" class="btn btn-primary btn-modern" type="submit">
+                                    <span class="btn-inner">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Gửi
+                                    </span>
                                 </button>
                             </div>
                         </form>
@@ -195,22 +239,13 @@
             </div>
         </section>
 
-        <!-- Nút điều hướng -->
-        <section class="text-center my-4">
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-                <a asp-controller="Home" asp-action="ChonLevel" class="btn btn-outline-secondary rounded-pill">🔙 Quay lại</a>
-                <a asp-controller="Home" asp-action="Flashcards" asp-route-baiHocId="@Model.Lesson.Id" class="btn btn-success rounded-pill">🎴 Flashcards</a>
-                <a asp-controller="Learning" asp-action="Daily" class="btn btn-info rounded-pill">📘 Lộ Trình Hôm Nay</a>
-                <a asp-controller="Learning" asp-action="LearnedWords" class="btn btn-dark rounded-pill">📖 Từ đã học</a>
-            </div>
-        </section>
     }
     else
     {
-        <div class="text-center">
+        <div class="text-center py-5">
             <h1 class="display-4">Lỗi</h1>
             <p class="lead">Không thể tải dữ liệu bài học.</p>
-            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Trang chủ</a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-modern">Trang chủ</a>
         </div>
     }
 </div>
@@ -219,3 +254,163 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="~/js/lesson-details.js" asp-append-version="true"></script>
 }
+
+<style>
+    :root {
+        --radius: 14px;
+        --shadow-sm: 0 6px 16px rgba(0,0,0,.06);
+        --shadow-md: 0 10px 28px rgba(0,0,0,.08);
+    }
+
+    body {
+        font-family: 'Be Vietnam Pro', sans-serif;
+        background: #f7f9fb;
+    }
+
+    /* Hero */
+    .lesson-hero {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        border-bottom-left-radius: 32px;
+        border-bottom-right-radius: 32px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .lesson-title {
+        color: #fef08a;
+    }
+
+    /* Card tổng quát */
+    .smart-card {
+        border: 0;
+        border-radius: var(--radius);
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    .smart-card__header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #eef2f7;
+        background: linear-gradient(180deg, #ffffff, #fafbff);
+    }
+
+    .smart-card__body {
+        padding: 1rem 1.25rem;
+    }
+
+    .icon-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+    }
+
+    .icon-green {
+        background: #16a34a;
+    }
+
+    .icon-blue {
+        background: #2563eb;
+    }
+
+    .icon-violet {
+        background: #7c3aed;
+    }
+
+    /* Bảng */
+    table thead th {
+        background: #f8fafc;
+        border-bottom: 1px solid #eef2f7 !important;
+        color: #475569;
+    }
+
+    table tbody td {
+        color: #334155;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #fbfdff;
+    }
+
+    /* Pagination */
+    .pagination-modern .page-link {
+        border: 0;
+        border-radius: 999px;
+        padding: .5rem .8rem;
+        margin: 0 .15rem;
+        background: #eef2ff;
+        color: #3730a3;
+        font-weight: 600;
+    }
+
+    .pagination-modern .page-item.active .page-link {
+        background: #4f46e5;
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(79,70,229,.25);
+    }
+
+    /* Comment card */
+    .comment-card {
+        border: 1px solid #eef2f7;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .comment-card__body {
+        padding: 1rem 1rem .5rem;
+    }
+
+    .comment-card__footer {
+        padding: .5rem 1rem .9rem;
+        border-top: 1px dashed #eef2f7;
+        background: #fcfdff;
+    }
+
+    /* Comment form */
+    .comment-form__wrap {
+        display: flex;
+        gap: .75rem;
+        align-items: center;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: .6rem .7rem;
+    }
+
+        .comment-form__wrap i {
+            color: #64748b;
+        }
+
+    .comment-form textarea {
+        border: 0;
+        background: transparent;
+        resize: none;
+        min-height: 44px;
+        max-height: 160px;
+    }
+
+        .comment-form textarea:focus {
+            box-shadow: none;
+            background: transparent;
+        }
+
+    .btn-modern {
+        border-radius: 999px;
+        padding: .55rem 1rem;
+        font-weight: 600;
+        box-shadow: 0 8px 18px rgba(37,99,235,.18);
+    }
+
+        .btn-modern .btn-inner {
+            display: inline-flex;
+            align-items: center;
+        }
+</style>
