@@ -45,6 +45,8 @@ namespace SharedModels.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.HasDefaultSchema("public");
+            modelBuilder.Entity<Level>().ToTable("Levels");
 
             // Cấu hình mối quan hệ: UserVocabularyProgress - Vocabulary
             modelBuilder.Entity<UserVocabularyProgress>()
@@ -73,10 +75,30 @@ namespace SharedModels.Models
                 .HasIndex(b => new { b.Name, b.LevelId })
                 .IsUnique();
 
+            // Baihoc - Index theo LevelId, Order (để sắp xếp)
+            modelBuilder.Entity<Baihoc>()
+            .HasIndex(b => new { b.LevelId, b.Order })
+             .IsUnique();
+
+            // Baihoc - Index theo LevelId, IsDeleted, Order
+            modelBuilder.Entity<Baihoc>()
+            .HasIndex(b => new { b.LevelId, b.IsDeleted, b.Order });
+
             // Vocabulary - Unique theo Hán tự + Lesson
             modelBuilder.Entity<Vocabulary>()
                 .HasIndex(v => new { v.HanTu, v.LessonId })
                 .IsUnique();
+
+            modelBuilder.Entity<Baihoc>()
+                .Property(b => b.Order)
+                .HasDefaultValue(1);
+
+            modelBuilder.Entity<Baihoc>()
+                .Property(b => b.IsPreview)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<Baihoc>()
+                .HasQueryFilter(b => !b.IsDeleted);
 
             // Vocabulary - Baihoc (optional để tránh lỗi khi Baihoc bị filter)
             modelBuilder.Entity<Vocabulary>()

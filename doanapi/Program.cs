@@ -14,7 +14,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("Không tìm thấy chuỗi kết nối");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString, x => x.MigrationsAssembly("doanapi"))); // đổi đúng tên assembly migrations của API
+    options.UseNpgsql(connectionString, x =>
+    {
+        x.MigrationsAssembly("doanapi"); // tên assembly chứa migrations
+        x.MigrationsHistoryTable("__EFMigrationsHistory", "public"); // lưu history ở schema public
+    })
+);
+// đổi đúng tên assembly migrations của API
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian hết hạn session, có thể thay đổi

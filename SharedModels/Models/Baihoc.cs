@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SharedModels.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 namespace SharedModels.Models
 {
@@ -25,6 +24,9 @@ namespace SharedModels.Models
         public Level Level { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [Range(1, int.MaxValue, ErrorMessage = "Order phải >= 1")]
+        public int Order { get; set; } = 1;
+        public bool IsPreview { get; set; } = false;
 
         public ICollection<Vocabulary> tuvung { get; set; } = new List<Vocabulary>();
         public List<GrammarStructure> nguphap { get; set; } = new List<GrammarStructure>();
@@ -32,7 +34,7 @@ namespace SharedModels.Models
         public ICollection<flashcards> Flashcards { get; set; } = new List<flashcards>();
         public ICollection<Diendanmodel> Diendan { get; set; } = new List<Diendanmodel>();
 
-        public Quiz ? Quiz { get; set; }
+        public Quiz? Quiz { get; set; }
 
     }
 }
