@@ -46,8 +46,8 @@ namespace doan.Areas.Admin.Controllers
 
             ModelState.Remove("Level");
             ModelState.Remove("Flashcards");
-            if (await _context.Baihoc.AnyAsync(b => b.Name == lesson.Name && b.LevelId == lesson.LevelId))
 
+            if (await _context.Baihoc.AnyAsync(b => b.Name == lesson.Name && b.LevelId == lesson.LevelId))
             {
                 ModelState.AddModelError("Name", "Tên bài học đã tồn tại.");
                 ViewBag.Levels = new SelectList(await _context.Levels.ToListAsync(), "Id", "Name", lesson.LevelId);
@@ -56,7 +56,6 @@ namespace doan.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-
                 _logger.LogWarning("ModelState không hợp lệ.");
                 ViewBag.Levels = new SelectList(await _context.Levels.ToListAsync(), "Id", "Name", lesson.LevelId);
                 return View(lesson);
@@ -64,14 +63,41 @@ namespace doan.Areas.Admin.Controllers
 
             try
             {
+                // Lấy toàn bộ Order đã dùng (kể cả bản đã xóa mềm)
+                var usedOrders = await _context.Baihoc
+                    .IgnoreQueryFilters()
+                    .Where(b => b.LevelId == lesson.LevelId)
+                    .Select(b => b.Order)
+                    .ToListAsync();
+
+                int nextOrder;
+
+                if (lesson.Order > 0)
+                {
+                    // Nếu user nhập sẵn Order và bị trùng thì tăng dần
+                    nextOrder = lesson.Order;
+                    while (usedOrders.Contains(nextOrder)) nextOrder++;
+                }
+                else
+                {
+                    // Nếu không nhập Order hoặc <= 0 thì chọn số nhỏ nhất chưa dùng
+                    nextOrder = 1;
+                    var usedSet = new HashSet<int>(usedOrders);
+                    while (usedSet.Contains(nextOrder)) nextOrder++;
+                }
+
+                lesson.Order = nextOrder;
+                lesson.CreatedAt = DateTime.UtcNow;
+
                 _context.Baihoc.Add(lesson);
                 await _context.SaveChangesAsync();
+
                 _logger.LogInformation("Bài học đã được tạo thành công.");
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Lỗi khi tạo bài học: {ex.Message}");
+                _logger.LogError(ex, "Lỗi khi tạo bài học");
                 ModelState.AddModelError("", "Có lỗi xảy ra khi lưu dữ liệu. Vui lòng thử lại.");
                 ViewBag.Levels = new SelectList(await _context.Levels.ToListAsync(), "Id", "Name", lesson.LevelId);
                 return View(lesson);

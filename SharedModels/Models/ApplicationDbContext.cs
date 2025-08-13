@@ -90,8 +90,8 @@ namespace SharedModels.Models
                 .IsUnique();
 
             modelBuilder.Entity<Baihoc>()
-                .Property(b => b.Order)
-                .HasDefaultValue(1);
+                .HasIndex(b => new { b.LevelId, b.Order })
+                .IsUnique();
 
             modelBuilder.Entity<Baihoc>()
                 .Property(b => b.IsPreview)
