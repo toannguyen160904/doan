@@ -106,69 +106,49 @@ namespace doan.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public string? role { get; set; }
-            [ValidateNever]
-            public IEnumerable<SelectListItem> RoleList { get; set; }
+            //public string? role { get; set; }
+            //[ValidateNever]
+            //public IEnumerable<SelectListItem> RoleList { get; set; }
         }
 
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!_roleManager.RoleExistsAsync(SD.Role_Customer).GetAwaiter().GetResult())
-            {
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Company)).GetAwaiter().GetResult();
-            }
-
-            Input = new()
-            {
-                RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
-                {
-                    Text = i,
-                    Value = i
-                })
-            };
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // ✅ Tạo Role nếu chưa có
+            if (!await _roleManager.RoleExistsAsync(SD.Role_Customer))
+                await _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer));
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var user = new ApplicationUser
+                {
+                    Name = Input.Name,
+                    Email = Input.Email,
+                    UserName = Input.Email
+                };
 
-                user.Name = Input.Name;
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User created.");
 
-                    if (!string.IsNullOrEmpty(Input.role))
-                    {
-                        await _userManager.AddToRoleAsync(user, Input.role);
-                    }
-                    else
-                    {
-                        await _userManager.AddToRoleAsync(user, SD.Role_Customer);
-                    }
+                    // ✅ Gán mặc định role "Customer"
+                    await _userManager.AddToRoleAsync(user, SD.Role_Customer);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    // 🔁 Điều hướng theo role
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (roles.Contains(SD.Role_Admin))
-                    {
-                        return RedirectToAction("Index", "Categories", new { area = "Admin" });
-                    }
-
                     return LocalRedirect(returnUrl);
                 }
 
@@ -178,7 +158,6 @@ namespace doan.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
 

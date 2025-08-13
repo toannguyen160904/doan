@@ -1,0 +1,106 @@
+﻿@model List<SharedModels.Models.ViewModels.UserViewModel>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    string RoleBadge(string role) => role?.ToLower() switch
+    {
+        "admin" => "badge bg-danger",
+        "employee" => "badge bg-warning text-dark",
+        "customer" => "badge bg-success",
+        _ => "badge bg-secondary"
+    };
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h2 class="mb-0 fw-bold">Quản lý quyền người dùng</h2>
+            <div class="text-muted">Gán/chuyển role cho tài khoản đã đăng ký</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="User" asp-action="Index">
+                <i class="bi bi-arrow-clockwise"></i> Tải lại
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="row g-2 mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input id="userFilter" type="text" class="form-control" placeholder="Tìm theo email, tên hoặc role...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="userTable" class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="min-width:260px">Email</th>
+                            <th style="min-width:180px">Tên</th>
+                            <th style="min-width:140px">Quyền hiện tại</th>
+                            <th style="min-width:260px" class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="fw-medium">@user.Email</td>
+                                <td>@user.Name</td>
+                                <td>
+                                    <span class="@RoleBadge(user.Role)">@user.Role</span>
+                                </td>
+                                <td class="text-end">
+                                    <form asp-area="Admin" asp-controller="User" asp-action="ChangeRole" method="post" class="d-inline-flex gap-2 align-items-center">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <select name="newRole" class="form-select form-select-sm" style="max-width: 160px;">
+                                            <option value="Admin" selected="@(string.Equals(user.Role,"Admin",StringComparison.OrdinalIgnoreCase))">Admin</option>
+                                            <option value="Employee" selected="@(string.Equals(user.Role,"Employee",StringComparison.OrdinalIgnoreCase))">Employee</option>
+                                            <option value="Customer" selected="@(string.Equals(user.Role,"Customer",StringComparison.OrdinalIgnoreCase))">Customer</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary"
+                                                onclick="return confirm('Xác nhận cập nhật quyền cho @user.Email ?');">
+                                            <i class="bi bi-check2-circle"></i> Cập nhật
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @* Thông báo TempData (nếu bạn set TempData["Success"] / ["Error"] từ Controller) *@
+            @if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+            {
+                <div class="alert alert-success mt-3 mb-0"><i class="bi bi-check-circle"></i> @ok</div>
+            }
+            @if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+            {
+                <div class="alert alert-danger mt-3 mb-0"><i class="bi bi-exclamation-triangle"></i> @err</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Lọc nhanh theo từ khóa (email/tên/role)
+        (function () {
+            const input = document.getElementById('userFilter');
+            const table = document.getElementById('userTable');
+            const rows = table?.querySelectorAll('tbody tr') || [];
+            input?.addEventListener('input', function () {
+                const q = this.value.toLowerCase().trim();
+                rows.forEach(tr => {
+                    const text = tr.innerText.toLowerCase();
+                    tr.style.display = text.includes(q) ? '' : 'none';
+                });
+            });
+        })();
+    </script>
+}

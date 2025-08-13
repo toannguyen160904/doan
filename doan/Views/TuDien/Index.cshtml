@@ -7,94 +7,166 @@
 }
 
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/css/TuDien.css" />
 </head>
 
-<div class="container mx-auto p-4 max-w-4xl">
+<div class="mx-auto max-w-5xl p-4">
 
     <!-- Header Navigation -->
-    <div class="page-header flex justify-between items-center mb-6">
-        <div class="flex items-center space-x-4">
+    <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
             <a href="/" class="text-lg font-semibold text-blue-600 flex items-center">
                 <i class="fas fa-home mr-2"></i> Trang chủ
             </a>
             <a href="/Home/ChonLevel" class="text-lg text-gray-700 hover:text-blue-600">Cấp độ</a>
             <a href="/TuDien" class="text-lg text-blue-600 font-semibold border-b-2 border-blue-600">Từ điển</a>
         </div>
+
+        <!-- Filter pills -->
+        <div class="flex flex-wrap gap-2">
+            @{
+                // Các giá trị filter giả định theo backend hiện có
+                var filters = new[] { ("TuVung", "Từ vựng") };
+            }
+            @foreach (var f in filters)
+            {
+                var isActive = string.Equals(currentFilter, f.Item1, System.StringComparison.OrdinalIgnoreCase);
+                <button type="button"
+                        class="px-3 py-1.5 rounded-full text-sm border transition
+                               @(isActive ? "bg-blue-600 text-white border-blue-600 shadow" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300")"
+                        onclick="setFilter('@f.Item1')">
+                    @f.Item2
+                </button>
+            }
+        </div>
     </div>
 
-    <!-- Search Container -->
-    <div class="search-container mb-6">
-        <form method="get" asp-action="Index">
+    <!-- Search -->
+    <div class="mb-6">
+        <form method="get" asp-action="Index" class="w-full">
             <input type="hidden" name="filter" value="@currentFilter" />
-            <div class="flex flex-col sm:flex-row items-center gap-4">
-                <div class="search-input-wrapper flex-grow relative">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text"
-                           name="searchTerm"
-                           value="@searchTerm"
-                           class="search-input"
-                           placeholder="Tìm từ vựng..." />
-                    <div class="search-actions px-2">
-                        <button type="button"><i class="fas fa-keyboard"></i></button>
-                        <button type="button"><i class="fas fa-microphone"></i></button>
-                        <button type="submit"><i class="fas fa-search"></i></button>
-                    </div>
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text"
+                       name="searchTerm"
+                       value="@searchTerm"
+                       class="w-full rounded-xl border border-gray-300 pl-10 pr-28 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                       placeholder="Tìm từ vựng, Hán tự, âm Hán, phát âm..." />
+                <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button type="button" class="px-3 py-2 rounded-lg hover:bg-gray-100" title="Bàn phím ảo (đang phát triển)">
+                        <i class="fas fa-keyboard"></i>
+                    </button>
+                    <button type="button" class="px-3 py-2 rounded-lg hover:bg-gray-100" title="Mic (đang phát triển)">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" title="Tìm kiếm">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
             </div>
         </form>
     </div>
 
     @{
-        var random = new Random();
-        var randomWords = Model.OrderBy(x => random.Next()).Take(5).ToList();
+        // Lấy ngẫu nhiên 5 từ vựng mỗi lần tải trang
+        var randomWords = Model.OrderBy(_ => Guid.NewGuid()).Take(5).ToList();
     }
-    <!-- Vocabulary List -->
-    <div class="vocabulary-list">
-        <h2 class="text-2xl font-semibold mb-4">Từ vựng </h2>
-        @if (!Model.Any())
-        {
-            <div class="no-results">
-                @if (string.IsNullOrEmpty(searchTerm))
-                {
-                    <p>Không có từ vựng nào.</p>
-                }
-                else
-                {
-                    <p>Không tìm thấy kết quả cho "@searchTerm".</p>
-                }
-            </div>
-        }
-        else
-        {
-            
-            @foreach (var word in randomWords)
-            {
-                <div class="vocab-item bg-white shadow-md rounded-lg p-4 mb-4">
-                    <div class="vocab-left flex items-center mb-3">
-                        <div class="vocab-japanese ml-4">
-                            <div class="word text-2xl font-semibold">@word.HanTu</div>
-                            @if (!string.IsNullOrEmpty(word.PhatAm))
-                            {
-                                <div class="reading text-sm text-gray-600">@word.PhatAm</div>
-                            }
-                            @if (!string.IsNullOrEmpty(word.Tuvung))
-                            {
-                                <div class="vocab-japanese ml-4 text-lg">@word.Tuvung</div>
-                            }
-                        </div>
-                    </div>
-                    <div class="vocab-meaning">
-                        <h3 class="text-xl font-semibold mb-2">Nghĩa:</h3>
-                        <p>@word.Nghia</p>
-                    </div>
-                </div>
-            }
-        }
+
+    <!-- Result header -->
+    <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-2xl font-semibold">Từ vựng nổi bật</h2>
+        <span class="text-sm text-gray-500">Hiển thị ngẫu nhiên 5 mục</span>
     </div>
 
+    <!-- Empty state -->
+    @if (!Model.Any())
+    {
+        <div class="rounded-xl border border-dashed border-gray-300 p-8 text-center">
+            @if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                <p class="text-gray-600">Chưa có dữ liệu từ vựng.</p>
+            }
+            else
+            {
+                <p class="text-gray-600">Không tìm thấy kết quả cho "<strong>@searchTerm</strong>".</p>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Cards grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @foreach (var w in randomWords)
+            {
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-start justify-between">
+                        <div class="min-w-0">
+                            <div class="text-2xl font-bold leading-tight break-words">@w.HanTu</div>
+
+                            @* @if (!string.IsNullOrWhiteSpace(w.PhatAm)) *@
+                            @* { *@
+                            @*     <div class="mt-1 text-sm text-gray-500">/@w.PhatAm/</div> *@
+                            @* } *@
+
+                            @if (!string.IsNullOrWhiteSpace(w.Tuvung))
+                            {
+                                <div class="mt-1 text-lg text-gray-800">@w.Tuvung</div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(w.AmHan))
+                            {
+                                <div class="mt-2 inline-flex items-center gap-2">
+                                    <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full border border-gray-200">Âm Hán</span>
+                                    <span class="text-sm text-gray-700">@w.AmHan</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="ml-3 shrink-0 flex flex-col items-end gap-2">
+                            <button type="button"
+                                    class="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                                    title="Sao chép từ vựng"
+                                    onclick="copyText('@(w.Tuvung ?? w.HanTu ?? w.Nghia)')">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                            <!-- Chừa chỗ audio nếu cần -->
+                            @* <button type="button" *@
+                            @*         class="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50" *@
+                            @*         title="Phát âm (đang phát triển)" *@
+                            @*         onclick="notImplemented()"> *@
+                            @*     <i class="fa-solid fa-volume-high"></i> Phát *@
+                            @* </button> *@
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="text-sm font-semibold text-gray-700 mb-1">Nghĩa</div>
+                        <p class="text-gray-800 leading-relaxed break-words">@w.Nghia</p>
+                    </div>
+
+                    @* Nếu backend đính kèm bài học *@
+                    @if (w.Lesson != null && !string.IsNullOrWhiteSpace(w.Lesson.Name))
+                    {
+                        <div class="mt-4 text-xs text-gray-500">
+                            Thuộc bài: <span class="font-medium text-gray-700">@w.Lesson.Name</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Footer actions -->
+    <div class="mt-8 flex items-center justify-center gap-3">
+        <button type="button" class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-50" onclick="window.location.reload()">
+            <i class="fa-solid fa-shuffle mr-2"></i>Tải ngẫu nhiên lại
+        </button>
+        <button type="button" class="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700" onclick="scrollToTop()">
+            <i class="fa-solid fa-arrow-up mr-2"></i>Lên đầu trang
+        </button>
+    </div>
 </div>
 
 <script src="~/js/TuDien.js"></script>

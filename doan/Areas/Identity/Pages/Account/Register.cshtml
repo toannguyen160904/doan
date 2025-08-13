@@ -67,12 +67,12 @@
                 <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <select asp-for="Input.role" asp-items="@Model.Input.RoleList" class="form-control">
-                    <option disabled selected>-Chọn vai trò-</option>
-                </select>
-                <label asp-for="Input.role">Vai trò</label>
-            </div>
+            @* <div class="form-floating mb-3"> *@
+            @*     <select asp-for="Input.role" asp-items="@Model.Input.RoleList" class="form-control"> *@
+            @*         <option disabled selected>-Chọn vai trò-</option> *@
+            @*     </select> *@
+            @*     <label asp-for="Input.role">Vai trò</label> *@
+            @* </div> *@
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng ký</button>
         </form>
 
