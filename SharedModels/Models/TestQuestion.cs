@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;          
 using System.Collections.Generic;                     
-using Microsoft.EntityFrameworkCore;                   
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace SharedModels.Models
 {
@@ -16,15 +17,21 @@ namespace SharedModels.Models
         [Required]
         public string CorrectAnswer { get; set; }
 
+        private List<string> _choices = new();
+
         [NotMapped]
-        public List<string> Choices { get; set; } = new();
+        public List<string> Choices
+        {
+            get => _choices;
+            set => _choices = value ?? new();
+        }
 
         public string ChoicesJson
         {
-            get => System.Text.Json.JsonSerializer.Serialize(Choices);
-            set => Choices = string.IsNullOrEmpty(value)
-                ? new List<string>()
-                : System.Text.Json.JsonSerializer.Deserialize<List<string>>(value);
+            get => JsonSerializer.Serialize(_choices);
+            set => _choices = string.IsNullOrWhiteSpace(value)
+                ? new()
+                : JsonSerializer.Deserialize<List<string>>(value) ?? new();
         }
 
         public string Topic { get; set; }

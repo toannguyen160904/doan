@@ -1,4 +1,4 @@
-﻿@model SharedModels.Models.TestResult
+﻿@model SharedModels.Models.ViewModels.TestResultViewModel
 
 @{
     ViewData["Title"] = "Kết quả bài kiểm tra đầu vào";
@@ -13,8 +13,7 @@
                     <h3 class="mb-0">✅ Kết quả kiểm tra đầu vào</h3>
                 </div>
                 <div class="card-body text-center">
-                    <p class="fs-5"><strong>Số câu đúng:</strong> <span class="text-primary">@Model.CorrectAnswers / 20</span></p>
-                    <p class="fs-5"><strong>Điểm tổng:</strong> <span class="text-primary">@Model.TotalScore</span></p>
+                    <p class="fs-5"><strong>Số câu đúng:</strong> <span class="text-primary">@Model.CorrectAnswers / @Model.TotalQuestions</span></p>
                     <p class="fs-5">
                         <strong>Trình độ gợi ý:</strong>
                         <span class="badge bg-primary fs-6 px-3 py-2">@Model.SuggestedLevel</span>

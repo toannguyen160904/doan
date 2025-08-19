@@ -131,31 +131,50 @@ function changeLevel(level) {
     history.pushState({}, "", "?level=" + level);
     localStorage.setItem("selectedLevel", level);
 
-    document.getElementById("loadingIcon").classList.remove("hidden");
+    // Bảo vệ nếu phần tử không tồn tại
+    const loadingIcon = document.getElementById("loadingIcon");
+    if (loadingIcon) {
+        loadingIcon.classList.remove("hidden");
+    }
 
     setTimeout(() => {
-        document.querySelectorAll(".level-section").forEach(section => {
-            section.style.display = section.getAttribute('data-level') === level ? "block" : "none";
-        });
+        const levelSections = document.querySelectorAll(".level-section");
+        if (levelSections.length > 0) {
+            levelSections.forEach(section => {
+                section.style.display = section.getAttribute('data-level') === level ? "block" : "none";
+            });
+        }
 
-        document.querySelectorAll(".grid-item").forEach(item => {
-            item.style.display = "none";
-            item.classList.remove('animate-fadeInUp');
-        });
+        const allGridItems = document.querySelectorAll(".grid-item");
+        if (allGridItems.length > 0) {
+            allGridItems.forEach(item => {
+                item.style.display = "none";
+                item.classList.remove("animate-fadeInUp");
+            });
+        }
 
-        document.querySelectorAll(`.level-${level}`).forEach((item, index) => {
+        const levelItems = document.querySelectorAll(`.level-${level}`);
+        levelItems.forEach((item, index) => {
             item.style.display = "block";
             item.style.animationDelay = (index * 0.1) + 's';
-            item.classList.add('animate-fadeInUp');
+            item.classList.add("animate-fadeInUp");
         });
 
         document.querySelectorAll(".level-btn").forEach(btn => btn.classList.remove("bg-blue-700"));
-        document.querySelector(`button[onclick="changeLevel('${level}')"]`).classList.add("bg-blue-700");
+        const levelButton = document.querySelector(`button[onclick="changeLevel('${level}')"]`);
+        if (levelButton) {
+            levelButton.classList.add("bg-blue-700");
+        }
 
         typeLevelTitle(level);
-        document.getElementById("loadingIcon").classList.add("hidden");
+
+        // Ẩn loadingIcon nếu có
+        if (loadingIcon) {
+            loadingIcon.classList.add("hidden");
+        }
     }, 300);
 }
+
 
 function typeLevelTitle(level) {
     let text = level + " - Danh sách bài học";

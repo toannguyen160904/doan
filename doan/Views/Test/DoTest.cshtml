@@ -49,7 +49,7 @@
                                 <div class="form-check-wrapper col-md-6">
                                     <input class="form-check-input"
                                            type="radio"
-                                           name="answers[@i].SelectedAnswer"
+                                           name="answers[@i].SelectedIndex"
                                            value="@j"
                                            id="Answer_@(i)_@(j)"
                                            required />
@@ -59,9 +59,12 @@
                                 </div>
                             }
                         </div>
+
+                        <!-- ✅ Hidden input for QuestionId -->
                         <input type="hidden" name="answers[@i].QuestionId" value="@question.Id" />
                     </div>
                 }
+
                 <div class="text-center mt-5">
                     <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow px-5">
                         <i class="bi bi-send-check-fill me-2"></i>Hoàn thành & Xem kết quả
@@ -121,6 +124,6 @@
 
 @section Scripts {
     <script src="~/js/test-handler.js" defer></script>
-    <script src="~/js/test-ui.js" defer></script>
+    @* <script src="~/js/test-ui.js" defer></script> *@
     <script src="~/js/test-submit.js" defer></script>
 }

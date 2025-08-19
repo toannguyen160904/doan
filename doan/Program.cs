@@ -61,9 +61,9 @@ builder.Services.AddRazorPages();
 // ===== HttpClient gọi Web API =====
 builder.Services.AddHttpClient("Api", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!); // vd: https://localhost:7191
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!); 
 });
-
+builder.Services.AddAntiforgery(o => o.HeaderName = "RequestVerificationToken");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ApiHelper>();
 

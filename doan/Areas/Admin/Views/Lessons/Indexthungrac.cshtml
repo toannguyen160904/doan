@@ -13,9 +13,11 @@
         <h4 class="text-danger fw-bold m-0">
             <i class="fa-solid fa-trash-can"></i> Thùng rác - Bài học đã xóa
         </h4>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
-        </a>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Lessons" asp-action="Indexthungrac">
+                <i class="bi bi-arrow-clockwise"></i> Tải lại
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0">

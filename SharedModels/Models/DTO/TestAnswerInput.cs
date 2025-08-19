@@ -9,6 +9,6 @@ namespace SharedModels.Models.DTO
     public class TestAnswerInput
     {
         public int QuestionId { get; set; }
-        public string? SelectedAnswer { get; set; } // nhận index (0..n) hoặc text
+        public string? SelectedIndex { get; set; } // nhận index (0..n) hoặc text
     }
 }

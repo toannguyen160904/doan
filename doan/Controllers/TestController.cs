@@ -1,11 +1,11 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedModels;                 // ApplicationDbContext
-using SharedModels.Models;          // TestQuestion, TestResult
-using DTO = SharedModels.Models.DTO; // <-- alias cho DTO
+using SharedModels.Models;          // TestQuestion
+using DTO = SharedModels.Models.DTO;
 using System.Text.Json;
+using SharedModels.Models.ViewModels;
 
 namespace doan.Controllers
 {
@@ -21,22 +21,19 @@ namespace doan.Controllers
             _context = context;
         }
 
-        // GET /Test/Start
         public IActionResult Start()
         {
             HttpContext.Session.Remove(TestSessionKey);
             return View();
         }
 
-        // GET /Test/DoTest
         public async Task<IActionResult> DoTest()
         {
             var ids = await GetOrCreateTestQuestionIdsAsync();
-
             if (ids.Count == 0)
             {
                 TempData["ErrorMessage"] = "Không có câu hỏi nào trong hệ thống.";
-                return RedirectToAction("Start");
+                return RedirectToAction(nameof(Start));
             }
 
             var questions = await _context.TestQuestions
@@ -51,27 +48,24 @@ namespace doan.Controllers
             return View(ordered);
         }
 
-        // POST /Test/Submit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Submit(List<DTO.TestAnswerInput> answers) // <-- dùng alias DTO
+        public async Task<IActionResult> Submit(List<DTO.TestAnswerInput> answers)
         {
             HttpContext.Session.Remove(TestSessionKey);
-
             var correct = await CalculateScoreAsync(answers);
             var level = DetermineLevel(correct);
 
-            var result = new TestResult
+            var vm = new TestResultViewModel
             {
                 CorrectAnswers = correct,
-                TotalScore = correct,
+                TotalQuestions = answers?.Count ?? 0,
                 SuggestedLevel = level
             };
 
-            return View("Result", result);
+            return View("Result", vm);
         }
 
-        // ===== Helpers =====
         private async Task<List<int>> GetOrCreateTestQuestionIdsAsync()
         {
             var json = HttpContext.Session.GetString(TestSessionKey);
@@ -102,58 +96,90 @@ namespace doan.Controllers
 
             foreach (var ans in answers)
             {
-                if (!map.TryGetValue(ans.QuestionId, out var q)) continue;
+                if (!map.TryGetValue(ans.QuestionId, out var q) || q == null) continue;
 
-                // 1) Selected từ client (index hoặc text)
-                string? selectedText = null;
-                int? selectedIndex = null;
+                var choices = q.Choices ?? new(); // ✅ Dùng model đã deserialize sẵn
 
-                if (int.TryParse(ans.SelectedAnswer, out var selIdx) &&
-                    selIdx >= 0 && selIdx < q.Choices.Count)
-                {
-                    selectedIndex = selIdx;
-                    selectedText = q.Choices[selIdx];
-                }
-                else
-                {
-                    selectedText = ans.SelectedAnswer?.Trim();
-                }
+                int? selectedIndex = GetSelectedIndex(ans, choices);
+                if (selectedIndex is null) continue;
 
-                // 2) Đáp án đúng trong DB (index hoặc text)
-                bool isCorrect = false;
+                int? correctIndex = NormalizeCorrectIndex(q.CorrectAnswer, choices);
+                if (correctIndex is null) continue;
 
-                // a) DB lưu index (ví dụ "2")
-                if (int.TryParse(q.CorrectAnswer, out var correctIdx))
-                {
-                    if (selectedIndex.HasValue && selectedIndex.Value == correctIdx)
-                        isCorrect = true;
-                }
-                else
-                {
-                    // b) DB lưu text
-                    var correctText = q.CorrectAnswer?.Trim();
-                    if (!string.IsNullOrEmpty(correctText) && !string.IsNullOrEmpty(selectedText) &&
-                        string.Equals(correctText, selectedText, StringComparison.OrdinalIgnoreCase))
-                    {
-                        isCorrect = true;
-                    }
-                    else if (selectedIndex.HasValue)
-                    {
-                        // fallback: so sánh theo index tính từ text đúng
-                        var idxFromText = q.Choices.FindIndex(c =>
-                            string.Equals(c?.Trim(), correctText, StringComparison.OrdinalIgnoreCase));
-                        if (idxFromText >= 0 && idxFromText == selectedIndex.Value)
-                            isCorrect = true;
-                    }
-                }
-
-                if (isCorrect) correct++;
+                if (selectedIndex.Value == correctIndex.Value) correct++;
             }
+
 
             return correct;
         }
 
-        private string DetermineLevel(int correctCount) => correctCount switch
+        private static int? GetSelectedIndex(object ans, List<string> choices)
+        {
+            var saProp = ans.GetType().GetProperty("SelectedAnswer");
+            if (saProp?.GetValue(ans) is string sa && !string.IsNullOrWhiteSpace(sa))
+            {
+                var idx = ParseIndexFromString(sa, choices);
+                if (idx != null) return idx;
+            }
+
+            var siProp = ans.GetType().GetProperty("SelectedIndex");
+            if (siProp != null)
+            {
+                var val = siProp.GetValue(ans);
+                if (val is int si && si >= 0 && si < choices.Count) return si;
+                if (val is string sis && !string.IsNullOrWhiteSpace(sis))
+                {
+                    var idx = ParseIndexFromString(sis, choices);
+                    if (idx != null) return idx;
+                }
+            }
+            return null;
+        }
+
+        private static int? ParseIndexFromString(string raw, List<string> choices)
+        {
+            raw = raw.Trim();
+
+            if (int.TryParse(raw, out var n0) && n0 >= 0 && n0 < choices.Count) return n0;
+            if (int.TryParse(raw, out var n1) && n1 >= 1 && n1 <= choices.Count) return n1 - 1;
+
+            char c = char.ToUpperInvariant(raw[0]);
+            if (c >= 'A' && c <= 'Z')
+            {
+                int idx = c - 'A';
+                if (idx >= 0 && idx < choices.Count) return idx;
+            }
+
+            var idxText = choices.FindIndex(x =>
+                string.Equals(x?.Trim(), raw, StringComparison.OrdinalIgnoreCase));
+            return idxText >= 0 ? idxText : (int?)null;
+        }
+
+        private static int? NormalizeCorrectIndex(string? correctAnswer, List<string> choices)
+        {
+            if (string.IsNullOrWhiteSpace(correctAnswer)) return null;
+            correctAnswer = correctAnswer.Trim();
+
+            if (int.TryParse(correctAnswer, out var n))
+            {
+                if (n >= 1 && n <= choices.Count) return n - 1;
+                if (n >= 0 && n < choices.Count) return n;
+                return null;
+            }
+
+            char c = char.ToUpperInvariant(correctAnswer[0]);
+            if (c >= 'A' && c <= 'Z')
+            {
+                int idx = c - 'A';
+                if (idx >= 0 && idx < choices.Count) return idx;
+            }
+
+            var idxText = choices.FindIndex(x =>
+                string.Equals(x?.Trim(), correctAnswer, StringComparison.OrdinalIgnoreCase));
+            return idxText >= 0 ? idxText : (int?)null;
+        }
+
+        private static string DetermineLevel(int correctCount) => correctCount switch
         {
             >= 15 => "N3",
             >= 8 => "N4",
