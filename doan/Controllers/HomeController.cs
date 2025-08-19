@@ -272,10 +272,21 @@ namespace doan.Controllers
 
             foreach (var level in levels)
             {
-                Console.WriteLine($"Level: {level.Name} - Số bài học: {level.Lessons?.Count ?? 0}");
+                level.Lessons = level.Lessons
+                    .OrderBy(l => ExtractLessonNumber(l.Name))
+                    .ToList();
             }
 
+
             return View(levels);
+        }
+        private int ExtractLessonNumber(string lessonName)
+        {
+            // Lấy ra số sau từ "Bài 1", "Bài 2", ...
+            if (string.IsNullOrEmpty(lessonName)) return int.MaxValue;
+
+            var parts = System.Text.RegularExpressions.Regex.Match(lessonName, @"\d+");
+            return parts.Success ? int.Parse(parts.Value) : int.MaxValue;
         }
     }
 }

@@ -2,40 +2,74 @@
 @{
     ViewData["Title"] = "Từ Đã Học";
 }
-<div class="container py-4">
-    <h2 class="mb-4 text-primary fw-semibold">✅ Danh sách từ đã học</h2>
 
-    <a asp-action="Daily" class="btn btn-outline-secondary mb-4 rounded-pill px-4">⬅️ Quay lại lộ trình hôm nay</a>
-
-    <div class="table-responsive shadow-sm rounded">
-        <table class="table table-hover align-middle">
-            <thead class="table-light text-center">
-                <tr>
-                    <th class="text-secondary">#</th>
-                    <th class="text-secondary">Từ</th>
-                    <th class="text-secondary">Nghĩa</th>
-                    <th class="text-secondary">Ngày tạo</th>
-                    <th class="text-secondary">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var word in Model)
-                {
-                    <tr class="text-center">
-                        <td class="fw-bold text-muted">@word.Id</td>
-                        <td class="fw-semibold text-dark">@word.Tuvung</td>
-                        <td class="text-secondary">@word.Nghia</td>
-                        <td class="text-secondary">@(word.CreatedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "-")</td>
-                        <td>
-                            <form asp-action="MarkUnlearned" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="VocabId" value="@word.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-3">🔄 Chưa học</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold mb-0">
+            ✅ Danh sách từ đã học
+        </h2>
+        <a asp-action="Daily" class="btn btn-outline-secondary rounded-pill px-4">
+            ⬅️ Quay lại lộ trình hôm nay
+        </a>
     </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive rounded shadow border">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Từ vựng</th>
+                        <th>Nghĩa</th>
+                        <th>Ngày học</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var word in Model)
+                    {
+                        <tr class="text-center">
+                            <td class="text-muted">@word.Id</td>
+                            <td class="fw-semibold text-primary">@word.Tuvung</td>
+                            <td class="text-dark">@word.Nghia</td>
+                            <td class="text-secondary">
+                                @(word.CreatedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "-")
+                            </td>
+                            <td>
+                                <form asp-action="MarkUnlearned" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="VocabId" value="@word.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-3">
+                                        🔄 Đánh dấu chưa học
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-5 rounded shadow-sm">
+            <i class="fa-solid fa-circle-info me-2"></i> Bạn chưa học từ nào!
+        </div>
+    }
 </div>
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+</style>
