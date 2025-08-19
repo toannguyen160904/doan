@@ -113,16 +113,20 @@
         </section>
 
         <!-- Ngữ pháp -->
+        <!-- Ngữ pháp (cuộn gọn) -->
         <section class="mb-4">
             <div class="smart-card">
-                <div class="smart-card__header">
+                <div class="smart-card__header d-flex justify-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                         <div class="icon-wrap icon-blue"><i class="fa-solid fa-pencil-ruler"></i></div>
                         <h2 class="h5 fw-bold mb-0">Ngữ pháp</h2>
                     </div>
+                    <button class="btn btn-sm btn-outline-secondary toggle-grammar-btn" type="button">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
                 </div>
 
-                <div class="smart-card__body">
+                <div class="smart-card__body grammar-section" style="display: none;">
                     @if (Model.Lesson.nguphap != null && Model.Lesson.nguphap.Any())
                     {
                         <div class="table-responsive">
@@ -130,17 +134,24 @@
                                 <thead>
                                     <tr>
                                         <th class="text-start" style="width: 25%;">Công thức</th>
-                                        <th class="text-start" style="width: 45%;">Giải thích</th>
-                                        <th class="text-start" style="width: 30%;">Ví dụ</th>
+                                        <th class="text-start" style="width: 75%;" colspan="2">Chi tiết</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var g in Model.Lesson.nguphap)
                                     {
-                                        <tr>
+                                        <tr class="grammar-toggle cursor-pointer" data-target="#grammar-detail-@g.Id">
                                             <td class="fw-semibold text-primary text-start">@g.CongThuc</td>
-                                            <td class="text-start">@g.GiaiThich</td>
-                                            <td class="text-start">@g.CauViDu</td>
+                                            <td colspan="2" class="text-muted">Nhấn để xem giải thích & ví dụ</td>
+                                        </tr>
+                                        <tr class="grammar-detail-row" id="grammar-detail-@g.Id" style="display: none;">
+                                            <td></td>
+                                            <td class="text-start" colspan="2">
+                                                <div class="p-2 border-start border-3 border-info">
+                                                    <div class="mb-1"><strong>Giải thích:</strong> @g.GiaiThich</div>
+                                                    <div><strong>Ví dụ:</strong> @g.CauViDu</div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -154,9 +165,11 @@
                             <span>Chưa có dữ liệu ngữ pháp cho bài học này.</span>
                         </div>
                     }
+
                 </div>
             </div>
         </section>
+
 
         <!-- Diễn đàn -->
         <section class="mb-5">
@@ -253,9 +266,39 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="~/js/lesson-details.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('.toggle-grammar-btn').on('click', function () {
+                const $icon = $(this).find('i');
+                const $body = $(this).closest('.smart-card').find('.grammar-section');
+                $body.slideToggle(200);
+
+                // Đổi icon giữa chevron-down và chevron-up
+                $icon.toggleClass('fa-chevron-down fa-chevron-up');
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.grammar-toggle').on('click', function () {
+                const targetId = $(this).data('target');
+                $(targetId).slideToggle(200);
+            });
+        });
+    </script>
+
 }
 
+
 <style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .grammar-toggle:hover td {
+        background-color: #f1f5f9;
+    }
+
     :root {
         --radius: 14px;
         --shadow-sm: 0 6px 16px rgba(0,0,0,.06);
