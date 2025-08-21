@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SharedModels.Models;
@@ -11,9 +12,11 @@ using SharedModels.Models;
 namespace doanapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250821082801_update")]
+    partial class update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1011,18 +1014,15 @@ namespace doanapi.Migrations
                 {
                     b.HasOne("SharedModels.Models.Baihoc", "Baihoc")
                         .WithMany("Flashcards")
-                        .HasForeignKey("BaihocId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("BaihocId");
 
                     b.HasOne("SharedModels.Models.GrammarStructure", "GrammarStructure")
                         .WithMany()
-                        .HasForeignKey("GrammarStructureId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("GrammarStructureId");
 
                     b.HasOne("SharedModels.Models.Vocabulary", "Vocabulary")
                         .WithMany()
-                        .HasForeignKey("VocabularyId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("VocabularyId");
 
                     b.Navigation("Baihoc");
 

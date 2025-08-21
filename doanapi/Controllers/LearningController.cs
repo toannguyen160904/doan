@@ -114,13 +114,26 @@ namespace doanapi.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState); // 400 cho abc, 0, null...
+
+            // ✅ Kiểm tra từ vựng có tồn tại để tránh FK 500
+            bool vocabExists = await _context.tuvung.AsNoTracking()
+                .AnyAsync(v => v.Id == request.VocabId);
+            if (!vocabExists)
+                return NotFound(new { message = "Vocabulary not found", id = request.VocabId });
+
             var nowUtc = DateTime.UtcNow;
 
             var progress = await _context.UserVocabularyProgresses
                 .FirstOrDefaultAsync(p => p.UserId == user.Id && p.VocabularyId == request.VocabId);
 
-            var plan = await _context.UserLearningPlans.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (plan == null) return BadRequest("User learning plan not found.");
+            var plan = await _context.UserLearningPlans
+                .FirstOrDefaultAsync(p => p.UserId == user.Id);
+            if (plan == null)
+                return BadRequest(new { message = "User learning plan not found" });
+
+            bool wasLearned = progress?.IsLearned == true;
 
             if (progress == null)
             {
@@ -139,29 +152,30 @@ namespace doanapi.Controllers
             {
                 progress.IsLearned = true;
                 progress.LearnedDate = nowUtc;
-
-                // Cập nhật lịch ôn dựa theo cấp độ ôn
-                switch (progress.ReviewLevel)
-                {
-                    case 0: progress.NextReviewDate = nowUtc.AddDays(1); break;
-                    case 1: progress.NextReviewDate = nowUtc.AddDays(3); break;
-                    case 2: progress.NextReviewDate = nowUtc.AddDays(7); break;
-                    default: progress.NextReviewDate = nowUtc.AddDays(14); break;
-                }
-                progress.ReviewLevel++;
+                progress.ReviewLevel = Math.Max(1, progress.ReviewLevel + 1);
+                progress.NextReviewDate = nowUtc.AddDays(1);
                 _context.UserVocabularyProgresses.Update(progress);
             }
 
-            // Tăng tiến độ nếu chưa đủ target
-            if (plan.CompletedToday < plan.DailyTarget)
+            if (!wasLearned && plan.CompletedToday < plan.DailyTarget)
             {
                 plan.CompletedToday++;
                 _context.UserLearningPlans.Update(plan);
             }
 
-            await _context.SaveChangesAsync();
-            return NoContent();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Phòng khi vẫn còn case FK khác
+                return BadRequest(new { message = "Invalid vocabId (FK)", id = request.VocabId });
+            }
+
+            return NoContent(); // 204
         }
+
 
         /// <summary>
         /// Đánh dấu từ là chưa học
@@ -202,19 +216,34 @@ namespace doanapi.Controllers
         /// Lấy danh sách tất cả từ đã học
         /// GET /api/learning/learned-words
         /// </summary>
-        [HttpGet("learned-words")]
-        public async Task<ActionResult<IEnumerable<Vocabulary>>> GetLearnedWords()
+        [HttpGet("learned")]
+        public async Task<IActionResult> GetLearned([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
-            var learnedWords = await _context.UserVocabularyProgresses
+            var query = _context.UserVocabularyProgresses
                 .Where(p => p.UserId == user.Id && p.IsLearned)
                 .Include(p => p.Vocabulary)
-                .Select(p => p.Vocabulary)
-                .ToListAsync();
+                .OrderBy(p => p.VocabularyId);
 
-            return Ok(learnedWords);
+            var total = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return Ok(new
+            {
+                page,
+                pageSize,
+                total,
+                items = items.Select(x => new {
+                    x.VocabularyId,
+                    vocabulary = new { x.Vocabulary.Id, x.Vocabulary.Tuvung, x.Vocabulary.Nghia },
+                    x.ReviewLevel,
+                    x.NextReviewDate,
+                    x.LearnedDate
+                })
+            });
         }
+
     }
 }

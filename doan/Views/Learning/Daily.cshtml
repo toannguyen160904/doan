@@ -73,7 +73,7 @@
                                 <td>
                                     <span class="badge bg-secondary status-badge">❌ Chưa học</span>
                                 </td>
-                                <td>@(item.CreatedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "Chưa có lịch")</td>
+                                <td>@(item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy") ?? "Chưa có lịch")</td>
                                 <td>
                                     <button type="button"
                                             class="btn btn-sm btn-mark-learned @(isLearned ? "btn-warning" : "btn-success")"

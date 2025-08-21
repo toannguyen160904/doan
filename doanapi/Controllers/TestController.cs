@@ -135,6 +135,41 @@ namespace doanapi.Controllers
                 SuggestedLevel = suggestedLevel
             };
         }
+        // GET /api/test/questions?count=20&level=N5
+        [HttpGet("questions")]
+        public async Task<ActionResult<IEnumerable<TestQuestionViewModel>>> GetQuestions(
+            [FromQuery] int count = 20,
+            [FromQuery] string? level = null)
+        {
+            count = Math.Clamp(count, 1, 100);
+
+            var query = _context.TestQuestions
+                .AsNoTracking()
+                .Where(q => q.IsActive);
+
+            if (!string.IsNullOrWhiteSpace(level))
+                query = query.Where(q => q.Level == level);
+
+            var questions = await query
+                .OrderBy(_ => EF.Functions.Random())
+                .Take(count)
+                .ToListAsync();
+
+            if (questions.Count == 0)
+                return NotFound("Không có câu hỏi phù hợp.");
+
+            var vm = questions.Select(q => new TestQuestionViewModel
+            {
+                Id = q.Id,
+                QuestionText = q.QuestionText,
+                Choices = string.IsNullOrWhiteSpace(q.ChoicesJson)
+                    ? new List<string>()
+                    : (JsonSerializer.Deserialize<string[]>(q.ChoicesJson)?.ToList() ?? new List<string>())
+            });
+
+            return Ok(vm);
+        }
+
         private static int? NormalizeCorrectIndex(string? correctAnswer, List<string> choices)
         {
             if (string.IsNullOrWhiteSpace(correctAnswer)) return null;

@@ -1,7 +1,6 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -76,9 +75,6 @@ namespace SharedModels.Models
                 .IsUnique();
 
             // Baihoc - Index theo LevelId, Order (để sắp xếp)
-            modelBuilder.Entity<Baihoc>()
-            .HasIndex(b => new { b.LevelId, b.Order })
-             .IsUnique();
 
             // Baihoc - Index theo LevelId, IsDeleted, Order
             modelBuilder.Entity<Baihoc>()
@@ -88,6 +84,9 @@ namespace SharedModels.Models
             modelBuilder.Entity<Vocabulary>()
                 .HasIndex(v => new { v.HanTu, v.LessonId })
                 .IsUnique();
+            modelBuilder.Entity<Vocabulary>()
+            .Property(v => v.CreatedAt)
+            .HasDefaultValueSql("now() at time zone 'utc'");
 
             modelBuilder.Entity<Baihoc>()
                 .HasIndex(b => new { b.LevelId, b.Order })
@@ -105,7 +104,7 @@ namespace SharedModels.Models
                 .HasOne(v => v.Lesson)
                 .WithMany(l => l.tuvung)
                 .HasForeignKey(v => v.LessonId)
-                .IsRequired(false); // ✅ optional
+               .OnDelete(DeleteBehavior.Cascade); // ✅ required
 
             // GrammarStructure - Baihoc (optional)
             modelBuilder.Entity<GrammarStructure>()
@@ -116,25 +115,28 @@ namespace SharedModels.Models
 
             // Flashcards - GrammarStructure (1-1, optional)
             // Quan hệ Baihoc - Flashcards
-            //modelBuilder.Entity<flashcards>()
-            //    .HasOne(f => f.Baihoc)
-            //    .WithMany(b => b.Flashcards)
-            //    .HasForeignKey(f => f.BaihocId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<flashcards>()
+                .HasOne(f => f.Baihoc)
+                .WithMany(b => b.Flashcards)
+                .HasForeignKey(f => f.BaihocId)
+                .OnDelete(DeleteBehavior.SetNull);
 
-            //// Flashcards - GrammarStructure (1-1 optional)
-            //modelBuilder.Entity<flashcards>()
-            //    .HasOne(f => f.GrammarStructure)
-            //    .WithOne()
-            //    .HasForeignKey<flashcards>(f => f.GrammarStructureId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            // Flashcards - GrammarStructure (1-1 optional)
+            modelBuilder.Entity<flashcards>()
+                .HasOne(f => f.GrammarStructure)
+                .WithMany()
+                .HasForeignKey(f => f.GrammarStructureId)
+                .OnDelete(DeleteBehavior.SetNull);
 
-            //// Flashcards - Vocabulary (1-1 optional)
-            //modelBuilder.Entity<flashcards>()
-            //    .HasOne(f => f.Vocabulary)
-            //    .WithOne()
-            //    .HasForeignKey<flashcards>(f => f.VocabularyId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            // Flashcards - Vocabulary (1-1 optional)
+            modelBuilder.Entity<flashcards>()
+                .HasOne(f => f.Vocabulary)
+                .WithMany() // không cần navigation ngược
+                .HasForeignKey(f => f.VocabularyId)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<flashcards>().HasIndex(f => f.VocabularyId);
+            modelBuilder.Entity<flashcards>().HasIndex(f => f.GrammarStructureId);
+            modelBuilder.Entity<flashcards>().HasIndex(f => f.BaihocId);
 
 
             // Baihoc - Quiz (1-1, optional)

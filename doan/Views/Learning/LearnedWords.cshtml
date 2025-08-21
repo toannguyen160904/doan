@@ -34,7 +34,7 @@
                             <td class="fw-semibold text-primary">@word.Tuvung</td>
                             <td class="text-dark">@word.Nghia</td>
                             <td class="text-secondary">
-                                @(word.CreatedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "-")
+                                @(word.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy") ?? "-")
                             </td>
                             <td>
                                 <form asp-action="MarkUnlearned" method="post" class="d-inline">
