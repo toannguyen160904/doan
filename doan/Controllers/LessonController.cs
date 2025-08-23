@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Authorization;
 public class LessonController : Controller
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly string _apiBaseUrl = "https://localhost:7191"; // Cập nhật đúng port API của bạn
+    private readonly string _apiBaseUrl ; // Cập nhật đúng port API của bạn
+    private object configuration;
 
-    public LessonController(IHttpClientFactory httpClientFactory)
+    public LessonController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
+        _apiBaseUrl = configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7191";
     }
     [HttpGet]
     public async Task<IActionResult> VocabularyPartial(int id, int page)
