@@ -44,9 +44,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 // ===== DataProtection (CHỈ KHAI BÁO 1 LẦN) =====
 // Lưu ý: MVC cũng phải cấu hình y hệt 2 dòng dưới
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
-    .SetApplicationName("DoAnIdentity");
+if (!builder.Environment.IsProduction())
+{
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(@"C:\SharedKeys")) // Local
+        .SetApplicationName("DoAnIdentity");
+}
+else
+{
+    builder.Services.AddDataProtection()
+        .SetApplicationName("DoAnIdentity"); // Railway
+}
 
 // ===== Cookie Auth (CHỈ KHAI BÁO 1 LẦN) =====
 builder.Services.ConfigureApplicationCookie(opt =>
