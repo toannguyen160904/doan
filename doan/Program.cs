@@ -94,11 +94,20 @@ authBuilder.AddGoogle(googleOptions =>
     // (tuỳ chọn) ép hiện màn hình chọn tài khoản + in ra URL để bạn kiểm tra
     googleOptions.Events.OnRedirectToAuthorizationEndpoint = context =>
     {
-        var redirect = context.RedirectUri + "&prompt=select_account";
+        var redirect = context.RedirectUri;
+
+        // 🛠 Bắt buộc chuyển sang HTTPS (Railway dùng proxy HTTPS)
+        redirect = redirect.Replace("http://", "https://");
+
+        // Optional: yêu cầu chọn tài khoản Google mỗi lần
+        redirect += "&prompt=select_account";
+
         Console.WriteLine(">>> GOOGLE RedirectUri SENT: " + redirect);
+
         context.Response.Redirect(redirect);
         return Task.CompletedTask;
     };
+
 });
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<ApplicationDbContext>()
