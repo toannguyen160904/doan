@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
 using SharedModels;
 using SharedModels.Models;
 using doan.Helpers;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequiredLength = 6;
+    options.Lockout.AllowedForNewUsers = false;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Password.RequireDigit = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
@@ -63,6 +68,32 @@ builder.Services.AddHttpClient("Api", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!); 
 });
+var authBuilder = builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+});
+
+// 1) Thêm Google vào AuthenticationBuilder
+authBuilder.AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    googleOptions.SaveTokens = true;
+
+    // luôn dùng đúng callback này
+    googleOptions.CallbackPath = "/signin-google";
+
+    // (tuỳ chọn) ép hiện màn hình chọn tài khoản + in ra URL để bạn kiểm tra
+    googleOptions.Events.OnRedirectToAuthorizationEndpoint = context =>
+    {
+        var redirect = context.RedirectUri + "&prompt=select_account";
+        Console.WriteLine(">>> GOOGLE RedirectUri SENT: " + redirect);
+        context.Response.Redirect(redirect);
+        return Task.CompletedTask;
+    };
+});
+
 builder.Services.AddAntiforgery(o => o.HeaderName = "RequestVerificationToken");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ApiHelper>();

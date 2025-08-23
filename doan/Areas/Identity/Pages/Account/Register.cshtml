@@ -5,104 +5,221 @@
 }
 
 <style>
-    .background {
-        background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    /* Layout nền đơn giản */
+    body {
+        background: #f6f7fb;
+    }
+
+    .wrap {
         min-height: 100vh;
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        padding: 24px;
     }
 
-    .card-custom {
-        border: 1px solid #dee2e6;
-        background-color: #ffffff;
-        border-radius: 8px; /* Góc bo tròn */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
-        padding: 20px;
+    /* Card tối giản */
+    .card-auth {
         width: 100%;
-        max-width: 500px; /* Giới hạn chiều rộng tối đa */
+        max-width: 760px;
+        background: #fff;
+        border: 1px solid #eceff3;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(16,24,40,.06);
+        display: grid;
+        grid-template-columns: 1fr;
+        overflow: hidden;
+    }
+    
+
+    /* Cột trái: mô tả ngắn */
+    .pane-left {
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    h1, h2, h3 {
+        .pane-left h3 {
+            font-size: 18px;
+            margin: 0 0 8px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .pane-left p {
+            margin: 0;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .pane-left .foot {
+            font-size: 12px;
+            opacity: .7;
+            margin-top: 16px;
+        }
+
+    /* Cột phải: form */
+    .pane-right {
+        padding: 24px;
+    }
+
+    .title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
         text-align: center;
     }
 
-    .form-floating {
-        margin-bottom: 1rem;
-    }
-
-    .external-login {
+    .sub {
+        margin: 6px 0 18px;
+        font-size: 13px;
+        color: #6b7280;
         text-align: center;
     }
 
-        .external-login button {
-            margin: 0.5rem;
+    /* Input nổi + bán kính nhẹ */
+    .form-floating > .form-control {
+        border-radius: 10px;
+    }
+
+    .form-floating > label {
+        color: #6b7280;
+    }
+
+    /* Ô mật khẩu với nút mắt */
+    .pw-wrap {
+        position: relative;
+    }
+
+    .pw-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 4px 6px;
+        font-size: 14px;
+    }
+
+    /* Nút chính */
+    .btn-primary {
+        background: #4f46e5;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 6px 18px rgba(79,70,229,.25);
+    }
+
+        .btn-primary:hover {
+            filter: brightness(1.03);
+        }
+
+    /* Dải phân cách */
+    .divider {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 10px;
+        color: #9ca3af;
+        font-size: 12px;
+        margin: 16px 0;
+    }
+
+        .divider::before, .divider::after {
+            content: "";
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+    /* Nút Google tối giản */
+    .btn-google {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #fff;
+        color: #111827;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 12px;
+    }
+
+        .btn-google:hover {
+            background: #fafafa;
         }
 </style>
 
-<div class="background">
-    <div class="card card-custom">
-        <h1>@ViewData["Title"]</h1>
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Tạo tài khoản mới.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Name" class="form-control" autocomplete="Name" aria-required="true" />
-                <label asp-for="Input.Name">Họ và tên</label>
-                <span asp-validation-for="Input.Name" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="mật khẩu" />
-                <label asp-for="Input.Password">Mật khẩu</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="mật khẩu" />
-                <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            @* <div class="form-floating mb-3"> *@
-            @*     <select asp-for="Input.role" asp-items="@Model.Input.RoleList" class="form-control"> *@
-            @*         <option disabled selected>-Chọn vai trò-</option> *@
-            @*     </select> *@
-            @*     <label asp-for="Input.role">Vai trò</label> *@
-            @* </div> *@
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng ký</button>
-        </form>
+<div class="wrap">
+    <div class="card-auth">
+        <!-- Trái: mô tả ngắn gọn -->
 
-        <section class="external-login mt-4">
-            <h3>Sử dụng dịch vụ khác để đăng ký.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            Không có dịch vụ xác thực bên ngoài nào được cấu hình. Xem <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
-                                bài viết
-                                về cách thiết lập ứng dụng ASP.NET này để hỗ trợ đăng nhập qua các dịch vụ bên ngoài
-                            </a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Đăng nhập bằng tài khoản @provider.DisplayName">@provider.DisplayName</button>
-                                }
-                        </div>
-                    </form>
-                }
+        <!-- Phải: form đăng ký -->
+        <section class="pane-right">
+            <h1 class="title">Tạo tài khoản</h1>
+            <div class="sub">Điền thông tin hoặc dùng Google</div>
+
+            <!-- Form local -->
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Name" class="form-control" autocomplete="name" />
+                    <label asp-for="Input.Name">Họ và tên</label>
+                    <span asp-validation-for="Input.Name" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                    <label asp-for="Input.Email">Email</label>
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3 pw-wrap">
+                    <input asp-for="Input.Password" type="password" class="form-control" autocomplete="new-password" />
+                    <label asp-for="Input.Password">Mật khẩu</label>
+                    <button type="button" class="pw-toggle" data-target="Input_Password" aria-label="Hiện/ẩn mật khẩu">👁️</button>
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3 pw-wrap">
+                    <input asp-for="Input.ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+                    <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
+                    <button type="button" class="pw-toggle" data-target="Input_ConfirmPassword" aria-label="Hiện/ẩn mật khẩu">👁️</button>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button id="registerSubmit" type="submit" class="btn btn-primary w-100">Tạo tài khoản</button>
+            </form>
+
+            <div class="divider">hoặc</div>
+
+            <!-- Google (form riêng, không lồng) -->
+            @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+            {
+                <form asp-page="./ExternalLogin" asp-route-returnUrl="~/" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" name="provider" value="Google" class="btn btn-google">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.782 32.658 29.259 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.676 6.053 29.627 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.357 16.14 18.83 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.676 6.053 29.627 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                            <path fill="#4CAF50" d="M24 44c5.176 0 9.86-1.977 13.377-5.197l-6.162-5.21C29.164 35.091 26.713 36 24 36c-5.241 0-9.748-3.317-11.289-7.946l-6.54 5.033C9.49 39.6 16.23 44 24 44z" />
+                            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-1.177 3.658-4.7 6-9.303 6-5.241 0-9.748-3.317-11.289-7.946l-6.54 5.033C9.49 39.6 16.23 44 24 44c10.493 0 19.12-8.027 19.12-20 0-1.341-.139-2.647-.409-3.917z" />
+                        </svg>
+                        <span>Đăng ký bằng Google</span>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <div class="text-center text-muted small">Chưa cấu hình dịch vụ ngoài.</div>
             }
         </section>
     </div>
@@ -110,4 +227,15 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Hiện/ẩn mật khẩu
+        document.querySelectorAll('.pw-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-target');
+                const input = document.getElementById(id);
+                if (!input) return;
+                input.type = input.type === 'password' ? 'text' : 'password';
+            });
+        });
+    </script>
 }
