@@ -1,0 +1,10 @@
+***REMOVED***
+regex:("ClientId"\s*:\s*")([^"]+)(")
+***REMOVED***
+
+regex:("ClientSecret"\s*:\s*")([^"]+)(")
+***REMOVED***
+
+***REMOVED***
+regex:(GOCSPX-[A-Za-z0-9_\-]+)
+***REMOVED***

@@ -1,0 +1,22 @@
+# Dockerfile.mvc
+# Dùng .NET 9 nếu project target net9.0; nếu bạn dùng net8.0 thì đổi 9.0 -> 8.0 ở 2 dòng FROM bên dưới.
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Copy toàn bộ source (đơn giản, ít lỗi với solution nhiều project)
+COPY . .
+
+# Restore & publish MVC project
+RUN dotnet restore doan.sln
+RUN dotnet publish doan/doan.csproj -c Release -o /out /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /out .
+ENTRYPOINT ["dotnet","doan.dll"]
