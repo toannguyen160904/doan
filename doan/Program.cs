@@ -44,17 +44,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultUI();
 
 // ===== DataProtection dùng chung key để share cookie =====
-if (!builder.Environment.IsProduction())
-{
-    builder.Services.AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo(@"C:\SharedKeys"))
-        .SetApplicationName("DoAnIdentity");
-}
-else
-{
-    builder.Services.AddDataProtection()
-        .SetApplicationName("DoAnIdentity");
-}
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
+    .SetApplicationName("DoAnIdentity");
 
 // ===== Cookie auth (chỉ gọi 1 lần) =====
 builder.Services.ConfigureApplicationCookie(opt =>
