@@ -1,5 +1,5 @@
 # ---------- Stage 1: Build ----------
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.0 AS build
 WORKDIR /src
 
 COPY ../SharedModels/ SharedModels/
