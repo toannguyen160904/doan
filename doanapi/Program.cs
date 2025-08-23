@@ -91,7 +91,9 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddRazorPages();
-
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<ApplicationDbContext>()
+    .SetApplicationName("doan-system");
 // ===== Repository =====
 builder.Services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

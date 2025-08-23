@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedModels;
+using System.Linq;
 using SharedModels.Models;
 using SharedModels.Models.DTO;
 using SharedModels.Models.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 
 namespace doanapi.Controllers;
 
@@ -139,16 +142,18 @@ public class LessonController : ControllerBase
 
         var pagedVocabularies = lesson.tuvung
             .Skip((page - 1) * vocabPageSize)
-            .Take(vocabPageSize)
+        .Take(vocabPageSize)
             .ToList();
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var learnedVocabIds = string.IsNullOrEmpty(userId)
-            ? new HashSet<int>()
-            : await _context.UserVocabularyProgresses
-                .Where(p => p.UserId == userId && p.IsLearned)
-                .Select(p => p.VocabularyId)
-                .ToHashSetAsync();
+    ?       new HashSet<int>()
+                :       (await _context.UserVocabularyProgresses
+        .Where(p => p.UserId == userId && p.IsLearned)
+        .Select(p => p.VocabularyId)
+        .ToListAsync())
+        .ToHashSet();
+
 
         var vm = new LessonDetailsViewModel
         {

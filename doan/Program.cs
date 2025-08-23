@@ -100,7 +100,9 @@ authBuilder.AddGoogle(googleOptions =>
         return Task.CompletedTask;
     };
 });
-
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<ApplicationDbContext>()
+    .SetApplicationName("doan-system");
 builder.Services.AddAntiforgery(o => o.HeaderName = "RequestVerificationToken");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ApiHelper>();

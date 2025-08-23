@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <!-- Dùng EF Identity bản 8 -->
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
 
     <!-- MVC.Core có thể giữ nguyên nếu cần; nếu bị lỗi thì gỡ -->
