@@ -2,16 +2,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY SharedModels/ SharedModels/
-COPY doanapi/ doanapi/
+COPY ../SharedModels/ SharedModels/
+COPY ./ ./   # Copy toàn bộ nội dung trong doanapi/
 
-RUN dotnet restore doanapi/doanapi.csproj
-RUN dotnet publish doanapi/doanapi.csproj -c Release -o /app/out
+RUN dotnet restore doanapi.csproj
+RUN dotnet publish doanapi.csproj -c Release -o /app/out
 
 # ---------- Stage 2: Runtime ----------
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out .
+COPY --from=build /app/out/ .
 
 ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
 ENTRYPOINT ["dotnet", "doanapi.dll"]
