@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY ../SharedModels/ SharedModels/
-COPY ./ ./   # Copy toàn bộ nội dung trong doanapi/
+COPY ./ ./   # ← tất cả bên trong doanapi/
 
 RUN dotnet restore doanapi.csproj
 RUN dotnet publish doanapi.csproj -c Release -o /app/out
