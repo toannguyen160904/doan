@@ -2,11 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ../SharedModels/ SharedModels/
-COPY ./ ./    # Copy toàn bộ project MVC
+COPY SharedModels/ SharedModels/
+COPY doan/ doan/
 
-RUN dotnet restore doan.csproj
-RUN dotnet publish doan.csproj -c Release -o /app/out
+RUN dotnet restore doan/doan.csproj
+RUN dotnet publish doan/doan.csproj -c Release -o /app/out
 
 # ---------- Stage 2: Runtime ----------
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
