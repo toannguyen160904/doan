@@ -84,44 +84,28 @@ var authBuilder = builder.Services.AddAuthentication(options =>
 });
 
 // 1) Thêm Google vào AuthenticationBuilder
-authBuilder.AddGoogle(googleOptions =>
-{
-    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    googleOptions.SaveTokens = true;
-
-    // luôn dùng đúng callback này
-    googleOptions.CallbackPath = "/signin-google";
-
-    // (tuỳ chọn) ép hiện màn hình chọn tài khoản + in ra URL để bạn kiểm tra
-    googleOptions.Events.OnRedirectToAuthorizationEndpoint = context =>
-    {
-        var redirect = context.RedirectUri;
-
-        // 🛠 Bắt buộc chuyển sang HTTPS (Railway dùng proxy HTTPS)
-        redirect = redirect.Replace("http://", "https://");
-
-        // Optional: yêu cầu chọn tài khoản Google mỗi lần
-        redirect += "&prompt=select_account";
-
-        Console.WriteLine(">>> GOOGLE RedirectUri SENT: " + redirect);
-
-        context.Response.Redirect(redirect);
-        return Task.CompletedTask;
-    };
-
-});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
 .AddCookie()
-.AddGoogle(options =>
+.AddGoogle(googleOptions =>
 {
-    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    googleOptions.SaveTokens = true;
+    googleOptions.CallbackPath = "/signin-google";
+    googleOptions.Events.OnRedirectToAuthorizationEndpoint = context =>
+    {
+        var redirect = context.RedirectUri.Replace("http://", "https://");
+        redirect += "&prompt=select_account";
+        Console.WriteLine(">>> GOOGLE RedirectUri SENT: " + redirect);
+        context.Response.Redirect(redirect);
+        return Task.CompletedTask;
+    };
 });
+
 
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<ApplicationDbContext>()
