@@ -109,7 +109,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.WebHost.UseUrls("https://0.0.0.0:" + Environment.GetEnvironmentVariable("PORT"));
+builder.WebHost.UseUrls("http://0.0.0.0:" + Environment.GetEnvironmentVariable("PORT"));
 
 var app = builder.Build();
 
