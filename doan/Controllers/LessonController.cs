@@ -14,7 +14,8 @@ public class LessonController : Controller
     public LessonController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
-        _apiBaseUrl = configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7191";
+        _apiBaseUrl = configuration["ApiSettings:BaseUrl"]
+    ?? throw new InvalidOperationException("Thiếu cấu hình ApiSettings:BaseUrl");
     }
     [HttpGet]
     public async Task<IActionResult> VocabularyPartial(int id, int page)
