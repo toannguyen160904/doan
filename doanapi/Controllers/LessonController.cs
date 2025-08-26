@@ -99,78 +99,143 @@ public class LessonController : ControllerBase
     }
 
     // GET /api/lesson/{id}  (chi tiết + phân trang vocab/comment)
+    // GET /api/lesson/{id}  (chi tiết + phân trang vocab/comment)
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<LessonDetailsViewModel>> GetDetails(int id, [FromQuery] int page = 1, [FromQuery] int commentPage = 1)
+    public async Task<ActionResult<LessonDetailsViewModel>> GetDetails(
+        int id,
+        [FromQuery] int page = 1,
+        [FromQuery] int commentPage = 1)
     {
         const int vocabPageSize = 5;
         const int commentPageSize = 4;
 
-        var lesson = await _context.Baihoc
-            .Include(l => l.Level)
-            .Include(l => l.tuvung)
-            .Include(l => l.nguphap)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == id);
+        page = Math.Max(1, page);
+        commentPage = Math.Max(1, commentPage);
 
-        if (lesson == null)
+        // 1) Lấy thông tin cơ bản của bài (không Include danh sách lớn)
+        var lessonBasic = await _context.Baihoc
+            .AsNoTracking()
+            .Where(l => l.Id == id)
+            .Select(l => new
+            {
+                Lesson = l,
+                LevelName = l.Level != null ? l.Level.Name : null
+            })
+            .FirstOrDefaultAsync();
+
+        if (lessonBasic == null)
             return NotFound(new { message = "Lesson not found", id });
 
-        var vocabIds = lesson.tuvung.Select(v => v.Id).ToList();
-        var grammarIds = lesson.nguphap.Select(g => g.Id).ToList();
-
-        var flashcards = await _context.Flashcards
-            .Include(f => f.Vocabulary)
-            .Include(f => f.GrammarStructure)
-            .Where(f =>
-                (f.VocabularyId != null && vocabIds.Contains(f.VocabularyId.Value)) ||
-                (f.GrammarStructureId != null && grammarIds.Contains(f.GrammarStructureId.Value)))
-            .Where(f => f.Vocabulary != null || f.GrammarStructure != null)
+        // 2) Lấy vocab theo trang (trực tiếp trên DB)
+        var vocabQuery = _context.tuvung
             .AsNoTracking()
+            .Where(v => v.BaiHocId == id);
+
+        var totalVocab = await vocabQuery.CountAsync();
+        var pagedVocabularies = await vocabQuery
+            .OrderBy(v => v.Id)
+            .Skip((page - 1) * vocabPageSize)
+            .Take(vocabPageSize)
             .ToListAsync();
 
-        var allComments = await _context.Diendan
-            .Include(d => d.User)
+        // 3) Lấy comment theo trang (trực tiếp trên DB)
+        var commentsQuery = _context.Diendan
+            .AsNoTracking()
             .Where(d => d.BaiHocId == id)
-            .OrderByDescending(d => d.CreatedAt)
-            .AsNoTracking()
-            .ToListAsync();
+            .OrderByDescending(d => d.CreatedAt);
 
-        var pagedComments = allComments
+        var totalComments = await commentsQuery.CountAsync();
+        var pagedComments = await commentsQuery
             .Skip((commentPage - 1) * commentPageSize)
             .Take(commentPageSize)
-            .ToList();
+            .Include(d => d.User)               // chỉ để lấy tên hiển thị
+            .AsSplitQuery()                     // tách query tránh join nặng
+            .Select(d => new Diendanmodel      // hoặc DTO nhẹ nhàng hơn
+            {
+                Id = d.Id,
+                BaiHocId = d.BaiHocId,
+                UserId = d.UserId,
+                TieuDe = d.TieuDe,
+                NoiDung = d.NoiDung,
+                CreatedAt = d.CreatedAt,
+                User = d.User == null ? null : new ApplicationUser
+                {
+                    Id = d.User.Id,
+                    Name = d.User.Name,
+                    UserName = d.User.UserName
+                }
+            })
+            .ToListAsync();
 
-        var pagedVocabularies = lesson.tuvung
-            .Skip((page - 1) * vocabPageSize)
-        .Take(vocabPageSize)
-            .ToList();
+        // 4) Lấy flashcards (KHÔNG include sâu nếu không cần)
+        var flashcards = await _context.Flashcards
+            .AsNoTracking()
+            .Where(f => f.BaihocId == id)
+            .OrderBy(f => f.Id)
+            .Select(f => new flashcards
+            {
+                Id = f.Id,
+                BaihocId = f.BaihocId,
+                VocabularyId = f.VocabularyId,
+                GrammarStructureId = f.GrammarStructureId,
+                CreatedAt = f.CreatedAt,
+                // Nếu UI cần vài field của Vocabulary/Grammar thì project tối thiểu:
+                Vocabulary = f.Vocabulary == null ? null : new tuvung
+                {
+                    Id = f.Vocabulary.Id,
+                    Tuvung = f.Vocabulary.Tuvung,
+                    Nghia = f.Vocabulary.Nghia,
+                    HanTu = f.Vocabulary.HanTu
+                },
+                GrammarStructure = f.GrammarStructure == null ? null : new nguphap
+                {
+                    Id = f.GrammarStructure.Id
+                }
+            })
+            .ToListAsync();
 
+        // 5) LearnedVocabularyIds: chỉ lọc theo vocab của bài và người dùng hiện tại
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var learnedVocabIds = string.IsNullOrEmpty(userId)
-    ?       new HashSet<int>()
-                :       (await _context.UserVocabularyProgresses
-        .Where(p => p.UserId == userId && p.IsLearned)
-        .Select(p => p.VocabularyId)
-        .ToListAsync())
-        .ToHashSet();
+        HashSet<int> learnedVocabIds = new();
 
+        if (!string.IsNullOrEmpty(userId))
+        {
+            // chỉ lấy id vocab của bài để giảm tải
+            var currentVocabIds = await _context.tuvung
+                .AsNoTracking()
+                .Where(v => v.BaiHocId == id)
+                .Select(v => v.Id)
+                .ToListAsync();
 
+            learnedVocabIds = (await _context.UserVocabularyProgresses
+                    .AsNoTracking()
+                    .Where(p => p.UserId == userId &&
+                                p.IsLearned &&
+                                currentVocabIds.Contains(p.VocabularyId))
+                    .Select(p => p.VocabularyId)
+                    .ToListAsync())
+                .ToHashSet();
+        }
+
+        // 6) Lắp vào ViewModel hiện có
         var vm = new LessonDetailsViewModel
         {
-            Lesson = lesson,
-            Flashcards = flashcards,
-            Diendan = allComments,
+            Lesson = lessonBasic.Lesson, // Lesson entity (đã NoTracking)
+            Flashcards = flashcards,      // đã tối ưu projection
+                                          // Diendan: nếu bạn chỉ cần trang hiện tại thì gán paged; nếu UI cần tất cả thì cân nhắc đổi ViewModel
+            Diendan = null,               // tránh nhét "tất cả" comment — có thể để null
             PagedVocabularies = pagedVocabularies,
             CurrentVocabularyPage = page,
-            TotalVocabularyPages = (int)Math.Ceiling((double)lesson.tuvung.Count / vocabPageSize),
+            TotalVocabularyPages = (int)Math.Ceiling((double)totalVocab / vocabPageSize),
             PagedComments = pagedComments,
             CurrentCommentPage = commentPage,
-            TotalCommentPages = (int)Math.Ceiling((double)allComments.Count / commentPageSize),
+            TotalCommentPages = (int)Math.Ceiling((double)totalComments / commentPageSize),
             LearnedVocabularyIds = learnedVocabIds
         };
 
         return Ok(vm);
     }
+
 
     // POST /api/lesson
     [HttpPost]
