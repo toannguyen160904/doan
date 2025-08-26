@@ -9,6 +9,7 @@
   <ItemGroup>
     <!-- Gói Swagger/OpenAPI -->
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 
     <!-- Entity Framework Core 8.0.6 -->
@@ -26,7 +27,6 @@
   <ItemGroup>
     <!-- Tham chiếu đến các project khác -->
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
-    <ProjectReference Include="..\doan\doan.csproj" />
   </ItemGroup>
 
 </Project>

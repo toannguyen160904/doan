@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using SharedModels;
 using SharedModels.Models;
-using doan.Repository;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         x.MigrationsHistoryTable("__EFMigrationsHistory", "public");
     })
 );
-
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = Environment.GetEnvironmentVariable("REDIS_URL");
+    options.InstanceName = "doanapi:";
+});
 // ===== Session =====
 builder.Services.AddSession(o =>
 {

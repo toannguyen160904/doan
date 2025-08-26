@@ -129,7 +129,7 @@ public class LessonController : ControllerBase
         // 2) Lấy vocab theo trang (trực tiếp trên DB)
         var vocabQuery = _context.tuvung
             .AsNoTracking()
-            .Where(v => v.BaiHocId == id);
+            .Where(v => v.LessonId == id);
 
         var totalVocab = await vocabQuery.CountAsync();
         var pagedVocabularies = await vocabQuery
@@ -180,14 +180,14 @@ public class LessonController : ControllerBase
                 GrammarStructureId = f.GrammarStructureId,
                 CreatedAt = f.CreatedAt,
                 // Nếu UI cần vài field của Vocabulary/Grammar thì project tối thiểu:
-                Vocabulary = f.Vocabulary == null ? null : new tuvung
+                Vocabulary = f.Vocabulary == null ? null : new Vocabulary
                 {
                     Id = f.Vocabulary.Id,
                     Tuvung = f.Vocabulary.Tuvung,
                     Nghia = f.Vocabulary.Nghia,
                     HanTu = f.Vocabulary.HanTu
                 },
-                GrammarStructure = f.GrammarStructure == null ? null : new nguphap
+                GrammarStructure = f.GrammarStructure == null ? null : new GrammarStructure
                 {
                     Id = f.GrammarStructure.Id
                 }
@@ -203,7 +203,7 @@ public class LessonController : ControllerBase
             // chỉ lấy id vocab của bài để giảm tải
             var currentVocabIds = await _context.tuvung
                 .AsNoTracking()
-                .Where(v => v.BaiHocId == id)
+                .Where(v => v.LessonId == id)
                 .Select(v => v.Id)
                 .ToListAsync();
 
