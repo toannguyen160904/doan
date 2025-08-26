@@ -78,7 +78,7 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "https://localhost:7080",
                 "http://localhost:5266",
-                // thêm domain MVC thật ở production nếu có, ví dụ:
+                // 👇 Sửa domain MVC production đúng của bạn tại đây:
                 "https://keen-transformation-production.up.railway.app"
             )
             .AllowAnyHeader()
@@ -86,7 +86,6 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-
 // ===== Controllers =====
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
