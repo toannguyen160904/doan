@@ -1,21 +1,27 @@
-# ---------- Stage 1: Build ----------
+# ---------- Build ----------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy dự án và SharedModels
-COPY ../SharedModels/ SharedModels/
-COPY . doanapi/
+# Copy csproj trước để cache restore
+COPY SharedModels/SharedModels.csproj SharedModels/
+COPY doanapi/doanapi.csproj doanapi/
 
-# Restore & Publish
+# Restore theo project API (tự kéo ProjectReference)
+RUN dotnet restore doanapi/doanapi.csproj
+
+# Copy toàn bộ source
+COPY SharedModels/ SharedModels/
+COPY doanapi/ doanapi/
+
+# Publish
 WORKDIR /src/doanapi
-RUN dotnet restore doanapi.csproj
 RUN dotnet publish doanapi.csproj -c Release -o /app/out /p:UseAppHost=false
 
-# ---------- Stage 2: Runtime ----------
+# ---------- Runtime ----------
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /app/out .
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
 ENV PORT=8080
-ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "doanapi.dll"]
